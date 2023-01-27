@@ -1,15 +1,24 @@
 .App {
-  text-align: center;
+  display: flex;
+  width: 100vw;
+  justify-content: center;
+}
+ 
+i, u {
+  cursor: pointer;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+i:hover {
+  color: red;
+}
+
+i.red {
+  color: red
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
-    animation: App-logo-spin infinite 20s linear;
+    animation: App-logo-spin infinite .7s linear;
   }
 }
 
