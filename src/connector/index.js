@@ -3,6 +3,13 @@
 
 const API_ENDPOINT = 'https://3bax4cg6w7.execute-api.us-east-1.amazonaws.com';
 const PHOTO_ENDPOINT = 'https://58uf2seho0.execute-api.us-east-1.amazonaws.com';
+const JAV_ENDPOINT = 'https://jhdcmv7zhi.execute-api.us-east-1.amazonaws.com';
+
+export const getVideoInfo = async (key) => {
+  const response = await fetch(JAV_ENDPOINT + `/${key?.toUpperCase()}`);
+  return await response.json();
+};
+
 
 export const getVideos = async (page) => {
   const response = await fetch(API_ENDPOINT + `/videos/${page}`);

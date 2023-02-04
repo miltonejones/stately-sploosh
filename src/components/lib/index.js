@@ -12,6 +12,7 @@ import PhotoModal, { usePhotoModal } from './PhotoModal/PhotoModal';
 import ConfirmPopover from './ConfirmPopover/ConfirmPopover';
 import Diagnostics from './Diagnostics/Diagnostics';
 import Photo, { usePhoto } from './Photo/Photo';
+import SettingsMenu from './SettingsMenu/SettingsMenu';
 
 import ModelGrid from './ModelGrid/ModelGrid';
 
@@ -19,6 +20,7 @@ import { usePagination , getPagination} from './usePagination';
 
 export {
   ConfirmPopover,
+  SettingsMenu,
   Dash,
   VideoCard,
   ModelGrid,

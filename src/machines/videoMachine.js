@@ -15,7 +15,7 @@ export const videoMachine = createMachine({
         OPEN: {
           target: "opened",
           actions:  assign({
-            video: (context, event) => event.video 
+            video: (context, event) => event.video  
           }),
         },
       },
@@ -224,7 +224,6 @@ export const videoMachine = createMachine({
             after: {
               100: [
                 {
-
                   target: 'go',
                   cond: context => context.loop_index < context.videos.length,
                   actions: assign({ 
@@ -232,7 +231,7 @@ export const videoMachine = createMachine({
                   })
                 },
                 {
-                  target: '#video_machine.refresh'
+                  target: '#video_machine.refresh', 
                 }
               ]
             }
@@ -254,21 +253,33 @@ export const videoMachine = createMachine({
       }
      }
     },
-
     refresh: {
       invoke: {
         src: 'refreshList',
         onDone: [
           {
-            target: 'opened'
+            target: '#video_machine.idle',
+            actions: assign({ 
+              videos: [],
+              open: false
+            })
           }
         ]
       }
     },
-
     opened: {
       initial: 'loading',
       states: {
+        error: {
+          on: {
+            RECOVER:  {
+              target: '#video_machine.idle',
+              actions:  assign({ 
+                open: false
+              }),
+            }
+          }
+        },
         loading: {
           invoke: {
             src: 'loadVideo',
@@ -278,7 +289,16 @@ export const videoMachine = createMachine({
                 video: (context, event) => event.data, 
                 open: true
               }),
-            }]
+            }],
+            onError: [
+              {
+                target: 'error',
+                actions:  assign({ 
+                  message: (context, event) => event.data.message,
+                  open: true
+                }),
+              }
+            ]
           }
         },
         loaded: {

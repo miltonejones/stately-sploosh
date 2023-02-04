@@ -3,7 +3,7 @@ import { AppStateContext } from "./context";
 import { VideoCard, Dash, useModelModal, ModelGrid,
   SearchDrawer, useSearchDrawer, usePhotoModal,  PhotoModal, ModelModal, VideoDrawer, 
   ShoppingDrawer, FloatingMenu, Diagnostics, getPagination,
-  useShoppingDrawer, useVideoDrawer  } from './components/lib';
+  useShoppingDrawer, useVideoDrawer , SettingsMenu } from './components/lib';
 import {useWindowManager,  VideoPersistService } from './services';
 
 import { Avatar, Box, Stack, Tooltip, Tabs, Tab, LinearProgress, Button, Pagination, TextField, Typography,styled } from '@mui/material';
@@ -165,7 +165,7 @@ function Application() {
  
   }, [send, type, page, param, location])
 
-  const { videos, search_param, tabs, view } = state.context;
+  const { videos, search_param, tabs, view, active_machine } = state.context;
   const pageSize = 30;
   const navigate = useNavigate();
   const pageCount = Math.ceil(videos?.count / pageSize); 
@@ -234,7 +234,7 @@ function Application() {
    const  busy =  ['save', 'search.loading', 'recent.loading', 'model.loading', 'video.loading', 'domain.loading' ].some(state.matches);
   const modelPageCount = Math.ceil(state.context.models?.count / 36);
   return (
-  <AppStateContext.Provider value={{ WindowManager }}>
+  <AppStateContext.Provider value={{ WindowManager, active_machine }}>
   <Flex spacing={2} sx={{p: 2, borderBottom: 1, borderColor: 'divider' }}>
  
   <i onClick={() => finder.handleClick()} className="fa-solid fa-bars"></i>
@@ -278,7 +278,16 @@ function Application() {
 {/* <i onClick={() =>  send('REFRESH')} className="fa-solid fa-rotate"></i>
 {!editor.videos?.length && <i onClick={() =>  editor.selectMode()} className={editor.multiple?"fa-solid fa-check red":"fa-solid fa-check"}></i>}
 {!!editor.videos?.length && <i onClick={() =>  editor.editMultiple()} className="fa-solid fa-pen"></i>} */}
-
+  <SettingsMenu
+    value={active_machine}
+    onChange={(value) =>
+     send({
+        type: "SET",
+        key: "active_machine",
+        value,
+      })
+    }
+  />
 
 {/* [{JSON.stringify(editor.multiple)}]
 [{editor.videos?.length}] */}
@@ -418,6 +427,9 @@ function Application() {
       {...modal} />
  <PhotoModal {...photo} />
  <ShoppingDrawer {...shop} />
+
+ <Diagnostics {...shop.diagnosticProps} />
+
         <Diagnostics 
           open={state.context.debug || state.matches('video_error')}
           id={splooshMachine.id}

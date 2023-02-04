@@ -1,7 +1,7 @@
 import React from 'react';
-import { Drawer, Stack, Avatar, Typography, Button, Box } from '@mui/material';
+import { Drawer, Stack, Avatar, Typography, Snackbar, Button, Box } from '@mui/material';
 import { useMachine } from '@xstate/react'; 
-import { ModelSelect, ConfirmPopover } from '..'
+import { ModelSelect,Diagnostics, ConfirmPopover } from '..'
 import { videoMachine } from '../../../machines';
 import { getVideo, deleteVideo, addModelToVideo, addModel, removeModelFromVideo } from '../../../connector';
 
@@ -20,7 +20,7 @@ export const useVideoDrawer = (onRefresh) => {
       },
       loadVideo:  async (context) => {
         const { video, videos } = context;
-        const { ID } = !!videos && Array.isArray(videos) ? videos[0] : video; 
+        const { ID } = !!videos && Array.isArray(videos) && videos[0] ? videos[0] : video; 
         const vid = await getVideo(ID);
         if (vid.records?.length) {
           return vid.records[0]
@@ -65,11 +65,16 @@ export const useVideoDrawer = (onRefresh) => {
     send('EDIT')
   }
   return {
+    diagnosticProps: {
+      ...videoMachine,
+      state 
+    },
     state, 
     multiple: state.matches('multiple'),
     editMultiple,
     selectMode,
     handleClose,
+    handleError: () => send('RECOVER'),
     handleDrop: () => send('REMOVE'),
     handleClick,
     castModel,
@@ -78,12 +83,27 @@ export const useVideoDrawer = (onRefresh) => {
   }
 }
  
-const VideoDrawer = ({  state, handleDrop, handleClose, loseModel, castModel, msg, open, video, videos = []}) => {
-  if (!video) return <i />
+const VideoDrawer = ({  diagnosticProps, state, handleDrop, 
+    handleClose, handleError, message, loseModel, castModel, msg, open, video, videos = []}) => {
+  if (!video) return <Diagnostics {...diagnosticProps} />
   
   // const titleTrack = videos.find(f => !!f.models.length);
 
+
+  if (state.matches('opened.error')) {
+    return <Snackbar open>
+      <Box>
+
+      Error: {message} <Button onClick={handleError}>
+        okay
+      </Button>
+      </Box>
+    </Snackbar>
+  }
+
  return (
+  <>
+  <Diagnostics {...diagnosticProps} />
    <Drawer anchor="left" onClose={handleClose} open={open} data-testid="test-for-VideoDrawer">
     <Box sx={{ borderBottom: 1, borderColor: 'divider'}}>
       <Stack direction="row" sx={{p: 1, justifyContent: 'space-between'}}>
@@ -139,6 +159,7 @@ const VideoDrawer = ({  state, handleDrop, handleClose, loseModel, castModel, ms
       </pre> */}
      </Box>
    </Drawer>
+  </>
  );
 }
 VideoDrawer.defaultProps = {};

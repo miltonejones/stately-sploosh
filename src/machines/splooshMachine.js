@@ -99,6 +99,11 @@ export const splooshMachine = createMachine({
                 page: 1, 
               }),
             },
+            SET: { 
+              actions:  assign((context, event) => ({
+                [event.key]:  event.value,  
+              })),
+            },
             CHANGE: { 
               actions:  assign({
                 search_param: (context, event) => event.value, 

@@ -1,22 +1,25 @@
-import React from 'react'; 
+import React from "react";
 import {
   styled,
   Divider,
   IconButton,
   Card,
-  Box, 
+  Box,
   Chip,
   Stack,
-  Typography 
-} from '@mui/material'; 
+  Typography,
+} from "@mui/material";
 
-const IceCream = styled(Box)(({ open }) => ({ 
-  position: 'fixed',
-  left: 20,
-  top: !open ? -400 : 80,
-  transition: 'top 0.4s linear',
-  zIndex: 400
-}))
+import { AppStateContext } from "../../../context";
+import { Flex, Nowrap } from "../../../styled";
+
+const IceCream = styled(Box)(({ open }) => ({
+  position: "fixed",
+  right: 20,
+  bottom: !open ? -400 : 80,
+  transition: "top 0.4s linear",
+  zIndex: 400,
+}));
 
 const ChipBody = ({ children }) => {
   return (
@@ -24,7 +27,7 @@ const ChipBody = ({ children }) => {
       {children}
     </Typography>
   );
-}; 
+};
 
 const TargetNode = ({ id, target, prefix }) => {
   const item = Array.isArray(target) ? target.pop() : target;
@@ -32,7 +35,7 @@ const TargetNode = ({ id, target, prefix }) => {
   if (item) {
     return (
       <ChipBody>
-        ↳ <em>{item.replace(`${id}.`, '').replace(`${prefix}.`, '')}</em>
+        ↳ <em>{item.replace(`${id}.`, "").replace(`${prefix}.`, "")}</em>
       </ChipBody>
     );
   }
@@ -53,7 +56,7 @@ const EventNode = ({ event, id, prefix, current, name, transitions }) => {
     const trans = transitions.find((t) => t.event === name);
     const transition = Array.isArray(trans) ? trans.pop() : trans;
     if (!transition?.target) {
-      if(Object.values(current).length) {
+      if (Object.values(current).length) {
         return <ChipBody>↳ {Object.values(current)[0]}</ChipBody>;
       }
       return <ChipBody>↳ {JSON.stringify(current)}</ChipBody>;
@@ -81,7 +84,7 @@ const StatusChip = ({
   if (!Object.keys(events).length) return <i />;
   return (
     <Chip
-      color={name === previous ? 'error' : 'primary'}
+      color={name === previous ? "error" : "primary"}
       label={
         <Stack>
           <Typography sx={{ lineHeight: 0.9 }} variant="subtitle2">
@@ -114,50 +117,76 @@ const Layout = styled(Box)(({ theme }) => ({
 }));
 
 const StateName = ({ state }) => {
-  if (typeof state === 'string') {
+  if (typeof state === "string") {
     return state;
   }
   if (!Object.keys(state)) return <>huh</>;
+  if (typeof Object.keys(state)[0] === "string" && 
+        typeof Object.values(state)[0] === "string") {
+    return (
+      <>
+        {Object.keys(state)[0]}.{Object.values(state)[0]}
+      </>
+    );
+  }
   return (
     <>
-      {Object.keys(state)[0]}.{Object.values(state)[0]}
+       {JSON.stringify(state)}
     </>
   );
 };
 
-const Diagnostics = ({ id, send, state, states, open, onClose, layer }) => {
+const Diagnostics = ({ id, send, state, states, error, onClose, layer }) => {
+  const [showContext, setShowContext] = React.useState(false);
   const { previous } = state.context;
   const event = getEvent(states, state);
+  const context = React.useContext(AppStateContext);
 
-  if (!event) return <>{JSON.stringify(state.value)}</>;
+  // if (!event) return <IceCream open
+  // ><Card sx={{p: 2}}>{JSON.stringify(state.value)}</Card></IceCream>;
 
-  const events = event.on;
+  const events = event?.on;
   const prefix =
-    typeof state.value === 'string' ? state.value : Object.keys(state.value)[0];
-
- 
-
+    typeof state.value === "string" ? state.value : Object.keys(state.value)[0];
+  const is = context.active_machine === id;
   return (
-    <IceCream key={id} open={!!open ? 1 : 0} >
-      <Card sx={{ mt: 2, width: 'fit-content', minWidth: 400 }}>
+    <IceCream key={id} open={is  ? 1 : 0}>
+      <Card sx={{ mt: 2, width: "fit-content", minWidth: 400 }}>
         <Layout data-testid="test-for-Diagnostics">
-          <Stack direction="row" sx={{ alignItems: 'center' }}>
-            <Typography variant="body2">
-              Machine ID: <em>"{id}"</em>  
+          <Stack direction="row" sx={{ alignItems: "center" }}>
+            <Typography color={error?"error":"text.secondary"} variant="body2">
+              Machine ID: <em>"{id}"</em>{" "}
+              <u onClick={() => setShowContext(!showContext)}>
+                {showContext ? "hide" : "show"} context
+              </u>
             </Typography>
+            {!!error && <Typography>
+              {error}
+              </Typography>}
             <Box sx={{ flexGrow: 1 }} />
             {!!onClose && (
-              <IconButton
-                onClick={onClose}
-              >
-                {' '}
-                <i class="fa-solid fa-xmark"></i>
+              <IconButton onClick={onClose}>
+                {" "}
+                <i className="fa-solid fa-xmark"></i>
               </IconButton>
             )}
           </Stack>
           <Divider sx={{ m: (t) => t.spacing(0.5, 0) }} />
+
+          {!!showContext &&
+            Object.keys(state.context).map((key) => (
+              <Flex key={key} between>
+                <Nowrap variant="body2" bold>
+                  {key}
+                </Nowrap>
+                <Nowrap variant="caption" width={300}>
+                  {JSON.stringify(state.context[key])}
+                </Nowrap>
+              </Flex>
+            ))}
+
           <Typography variant="body2">
-            Current state:{' '}
+            Current state:{" "}
             <b>
               <StateName state={state.value} />
             </b>
@@ -174,13 +203,13 @@ const Diagnostics = ({ id, send, state, states, open, onClose, layer }) => {
           )}
           <Stack>
             <Typography variant="caption">
-              Events available in{' '}
+              Events available in{" "}
               <em>
                 <StateName state={state.value} />
-              </em>{' '}
+              </em>{" "}
               state
             </Typography>
-            <Stack direction="row" sx={{ flexWrap: 'wrap' }} spacing={1}>
+            <Stack direction="row" sx={{ flexWrap: "wrap" }} spacing={1}>
               {!!events &&
                 Object.keys(events).map((key) => (
                   <StatusChip
@@ -191,7 +220,7 @@ const Diagnostics = ({ id, send, state, states, open, onClose, layer }) => {
                     previous={previous}
                     events={events}
                     current={state.value}
-                    transitions={event.transitions}
+                    transitions={event?.transitions}
                   />
                 ))}
             </Stack>
@@ -207,10 +236,7 @@ Diagnostics.defaultProps = {};
 export default Diagnostics;
 
 export const getEvent = (states, state) => {
-  return typeof state.value === 'string'
+  return typeof state.value === "string"
     ? states[state.value]
     : states[Object.keys(state.value)[0]].states[Object.values(state.value)[0]];
 };
-
-
- 

@@ -1,7 +1,9 @@
 import React from 'react';
-import { styled, Box, Avatar, Badge, Stack, Drawer, Snackbar, Button, Pagination, LinearProgress, TextField } from '@mui/material';
+import { styled, Box, Avatar, Badge, Stack, Drawer, Snackbar, 
+  Button, Pagination, LinearProgress, TextField } from '@mui/material';
 import { useMachine } from '@xstate/react';  
 import { shoppingMachine } from '../../../machines';
+import { Flex, Nowrap } from '../../../styled';
 
 import {
   // Avatar, 
@@ -11,15 +13,15 @@ import {
   CardContent, 
 } from '@mui/material';
 
-import { getPagination } from '..';
+import {  getPagination } from '..';
 
 import { getParsers,getVideosByText,getVideoByURL,getVideosByURL } from '../../../connector/parser';
 
 
 // import Observer from '../../../services/Observer';
 import dynamoStorage from '../../../services/DynamoStorage';
-import { saveVideo } from '../../../connector';
-import { ScrollingText, Photo } from '..';
+import { getVideoInfo,getModelsByName, addModelToVideo,  saveVideo } from '../../../connector';
+import { ScrollingText, Photo, ModelCard } from '..';
 import { usePhoto } from '..';
 
 
@@ -33,6 +35,63 @@ export const useShoppingDrawer = (onRefresh) => {
     services: {  
       refreshList: async () => {
         onRefresh && onRefresh()
+      },
+      
+      castModels: async (context) => {
+        const { stars_to_add, track_to_save } = context;
+        if (stars_to_add?.length) {
+          const { ID } = track_to_save;
+          const IDs = stars_to_add 
+            .map((s) => s.ID) 
+  
+      
+          if (!IDs.length) return false;
+          return Promise.all(
+            IDs.map((s) => addModelToVideo(ID, s))
+          );
+        }
+        return false;
+      },
+
+
+      loadModels: async (context) => {
+        const { stars } = context.track_info;
+        if (stars?.length) {
+          const downloaded = await Promise.all(
+            stars.map((s) => getModelsByName(s))
+          );
+          if (downloaded?.length) {
+            const list = downloaded[0].filter((star) =>
+              stars.find((name) => star.name === name)
+            );
+            return list;
+          }
+        }
+        return false;
+      },
+
+      curateVideo: async(context) => {
+        const { track_to_save } = context;
+        const { title, image } = track_to_save;
+        const key = /([a-z|A-Z]+[-\s]\d+)/.exec(title);
+        if (key) {
+          const info = await getVideoInfo(key[1]);
+          return {
+            ...info,
+            key: key[1],
+            old: title,
+            image, 
+          };
+        }  
+        return false;
+      },
+      loadByURL: async (context) => {
+        const address = context.chosen[context.save_index];
+        return await getVideoByURL(address);
+      },
+      saveVideoObject: async (context) => { 
+        const { track_to_save } = context;
+        return await saveVideo(track_to_save); 
       },
       saveByURL: async(context) => { 
         const address = context.chosen[context.save_index];
@@ -52,7 +111,11 @@ export const useShoppingDrawer = (onRefresh) => {
       searchByText: async(context)=> { 
         const currentDomain = context.selected[context.search_index] 
         const address = `https://${currentDomain}`; 
-        return await getVideosByText(address + '/', context.param);  
+        const answer = await getVideosByText(address + '/', context.param);  
+        console.log ({
+          address, answer
+        })
+        return answer;
       },
       loadParserList: async()=> {
         return await getParsers();
@@ -112,8 +175,13 @@ export const useShoppingDrawer = (onRefresh) => {
     })
   }
   const handleSave = () => send('SAVE')
+  const handleError = () => send('RECOVER')
 
   return {
+    diagnosticProps: {
+      ...shoppingMachine,
+      state 
+    },
     state, 
     setPage,
     handleClose,
@@ -124,6 +192,7 @@ export const useShoppingDrawer = (onRefresh) => {
     handleChoose,
     handleSelect,
     handleSave,
+    handleError,
     handleMode: () => send({
       type: 'MODE',
       minimal: !state.context.minimal
@@ -197,36 +266,53 @@ const Grid = styled(Box)(({ theme, }) => ({
   gridTemplateColumns:  '1fr 1fr 1fr 1fr 1fr 1fr'  
 }));
 const timeSort = (a,b) => a.CalculatedTime > b.CalculatedTime ? -1 : 1;
-const ShoppingDrawer = ({ state, results, page = 1, auto_search,  message, handleChoose, handleSelect, 
+const ShoppingDrawer = ({ latest, diagnosticProps, stars_to_add, track_to_save, state, handleError, results, page = 1, auto_search,  message, handleChoose, handleSelect, 
     handleSave, saved, chosen, setPage, progress, handleClear, handleClose, handleSearch,  handleAppend,
     param, handleChange, selected, parsers, open, busy, minimal, handleMode }) => {
   const pages = getPagination(results?.sort(timeSort), { page, pageSize: 24});
-  const saving = ['save.next','save.load'].some(state.matches);
+  const saving = ['save.next','save.load', 'save'].some(state.matches);
 
 
-  if (!!saving && !!saved) { 
-    return <Snackbar open>
-    <Card onClick={handleMode}><Stack sx={{p:2, minWidth: 360}} spacing={1}> 
-    {!minimal && <Photo backup={ERR_IMAGE} src={saved.image} alt={saved.title} style={{
+  if (!!saving && !!track_to_save) { 
+    if (state.matches('save.cast.error')) {
+      return <>
+        {message} 
+      <Button onClick={handleError}>Okay</Button>
+      </>
+    }
+    return <> 
+    <Snackbar open>
+    <Card onClick={handleMode}><Flex><Stack sx={{p:2, minWidth: 360}} spacing={1}> 
+    {!minimal && <Photo backup={ERR_IMAGE} src={track_to_save.image} alt={track_to_save.title} style={{
       width: 360,
       aspectRatio: '16 / 9',
       borderRadius: 4
     }}/>}
     <Stack direction="row" sx={{alignItems: 'center'}} spacing={1}>
-      {!!minimal && <Avatar sx={{aspectRatio:'16/9'}} variant="square" src={saved.image} />}
-    <Typography sx={{maxWidth: 360}} variant="body2">{message}</Typography> 
+      {!!minimal && <Avatar sx={{aspectRatio:'16/9'}} variant="square" src={track_to_save.image} />}
+    <Typography sx={{maxWidth: 360}} variant="body2">{message} 
+    [  {JSON.stringify(state.value)}]</Typography> 
     </Stack>
-    <Typography sx={{maxWidth: 360}} variant="caption">{saved.title}</Typography>
+    <Typography sx={{maxWidth: 360}} variant="caption">{track_to_save.title}</Typography>
+
         <LinearProgress variant={!progress ? "indeterminate" : "determinate"} value={progress} />
-  </Stack></Card>
+  </Stack>
+
+  {!!stars_to_add?.length && <Flex sx={{p: 2}}>{stars_to_add.map(star => (
+  <ModelCard key={star.ID} model={star} />
+  ))}</Flex>}
+  
+  </Flex></Card>
     </Snackbar>
+    </>
   }
 
 
   if (busy && results?.length) {
-    const result =  results.sort(timeSort)[results.length - 1];
-    if (!result) return <i />
-    return <Snackbar open>
+    const result = latest; //results[results.length - 1];
+    if (!result) return  <i />
+    return <> 
+    <Snackbar open>
       <Card onClick={handleMode}>
         <Stack  spacing={2} sx={{width: 360, p: 1}}>
         {!minimal && <PhotoCard size={360} {...result} />}
@@ -236,19 +322,25 @@ const ShoppingDrawer = ({ state, results, page = 1, auto_search,  message, handl
           {message}
           </Typography>
         </Stack>
+          {/* <Nowrap onClick={() => window.open(result.Photo)} variant="caption" sx={{maxWidth:360,overflow:'hidden'}}>
+          {result.Photo}
+          </Nowrap> */}
         </Stack>
+        {/* <pre>
+          {JSON.stringify(result,0,2)}
+        </pre> */}
         <LinearProgress variant={!progress ? "indeterminate" : "determinate"} value={progress} />
       </Card>
     </Snackbar>
+    </>
   }
 
 
  return (
+  <> 
   <Drawer anchor="left" onClose={e => handleClose()} open={open} >
-  {/* <pre>
-   {JSON.stringify({selected},0,2)}
-  </pre> */}
-
+ 
+ 
 <Box sx={{ borderBottom: 1, minWidth: 360, borderColor: 'divider'}}>
       <Stack direction="row" sx={{p: 1, justifyContent: 'space-between'}}>
       <Typography>Shop</Typography>
@@ -342,8 +434,8 @@ const ShoppingDrawer = ({ state, results, page = 1, auto_search,  message, handl
      </Stack>}
 
 
-  {JSON.stringify(state.value)}
    </Drawer>
+  </>
  );
 }
 ShoppingDrawer.defaultProps = {};

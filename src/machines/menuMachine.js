@@ -1,4 +1,5 @@
 import { createMachine, assign } from 'xstate';
+import { useMachine } from "@xstate/react";
 
 
 export const menuMachine = createMachine({
@@ -56,3 +57,43 @@ export const menuMachine = createMachine({
     },
   },
 });
+
+
+export const useMenu = (onChange) => {
+  const [state, send] = useMachine(menuMachine, {
+    services: {
+      menuClicked: async (context, event) => {
+        onChange && onChange(event.value);
+      },
+      readClipboard: async () => false
+    },
+  });
+  const { anchorEl } = state.context;
+  const handleClose = (value) => () =>
+    send({
+      type: "close",
+      value,
+    });
+  const handleClick = (event) => {
+    send({
+      type: "open",
+      anchorEl: event.currentTarget,
+    });
+  };
+
+  const diagnosticProps = {
+    id: menuMachine.id,
+    states: menuMachine.states,
+    state,
+    send,
+  };
+
+  return {
+    state,
+    send,
+    anchorEl,
+    handleClick,
+    handleClose,
+    diagnosticProps,
+  };
+};
