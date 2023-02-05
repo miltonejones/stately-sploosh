@@ -83,7 +83,7 @@ const ModelName = ({ model, onClick }) => {
     return <em onClick={onClick}>{model.Name}</em>
   }
   return <Tooltip onClick={onClick} title={<img src={model.image} alt={model.Name} style={{
-    width: 120,
+    width: 160,
     aspectRatio: '2.1 / 3'
 
   }}/>}>

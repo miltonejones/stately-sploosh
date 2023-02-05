@@ -1,6 +1,6 @@
 import React from 'react';
 import { styled, Box, Avatar, Badge, Stack, Drawer, Snackbar, 
-  Button, Pagination, LinearProgress, TextField } from '@mui/material';
+  Button, Pagination, LinearProgress, TextField, Collapse } from '@mui/material';
 import { useMachine } from '@xstate/react';  
 import { shoppingMachine } from '../../../machines';
 import { Flex, Nowrap } from '../../../styled';
@@ -72,8 +72,21 @@ export const useShoppingDrawer = (onRefresh) => {
 
       curateVideo: async(context) => {
         const { track_to_save } = context;
-        const { title, image } = track_to_save;
-        const key = /([a-z|A-Z]+[-\s]\d+)/.exec(title);
+        const { title, image, domain, URL } = track_to_save;
+
+   
+
+        const key =
+        URL.indexOf('xvideo') > 0
+            ? /\.com\/(.*)/.exec(URL)
+            : /([a-z|A-Z]+[-\s]\d+)/.exec(title);
+
+            console.log ({
+              key,
+              URL,
+              domain
+            })
+
         if (key) {
           const info = await getVideoInfo(key[1]);
           return {
@@ -290,17 +303,20 @@ const ShoppingDrawer = ({ latest, diagnosticProps, stars_to_add, track_to_save, 
     }}/>}
     <Stack direction="row" sx={{alignItems: 'center'}} spacing={1}>
       {!!minimal && <Avatar sx={{aspectRatio:'16/9'}} variant="square" src={track_to_save.image} />}
-    <Typography sx={{maxWidth: 360}} variant="body2">{message} 
-    [  {JSON.stringify(state.value)}]</Typography> 
+    <Typography sx={{maxWidth: 360}} variant="body2">{message}</Typography> 
     </Stack>
     <Typography sx={{maxWidth: 360}} variant="caption">{track_to_save.title}</Typography>
 
         <LinearProgress variant={!progress ? "indeterminate" : "determinate"} value={progress} />
   </Stack>
 
-  {!!stars_to_add?.length && <Flex sx={{p: 2}}>{stars_to_add.map(star => (
+  <Collapse orientation="horizontal" in={!!stars_to_add?.length  && !state.matches('save.curate')}>
+    {!!stars_to_add?.length && <Flex sx={{p: 2}}>{stars_to_add.map(star => (
   <ModelCard key={star.ID} model={star} />
   ))}</Flex>}
+  </Collapse>
+
+
   
   </Flex></Card>
     </Snackbar>

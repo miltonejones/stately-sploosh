@@ -15,7 +15,9 @@ export const videoMachine = createMachine({
         OPEN: {
           target: "opened",
           actions:  assign({
-            video: (context, event) => event.video  
+            video: (context, event) => event.video  ,
+            error: null,
+            stack: null
           }),
         },
       },
@@ -92,17 +94,37 @@ export const videoMachine = createMachine({
                 ]
               }
             },
-            go: {
-              invoke: {
-                src: 'dropVideo',
-                onDone: [
-                  {
+            error: {
+              after: {
+                4999: {
                   target: 'next',
                   actions: assign({
                     loop_index: context => context.loop_index + 1,
                   }),
-                } 
-              ]
+                }
+              }
+            },
+            go: {
+              invoke: {
+                src: 'dropVideo',
+                onDone: [
+                    {
+                    target: 'next',
+                    actions: assign({
+                      loop_index: context => context.loop_index + 1,
+                    }),
+                  } 
+                ],
+
+                  onError: [
+                    {
+                    target: 'error',
+                    actions: assign((context, event) => ({
+                      error: event.data.message,
+                      stack: event.data.stack
+                    })),
+                  } 
+                ]
               }
             }
           }
@@ -152,7 +174,7 @@ export const videoMachine = createMachine({
 
             {
               target: 'add',
-              cond: context => !context.videos
+              cond: context => !context.videos?.length
             },
 
             {
@@ -225,7 +247,7 @@ export const videoMachine = createMachine({
               100: [
                 {
                   target: 'go',
-                  cond: context => context.loop_index < context.videos.length,
+                  cond: context => context.videos?.length && context.loop_index < context.videos.length,
                   actions: assign({ 
                     video: context => context.videos[context.loop_index]
                   })
@@ -236,15 +258,35 @@ export const videoMachine = createMachine({
               ]
             }
           },
-          go: {
-            invoke: {
-              src: 'applyModel',
-              onDone: [
-                {
+          error: {
+            after: {
+              4999: {
                 target: 'next',
                 actions: assign({
                   loop_index: context => context.loop_index + 1,
                 }),
+              }
+            }
+          },
+          go: {
+            invoke: {
+              src: 'applyModel',
+              onDone: [
+                  {
+                  target: 'next',
+                  actions: assign({
+                    loop_index: context => context.loop_index + 1,
+                  }),
+                } 
+              ],
+
+              onError: [
+                {
+                target: 'error',
+                actions: assign( (context, event) => ({
+                  error: event.data.message,
+                  stack: event.data.stack
+                })),
               } 
             ]
             }
@@ -294,7 +336,7 @@ export const videoMachine = createMachine({
               {
                 target: 'error',
                 actions:  assign({ 
-                  message: (context, event) => event.data.message,
+                  error: (context, event) => event.data.message,
                   open: true
                 }),
               }

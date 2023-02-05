@@ -136,7 +136,8 @@ const StateName = ({ state }) => {
   );
 };
 
-const Diagnostics = ({ id, send, state, states, error, onClose, layer }) => {
+const Diagnostics = ({ id, send, state, states, error: problem, onClose, layer }) => {
+  const error = problem || state.context.error;
   const [showContext, setShowContext] = React.useState(false);
   const { previous } = state.context;
   const event = getEvent(states, state);
@@ -156,14 +157,15 @@ const Diagnostics = ({ id, send, state, states, error, onClose, layer }) => {
           <Stack direction="row" sx={{ alignItems: "center" }}>
             <Typography color={error?"error":"text.secondary"} variant="body2">
               Machine ID: <em>"{id}"</em>{" "}
-              <u onClick={() => setShowContext(!showContext)}>
+              {/* <u onClick={() => setShowContext(!showContext)}>
                 {showContext ? "hide" : "show"} context
-              </u>
+              </u> */}
             </Typography>
-            {!!error && <Typography>
-              {error}
-              </Typography>}
             <Box sx={{ flexGrow: 1 }} />
+            
+           {!!Object.keys(state.context).length && <i onClick={() => setShowContext(!showContext)} className="fa-solid fa-circle-info"></i>}
+
+
             {!!onClose && (
               <IconButton onClick={onClose}>
                 {" "}
@@ -171,19 +173,30 @@ const Diagnostics = ({ id, send, state, states, error, onClose, layer }) => {
               </IconButton>
             )}
           </Stack>
+
+          {!!error && <Typography>
+              {error}
+              </Typography>}
+          {!!state.context.stack && <Typography variant="caption">
+              {state.context.stack}
+              </Typography>}
           <Divider sx={{ m: (t) => t.spacing(0.5, 0) }} />
 
-          {!!showContext &&
-            Object.keys(state.context).map((key) => (
+          {!!showContext && (<Box>
+
+            {Object.keys(state.context).map((key) => (
               <Flex key={key} between>
                 <Nowrap variant="body2" bold>
                   {key}
                 </Nowrap>
-                <Nowrap variant="caption" width={300}>
+                <Nowrap variant="caption" onClick={() => alert(JSON.stringify(state.context[key]))} width={300}>
                   {JSON.stringify(state.context[key])}
                 </Nowrap>
               </Flex>
             ))}
+            <Divider sx={{ m: (t) => t.spacing(0.5, 0) }} />
+          </Box>)
+            }
 
           <Typography variant="body2">
             Current state:{" "}

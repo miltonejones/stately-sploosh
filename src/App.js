@@ -203,9 +203,11 @@ function Application() {
    const { windowLength } = WindowManager;
  
  
-   const floatingProps = [
+   const floatingProps = (windowLength ? [
 
-   
+    { icon: <i className="fa-solid fa-users-viewfinder" />, action:  () =>  WindowManager.focus(), name: 'Focus all windows' },
+    { icon: <i className="fa-solid fa-xmark" />, action: () =>  WindowManager.exit(), name: 'Close all windows' },
+   ] : []) .concat([ 
    
     { icon: <i className="fa-solid fa-clipboard-check"/>, action: () =>  {
       send({
@@ -225,11 +227,7 @@ function Application() {
             ? <i className="fa-solid fa-check red" />
             : <i className="fa-solid fa-check" />)
     }
-   ].concat(windowLength ? [
-
-    { icon: <i className="fa-solid fa-users-viewfinder" />, action:  () =>  WindowManager.focus(), name: 'Focus all windows' },
-    { icon: <i className="fa-solid fa-xmark" />, action: () =>  WindowManager.exit(), name: 'Close all windows' },
-   ] : [])
+   ])
 
    const  busy =  ['save', 'search.loading', 'recent.loading', 'model.loading', 'video.loading', 'domain.loading' ].some(state.matches);
   const modelPageCount = Math.ceil(state.context.models?.count / 36);
@@ -428,6 +426,7 @@ function Application() {
  <PhotoModal {...photo} />
  <ShoppingDrawer {...shop} />
 
+ <Diagnostics {...editor.diagnosticProps} />
  <Diagnostics {...shop.diagnosticProps} />
 
         <Diagnostics 

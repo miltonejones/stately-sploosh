@@ -12,6 +12,7 @@ export const shoppingMachine = createMachine(
             actions: assign({
               auto_search: (context, event) => event.value,
               page: 1,
+              stars_to_add: []
             }),
           },
         },
@@ -108,6 +109,13 @@ export const shoppingMachine = createMachine(
               ],
             },
           },
+          error: {
+            after: {
+              4999: {
+                target: "#shop_machine.idle", 
+              }
+            }
+          },
           find: {
             on: {
               MODE: {
@@ -120,6 +128,16 @@ export const shoppingMachine = createMachine(
                 {
                   target: "next",
                   actions: "assignResults",
+                },
+              ],
+              onError: [
+                {
+                  target: "error",
+                  actions: assign((context, event) => ({
+                    error: event.data.message,
+                    stack: event.data.stack,
+                    open: false
+                  })),
                 },
               ],
             },
@@ -226,6 +244,7 @@ export const shoppingMachine = createMachine(
               },
             },
           },
+          error: {},
           curate: {
             entry: assign(({
               message: context => `Looking up video details...'`
@@ -241,6 +260,15 @@ export const shoppingMachine = createMachine(
                       ...context.track_to_save,
                       title: event.data?.title || context.track_to_save.title,
                     },
+                  })),
+                },
+              ],
+              onError: [
+                {
+                  target: "error",
+                  actions: assign((context, event) => ({
+                    error: event.data.message, 
+                    stack: event.data.stack, 
                   })),
                 },
               ],
@@ -338,12 +366,13 @@ export const shoppingMachine = createMachine(
                     },
                     {
                       target: "#shop_machine.search",
-                      actions: assign({
-                        param: (context) => context.auto_search,
+                      actions: assign((context, event) => ({
+                        param: context.auto_search,
+                        selected: event.data,
                         open: true,
                         param_list: [],
                         param_index: 0,
-                      }),
+                      })),
                     },
                   ],
                 },

@@ -103,7 +103,6 @@ const VideoDrawer = ({  diagnosticProps, state, handleDrop,
 
  return (
   <>
-  <Diagnostics {...diagnosticProps} />
    <Drawer anchor="left" onClose={handleClose} open={open} data-testid="test-for-VideoDrawer">
     <Box sx={{ borderBottom: 1, borderColor: 'divider'}}>
       <Stack direction="row" sx={{p: 1, justifyContent: 'space-between'}}>
