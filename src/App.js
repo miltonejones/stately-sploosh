@@ -232,7 +232,7 @@ function Application() {
    const  busy =  ['save', 'search.loading', 'recent.loading', 'model.loading', 'video.loading', 'domain.loading' ].some(state.matches);
   const modelPageCount = Math.ceil(state.context.models?.count / 36);
   return (
-  <AppStateContext.Provider value={{ WindowManager, active_machine }}>
+  <AppStateContext.Provider value={{ WindowManager, active_machine, floatingProps }}>
   <Flex spacing={2} sx={{p: 2, borderBottom: 1, borderColor: 'divider' }}>
  
   <i onClick={() => finder.handleClick()} className="fa-solid fa-bars"></i>
@@ -414,7 +414,7 @@ function Application() {
     )}
       </Stack>}
     </div>
-    <FloatingMenu actions={floatingProps}/>
+    <FloatingMenu fixed />
     <VideoDrawer {...editor} />
     <SearchDrawer {...finder}/>
  <ModelModal  

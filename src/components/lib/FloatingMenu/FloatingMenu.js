@@ -3,6 +3,7 @@ import { styled, Box } from '@mui/material';
 import SpeedDial from '@mui/material/SpeedDial';
 import SpeedDialIcon from '@mui/material/SpeedDialIcon';
 import SpeedDialAction from '@mui/material/SpeedDialAction';
+import { AppStateContext } from "../../../context";
 // import FileCopyIcon from '@mui/icons-material/FileCopyOutlined';
 // import SaveIcon from '@mui/icons-material/Save';
 // import PrintIcon from '@mui/icons-material/Print';
@@ -23,21 +24,22 @@ import SpeedDialAction from '@mui/material/SpeedDialAction';
 //   { icon: <i className="fa-solid fa-rotate" />, name: 'Share' },
 // ];
 
-const Layout = styled(Box)(({ theme }) => ({
+const Layout = styled(Box)(({ theme, fixed }) => ({
   height: 320, 
   transform: 'translateZ(0px)', 
   flexGrow: 1,
-  position: 'fixed',
+  position: fixed ? "fixed" : 'absolute',
   bottom: 50,
   right: 50
 }));
  
-const FloatingMenu = ({ actions }) => {
+const FloatingMenu = ({ fixed }) => {
+  const { floatingProps: actions } = React.useContext(AppStateContext) 
  return (
-  <Layout>
+  <Layout fixed={fixed}>
   <SpeedDial
     ariaLabel="SpeedDial basic example"
-    sx={{ position: 'absolute', bottom: 16, right: 16 }}
+    sx=  {{ position: 'absolute', bottom: 16, right: 16 }}
     icon={<SpeedDialIcon />}
   >
     {actions.map((action) => (

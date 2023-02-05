@@ -3,7 +3,7 @@ import { styled, Avatar, Chip,  LinearProgress, Box, TextField, Pagination, Dial
 import { useMachine } from '@xstate/react'; 
 import { modelMachine } from '../../../machines';
 import { getModel, getModelCostars, addModelAlias, updateModelPhoto, addModelToVideo, getModelMissingVideos } from '../../../connector';
-import { VideoCard, ModelSelect, ModelCard} from '..';
+import { VideoCard, ModelSelect, FloatingMenu, ModelCard} from '..';
 import { ModelMenu } from '..';
 import { IconTextField } from '../../../styled';
 import { Flex } from '../../../styled';
@@ -165,7 +165,7 @@ const ModelModal = ({ open, agent, state, tab: tabnum, memory, missing, selected
  return (
    <Dialog maxWidth="md" open={open} onClose={handleClose}>
      
-    <Stack spacing={1} sx={{p: 2, minHeight: 500}}> 
+    <Stack spacing={1} sx={{p: 2, minHeight: 500, position: 'relative'}}> 
       <Stack direction="row" spacing={1} sx={{pr: 2}}>
         <ModelMenu onChange={handleModelMenu} models={photoOpts}
           clipText="Copy image from clipboard"
@@ -292,6 +292,7 @@ const ModelModal = ({ open, agent, state, tab: tabnum, memory, missing, selected
      </>}
 
 
+     <FloatingMenu />
     </Stack>
    </Dialog>
  );

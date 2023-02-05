@@ -135,8 +135,7 @@ export const shoppingMachine = createMachine(
                   target: "error",
                   actions: assign((context, event) => ({
                     error: event.data.message,
-                    stack: event.data.stack,
-                    open: false
+                    stack: event.data.stack,  
                   })),
                 },
               ],
@@ -175,7 +174,7 @@ export const shoppingMachine = createMachine(
               onDone: [
                 {
                   target: "next",
-                  cond: (context) => !context.track_info?.stars,
+                  cond: (context, event) => !context.track_info?.stars,
                   actions: "incrementSave"
                 },
                 {
@@ -214,16 +213,57 @@ export const shoppingMachine = createMachine(
                 },
               },
               error: {
-                after: {
-                  5555: {
+
+                initial: 'start',
+                states: {
+                  start: {
+                    after: {
+                      1: {
+                        target: 'count',
+                        actions: assign({
+                          counter: 0
+                        })
+                      }
+                    }
+                  },
+                  count: {
+                    after: {
+                      100: [
+                        {
+                          target: 'count',
+                          cond: context => context.counter < 7999,
+                          actions: assign({
+                            counter: context => context.counter + 100
+                          })
+                        },
+                        {
+                          target: 'done'
+                        }
+                      ]
+                    }
+                  },
+                  done: {
                     target: "#shop_machine.save.next",
                     actions: "incrementSave"
                   }
                 },
+ 
                 on: {
                   RECOVER: {
                     target: "#shop_machine.save.next",
                     actions: "incrementSave"
+                  },
+                  RETRY: {
+                    target: "#shop_machine.save.next", 
+                  }
+                }
+              },
+
+
+              pause: {
+                after: { 
+                  1999: {
+                    target: "#shop_machine.save.next",
                   }
                 }
               },
@@ -231,7 +271,7 @@ export const shoppingMachine = createMachine(
                 invoke: {
                   src: "castModels",
                   onDone: {
-                    target: "#shop_machine.save.next",
+                    target: "pause",
                     actions: "incrementSave"
                   },
                   onError: {
@@ -244,7 +284,9 @@ export const shoppingMachine = createMachine(
               },
             },
           },
-          error: {},
+          error: {
+
+          },
           curate: {
             entry: assign(({
               message: context => `Looking up video details...'`
@@ -432,6 +474,7 @@ export const shoppingMachine = createMachine(
                 target: "#shop_machine.idle",
                 actions: assign({
                   open: false,
+                  param: ''
                 }),
               },
             },
@@ -461,15 +504,16 @@ export const shoppingMachine = createMachine(
         const addresses = !pages
           ? null
           : pages.map(dressAddress(currentDomain));
-        const trimmed = videos?.filter(f => !context.results?.find(v => !!v && !!f && v.URL === f.URL))
-        const results = context.results.filter(f => !videos?.find(v => !!v && !!f && v.URL === f.URL))
-        console.log ({
-          videos,
-          trimmed
-        })
+        // const trimmed = videos?.filter(f => !context.results?.find(v => !!v && !!f && v.URL === f.URL))
+        // const results = context.results.filter(f => !videos?.find(v => !!v && !!f && v.URL === f.URL))
+        // console.log ({
+        //   videos,
+        //   trimmed
+        // })
         return {
-          latest: trimmed[0] || context.latest,
-          results: results.concat(videos),
+          latest: videos[0] || context.latest,
+          results: combine(videos, context.results), // results.concat(trimmed),
+          
           message: `Searching ${currentDomain}. ${context.results.length} matches for "${context.param}"...`,
           addresses,
           page_index: 0,
@@ -484,10 +528,10 @@ export const shoppingMachine = createMachine(
         return event;
       }),
 
-      assignPage: assign((context, event) => {
+      assignPage: assign((context, event) => {  
         return {
           latest: event.data[0] || context.latest,
-          results: context.results.concat(event.data),
+          results: combine(event.data, context.results),
           message: `Searching ${context.currentDomain}. ${context.results.length} matches for "${context.param}"...`,
           page_index: context.page_index + 1,
         };
@@ -495,6 +539,18 @@ export const shoppingMachine = createMachine(
     },
   }
 );
+
+const combine = (source, destination) => {
+  const trimmed = source?.filter(src => !destination?.find(dest => !!dest && !!src && dest.URL === src.URL));
+  const combined = destination.concat(trimmed);
+  const timed = combined.filter(file => !file.CalculatedTime || file.CalculatedTime > 599);
+  console.log ({
+    combined,
+    timed
+  })
+  return timed;
+}
+
 
 const dressAddress = (domain) => (p) => {
   const address = p[0].indexOf("://") > 0 ? p[0] : `https://${domain}${p[0]}`;

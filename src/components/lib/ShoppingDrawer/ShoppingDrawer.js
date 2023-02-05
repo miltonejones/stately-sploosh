@@ -43,6 +43,10 @@ export const useShoppingDrawer = (onRefresh) => {
           const { ID } = track_to_save;
           const IDs = stars_to_add 
             .map((s) => s.ID) 
+
+          if (isNaN(ID)) {
+            return false
+          }
   
       
           if (!IDs.length) return false;
@@ -55,16 +59,33 @@ export const useShoppingDrawer = (onRefresh) => {
 
 
       loadModels: async (context) => {
-        const { stars } = context.track_info;
+        const { track_to_save, track_info } = context;
+        const { title } = track_to_save;
+        const { stars } = track_info;
         if (stars?.length) {
+          const wanted = stars.filter(f => !title.toLowerCase().indexOf(f.toLowerCase()) > -1);
+
+          if (!wanted?.length) {
+            return false;
+          }
+
           const downloaded = await Promise.all(
-            stars.map((s) => getModelsByName(s))
+            wanted.map((s) => getModelsByName(s))
           );
+
           if (downloaded?.length) {
-            const list = downloaded[0].filter((star) =>
-              stars.find((name) => star.name === name)
-            );
-            return list;
+            const list = downloaded.filter((star) => {
+              const model = stars.find((name) => !!star[0] && star[0].name === name);
+              if (model) return model[0]
+            } 
+            ).filter(f => !!f);
+
+            console.log ({
+              stars,
+              downloaded,
+              list: list.map(f => Array.isArray(f) ? f[0] : f)
+            })
+            return list.map(f => Array.isArray(f) ? f[0] : f);
           }
         }
         return false;
@@ -81,11 +102,11 @@ export const useShoppingDrawer = (onRefresh) => {
             ? /\.com\/(.*)/.exec(URL)
             : /([a-z|A-Z]+[-\s]\d+)/.exec(title);
 
-            console.log ({
-              key,
-              URL,
-              domain
-            })
+            // console.log ({
+            //   key,
+            //   URL,
+            //   domain
+            // })
 
         if (key) {
           const info = await getVideoInfo(key[1]);
@@ -206,6 +227,7 @@ export const useShoppingDrawer = (onRefresh) => {
     handleSelect,
     handleSave,
     handleError,
+    handleRetry: () => send('RETRY'),
     handleMode: () => send({
       type: 'MODE',
       minimal: !state.context.minimal
@@ -279,7 +301,7 @@ const Grid = styled(Box)(({ theme, }) => ({
   gridTemplateColumns:  '1fr 1fr 1fr 1fr 1fr 1fr'  
 }));
 const timeSort = (a,b) => a.CalculatedTime > b.CalculatedTime ? -1 : 1;
-const ShoppingDrawer = ({ latest, diagnosticProps, stars_to_add, track_to_save, state, handleError, results, page = 1, auto_search,  message, handleChoose, handleSelect, 
+const ShoppingDrawer = ({ counter, handleRetry, latest, diagnosticProps, stars_to_add, track_to_save, state, handleError, results, page = 1, auto_search,  message, handleChoose, handleSelect, 
     handleSave, saved, chosen, setPage, progress, handleClear, handleClose, handleSearch,  handleAppend,
     param, handleChange, selected, parsers, open, busy, minimal, handleMode }) => {
   const pages = getPagination(results?.sort(timeSort), { page, pageSize: 24});
@@ -287,12 +309,9 @@ const ShoppingDrawer = ({ latest, diagnosticProps, stars_to_add, track_to_save, 
 
 
   if (!!saving && !!track_to_save) { 
-    if (state.matches('save.cast.error')) {
-      return <>
-        {message} 
-      <Button onClick={handleError}>Okay</Button>
-      </>
-    }
+
+
+   
     return <> 
     <Snackbar open>
     <Card onClick={handleMode}><Flex><Stack sx={{p:2, minWidth: 360}} spacing={1}> 
@@ -307,11 +326,23 @@ const ShoppingDrawer = ({ latest, diagnosticProps, stars_to_add, track_to_save, 
     </Stack>
     <Typography sx={{maxWidth: 360}} variant="caption">{track_to_save.title}</Typography>
 
+    {state.matches('save.cast.error') && (
+      <Stack>
+      <Nowrap muted>There was an error processing this request [{counter}]</Nowrap>
+      <Nowrap width={360} >{message} </Nowrap>
+      <Flex spacing={2}>
+        <Button onClick={handleRetry}>Retry</Button>
+        <Button variant="contained" onClick={handleError}>Next</Button>
+      </Flex>
+      </Stack>
+    )}
+
+
         <LinearProgress variant={!progress ? "indeterminate" : "determinate"} value={progress} />
   </Stack>
 
-  <Collapse orientation="horizontal" in={!!stars_to_add?.length  && !state.matches('save.curate')}>
-    {!!stars_to_add?.length && <Flex sx={{p: 2}}>{stars_to_add.map(star => (
+  <Collapse orientation="horizontal" in={!!stars_to_add?.length  && state.matches('save.cast.pause')}>
+    {!!stars_to_add?.length && <Flex spacing={2} sx={{p: 2}}>{stars_to_add.map(star => (
   <ModelCard key={star.ID} model={star} />
   ))}</Flex>}
   </Collapse>
