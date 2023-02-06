@@ -9,13 +9,14 @@ const SettingsMenu = ({ value, onChange }) => {
   const machines = {
     sploosh_machine: "Application",
     shop_machine: "Shopping Drawer",
-    video_machine: "Video Drawer", 
+    photo_modal: "Photo Drawer",
+    video_machine: "Video Drawer",
   };
 
   return (
     <>
       <i onClick={menu.handleClick} class="fa-solid fa-gear"></i>
- 
+
       <Drawer
         anchor="right"
         open={menu.state.matches("opened")}

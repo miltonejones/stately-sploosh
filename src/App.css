@@ -3,8 +3,16 @@
   width: 100vw;
   justify-content: center;
 }
- 
-i, u {
+
+body {
+  box-sizing: border-box;
+  margin: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+i,
+u {
   cursor: pointer;
 }
 
@@ -13,12 +21,12 @@ i:hover {
 }
 
 i.red {
-  color: red
+  color: red;
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
-    animation: App-logo-spin infinite .7s linear;
+    animation: App-logo-spin infinite 0.7s linear;
   }
 }
 

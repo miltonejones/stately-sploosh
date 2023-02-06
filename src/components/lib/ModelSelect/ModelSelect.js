@@ -1,62 +1,69 @@
-import React from 'react';
-import { styled, Autocomplete, Avatar, TextField, Box } from '@mui/material';
-import throttle from 'lodash/throttle';
-import { getModelsByName, addModel } from '../../../connector';
- 
- 
+import React from "react";
+import { styled, Autocomplete, Avatar, TextField, Box } from "@mui/material";
+import throttle from "lodash/throttle";
+import { getModelsByName } from "../../../connector";
+
 const Layout = styled(Box)(({ theme }) => ({
- margin: theme.spacing(0)
+  margin: theme.spacing(0),
 }));
- 
+
 const ModelSelect = (props) => {
   const { onValueSelected } = props;
 
-  const onSelected = async (option)  => {
-    if (option.value) {
-      const { insertId } = await addModel(option.value);
-      onValueSelected && onValueSelected({
-        name: option.value,
-        ID:  insertId
-      });
-      return;
-    }
-    onValueSelected && onValueSelected(option)
-  }
+  // const onSelected = async (option)  => {
+  //   if (option.value) {
+  //     const { insertId } = await addModel(option.value);
+  //     onValueSelected && onValueSelected({
+  //       name: option.value,
+  //       ID:  insertId
+  //     });
+  //     return;
+  //   }
+  //   onValueSelected && onValueSelected(option)
+  // }
 
-  const onValueChanged = async ({ value })  =>  {
+  const onValueChanged = async ({ value }) => {
     if (!value?.length) return;
-    const opts =  await getModelsByName(value);
-    setOptions([{
-      name: `Create new model named "${value}"`,
-      value,
-      create: 1
-    }].concat(opts));
+    const opts = await getModelsByName(value);
+    setOptions(
+      [
+        {
+          name: `Create new model named "${value}"`,
+          value,
+          create: 1,
+        },
+      ].concat(opts)
+    );
     // setOptions(opts);
     // console.log(opts)
-  }
-  const [value] = React.useState('');
-  const [inputValue, setInputValue] = React.useState('');
-  const [options, setOptions] = React.useState( []);
+  };
+  const [value] = React.useState("");
+  const [inputValue, setInputValue] = React.useState("");
+  const [options, setOptions] = React.useState([]);
 
   const renderOption = (props, option) => {
-    if (option.image) return <Box {...props}
-      ><Avatar sx={{mr: 1}} src={option.image} alt={option.name}/>{option.name}</Box>
-    return <Box {...props}>{option.name}</Box> 
-  }
+    if (option.image)
+      return (
+        <Box {...props}>
+          <Avatar sx={{ mr: 1 }} src={option.image} alt={option.name} />
+          {option.name}
+        </Box>
+      );
+    return <Box {...props}>{option.name}</Box>;
+  };
 
   const fetch = React.useMemo(
     () =>
       throttle((request, callback) => {
-        onValueChanged && onValueChanged( request);
+        onValueChanged && onValueChanged(request);
       }, 1000),
-    [],
+    []
   );
- 
+
   React.useEffect(() => {
     let active = true;
- 
- 
-    if (inputValue === '') {
+
+    if (inputValue === "") {
       setOptions(value ? [value] : []);
       return undefined;
     }
@@ -73,10 +80,14 @@ const ModelSelect = (props) => {
           newOptions = [...newOptions, ...results];
         }
 
-        setOptions([{
-          name: `Create new model named ${inputValue}`,
-          create: 1
-        }].concat(newOptions));
+        setOptions(
+          [
+            {
+              name: `Create new model named ${inputValue}`,
+              create: 1,
+            },
+          ].concat(newOptions)
+        );
       }
     });
 
@@ -85,28 +96,32 @@ const ModelSelect = (props) => {
     };
   }, [value, inputValue, fetch]);
 
-
- 
- return (
-   <Layout data-testid="test-for-ModelSelect">
-    <Autocomplete
-          sx={{minWidth: 300}}
-          renderOption={renderOption}
-          getOptionLabel={option => option.name || option} 
-          options={options}
-          value={props.value}
-          onChange={(event, newValue) => {
-            onValueSelected && onValueSelected(newValue);
-            // setValue(newValue);
-          }}
-          onInputChange={(event, newInputValue) => {
-            setInputValue(newInputValue);
-          }}
-          renderInput={(params) => <TextField  label="Choose model" placeholder="Type a model name" {...params}  size={'small'} />
-          }
+  return (
+    <Layout data-testid="test-for-ModelSelect">
+      <Autocomplete
+        sx={{ minWidth: 300 }}
+        renderOption={renderOption}
+        getOptionLabel={(option) => option.name || option}
+        options={options}
+        value={props.value}
+        onChange={(event, newValue) => {
+          onValueSelected && onValueSelected(newValue);
+          // setValue(newValue);
+        }}
+        onInputChange={(event, newInputValue) => {
+          setInputValue(newInputValue);
+        }}
+        renderInput={(params) => (
+          <TextField
+            label="Choose model"
+            placeholder="Type a model name"
+            {...params}
+            size={"small"}
+          />
+        )}
       />
-   </Layout>
- );
-}
+    </Layout>
+  );
+};
 ModelSelect.defaultProps = {};
 export default ModelSelect;

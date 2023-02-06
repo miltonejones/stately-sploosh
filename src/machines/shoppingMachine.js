@@ -12,7 +12,7 @@ export const shoppingMachine = createMachine(
             actions: assign({
               auto_search: (context, event) => event.value,
               page: 1,
-              stars_to_add: []
+              stars_to_add: [],
             }),
           },
         },
@@ -25,24 +25,25 @@ export const shoppingMachine = createMachine(
             after: {
               44: {
                 target: "next_param",
-                actions: assign(({
-                  param_list: context => context.param.split('|'),
+                actions: assign({
+                  param_list: (context) => context.param.split("|"),
                   param_index: 0,
                   results: [],
-                }))
-              }
-            }
+                }),
+              },
+            },
           },
           next_param: {
             after: {
               44: [
                 {
                   target: "init",
-                  cond: context => context.param_index < context.param_list.length ,
-                  actions: assign(({
+                  cond: (context) =>
+                    context.param_index < context.param_list.length,
+                  actions: assign({
                     busy: true,
-                    param: context => context.param_list [context.param_index] 
-                  }))
+                    param: (context) => context.param_list[context.param_index],
+                  }),
                 },
                 {
                   target: "#shop_machine.results",
@@ -50,11 +51,11 @@ export const shoppingMachine = createMachine(
                     message: "",
                     busy: false,
                     chosen: [],
-                    param: context => context.param_list.join(' OR ')
+                    param: (context) => context.param_list.join(" OR "),
                   }),
                 },
-              ]
-            }
+              ],
+            },
           },
           init: {
             after: {
@@ -86,14 +87,14 @@ export const shoppingMachine = createMachine(
                 },
                 {
                   target: "#shop_machine.search.next_param",
-                  actions: assign({ 
-                    param_index: context => context.param_index + 1
+                  actions: assign({
+                    param_index: (context) => context.param_index + 1,
                   }),
                 },
               ],
             },
           },
-          page: { 
+          page: {
             on: {
               MODE: {
                 actions: "assignProps",
@@ -112,9 +113,9 @@ export const shoppingMachine = createMachine(
           error: {
             after: {
               4999: {
-                target: "#shop_machine.idle", 
-              }
-            }
+                target: "#shop_machine.idle",
+              },
+            },
           },
           find: {
             on: {
@@ -135,7 +136,7 @@ export const shoppingMachine = createMachine(
                   target: "error",
                   actions: assign((context, event) => ({
                     error: event.data.message,
-                    stack: event.data.stack,  
+                    stack: event.data.stack,
                   })),
                 },
               ],
@@ -166,16 +167,16 @@ export const shoppingMachine = createMachine(
             },
           },
           commit: {
-            entry: assign(({
-              message: context => `Saving video details...'`
-            })),
+            entry: assign({
+              message: (context) => `Saving video details...'`,
+            }),
             invoke: {
               src: "saveVideoObject",
               onDone: [
                 {
                   target: "next",
                   cond: (context, event) => !context.track_info?.stars,
-                  actions: "incrementSave"
+                  actions: "incrementSave",
                 },
                 {
                   target: "cast",
@@ -193,9 +194,9 @@ export const shoppingMachine = createMachine(
             initial: "load",
             states: {
               load: {
-                entry: assign(({
-                  message: context => `Getting models...'`
-                })),
+                entry: assign({
+                  message: (context) => `Getting models...'`,
+                }),
                 invoke: {
                   src: "loadModels",
                   onDone: {
@@ -213,66 +214,64 @@ export const shoppingMachine = createMachine(
                 },
               },
               error: {
-
-                initial: 'start',
+                initial: "start",
                 states: {
                   start: {
                     after: {
                       1: {
-                        target: 'count',
+                        target: "count",
                         actions: assign({
-                          counter: 0
-                        })
-                      }
-                    }
+                          counter: 0,
+                        }),
+                      },
+                    },
                   },
                   count: {
                     after: {
                       100: [
                         {
-                          target: 'count',
-                          cond: context => context.counter < 7999,
+                          target: "count",
+                          cond: (context) => context.counter < 7999,
                           actions: assign({
-                            counter: context => context.counter + 100
-                          })
+                            counter: (context) => context.counter + 100,
+                          }),
                         },
                         {
-                          target: 'done'
-                        }
-                      ]
-                    }
+                          target: "done",
+                        },
+                      ],
+                    },
                   },
                   done: {
                     target: "#shop_machine.save.next",
-                    actions: "incrementSave"
-                  }
+                    actions: "incrementSave",
+                  },
                 },
- 
+
                 on: {
                   RECOVER: {
                     target: "#shop_machine.save.next",
-                    actions: "incrementSave"
+                    actions: "incrementSave",
                   },
                   RETRY: {
-                    target: "#shop_machine.save.next", 
-                  }
-                }
+                    target: "#shop_machine.save.next",
+                  },
+                },
               },
 
-
               pause: {
-                after: { 
+                after: {
                   1999: {
                     target: "#shop_machine.save.next",
-                  }
-                }
+                  },
+                },
               },
               apply: {
                 invoke: {
                   src: "castModels",
                   onDone: {
                     target: "pause",
-                    actions: "incrementSave"
+                    actions: "incrementSave",
                   },
                   onError: {
                     target: "error",
@@ -284,13 +283,11 @@ export const shoppingMachine = createMachine(
               },
             },
           },
-          error: {
-
-          },
+          error: {},
           curate: {
-            entry: assign(({
-              message: context => `Looking up video details...'`
-            })),
+            entry: assign({
+              message: (context) => `Looking up video details...'`,
+            }),
             invoke: {
               src: "curateVideo",
               onDone: [
@@ -309,8 +306,8 @@ export const shoppingMachine = createMachine(
                 {
                   target: "error",
                   actions: assign((context, event) => ({
-                    error: event.data.message, 
-                    stack: event.data.stack, 
+                    error: event.data.message,
+                    stack: event.data.stack,
                   })),
                 },
               ],
@@ -459,10 +456,10 @@ export const shoppingMachine = createMachine(
               },
               SEARCH: {
                 target: "#shop_machine.search",
-                actions: assign(({ 
+                actions: assign({
                   param_list: [],
                   param_index: 0,
-                }))
+                }),
               },
               SELECT: {
                 target: "#shop_machine.opened.selecting",
@@ -474,7 +471,7 @@ export const shoppingMachine = createMachine(
                 target: "#shop_machine.idle",
                 actions: assign({
                   open: false,
-                  param: ''
+                  param: "",
                 }),
               },
             },
@@ -486,17 +483,15 @@ export const shoppingMachine = createMachine(
   {
     actions: {
       incrementSave: assign((context, event) => {
-                  
         return {
-
-          saved:   event.data,
+          saved: event.data,
           message: `Saved ${context.save_index} of ${context.chosen.length}`,
-          progress:  100 * ((context.save_index + 1) / context.chosen.length),
-          save_index:  context.save_index + 1,
+          progress: 100 * ((context.save_index + 1) / context.chosen.length),
+          save_index: context.save_index + 1,
           // track_to_save: null,
           track_info: null,
           // stars_to_add: null
-        }
+        };
       }),
       assignResults: assign((context, event) => {
         const currentDomain = context.selected[context.search_index];
@@ -514,7 +509,7 @@ export const shoppingMachine = createMachine(
         return {
           latest: results[0] || context.latest,
           results,
-          
+
           message: `Searching ${currentDomain}. ${context.results.length} matches for "${context.param}"...`,
           addresses,
           page_index: 0,
@@ -529,7 +524,7 @@ export const shoppingMachine = createMachine(
         return event;
       }),
 
-      assignPage: assign((context, event) => {  
+      assignPage: assign((context, event) => {
         const results = combine(event.data, context.results);
         return {
           latest: results[0] || context.latest,
@@ -543,16 +538,20 @@ export const shoppingMachine = createMachine(
 );
 
 const combine = (source, destination) => {
-  const trimmed = source?.filter(src => !destination?.find(dest => !!dest && !!src && dest.URL === src.URL));
+  const trimmed = source?.filter(
+    (src) =>
+      !destination?.find((dest) => !!dest && !!src && dest.URL === src.URL)
+  );
   const combined = destination.concat(trimmed);
-  const timed = combined.filter(file => !file.CalculatedTime || file.CalculatedTime > 899);
-  console.log ({
+  const timed = combined.filter(
+    (file) => !file.CalculatedTime || file.CalculatedTime > 899
+  );
+  console.log({
     combined,
-    timed
-  })
+    timed,
+  });
   return timed;
-}
-
+};
 
 const dressAddress = (domain) => (p) => {
   const address = p[0].indexOf("://") > 0 ? p[0] : `https://${domain}${p[0]}`;
