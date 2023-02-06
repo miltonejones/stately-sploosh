@@ -6,7 +6,8 @@ const Flex = styled(Box)(({ theme, between, spacing }) => ({
   gap: theme.spacing(spacing),
   cursor: 'pointer',
   display: 'flex',
-  alignItems: between ? 'space-between' : 'center'
+  alignItems: 'center',
+  justifyContent: between ? 'space-between' : 'flex-start'
 }))
 
 export default Flex;

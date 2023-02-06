@@ -510,9 +510,10 @@ export const shoppingMachine = createMachine(
         //   videos,
         //   trimmed
         // })
+        const results = combine(videos, context.results);
         return {
-          latest: videos[0] || context.latest,
-          results: combine(videos, context.results), // results.concat(trimmed),
+          latest: results[0] || context.latest,
+          results,
           
           message: `Searching ${currentDomain}. ${context.results.length} matches for "${context.param}"...`,
           addresses,
@@ -529,9 +530,10 @@ export const shoppingMachine = createMachine(
       }),
 
       assignPage: assign((context, event) => {  
+        const results = combine(event.data, context.results);
         return {
-          latest: event.data[0] || context.latest,
-          results: combine(event.data, context.results),
+          latest: results[0] || context.latest,
+          results,
           message: `Searching ${context.currentDomain}. ${context.results.length} matches for "${context.param}"...`,
           page_index: context.page_index + 1,
         };

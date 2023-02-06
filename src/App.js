@@ -209,12 +209,14 @@ function Application() {
     { icon: <i className="fa-solid fa-xmark" />, action: () =>  WindowManager.exit(), name: 'Close all windows' },
    ] : []) .concat([ 
    
-    { icon: <i className="fa-solid fa-clipboard-check"/>, action: () =>  {
-      send({
-        type: 'CHANGE',
-        debug: !state.context.debug
-      })
-    }, name: 'Show machine state' },
+  //   { icon: <i className="fa-solid fa-clipboard-check"/>, action: () =>  {
+  //     send({
+  //       type: 'CHANGE',
+  //       debug: !state.context.debug
+  //     })
+  //   }, 
+  //   name: 'Show machine state' 
+  // },
     { icon: <i className="fa-solid fa-rotate" />, action: () =>  send('REFRESH'), name: 'Refresh' },
     {
       name: 'Edit',

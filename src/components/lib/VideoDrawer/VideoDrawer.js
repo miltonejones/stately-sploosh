@@ -1,9 +1,10 @@
 import React from 'react';
 import { Drawer, Stack, Avatar, Typography, Snackbar, Button, Box } from '@mui/material';
 import { useMachine } from '@xstate/react'; 
-import { ModelSelect,Diagnostics, ConfirmPopover } from '..'
+import { ModelSelect,  Diagnostics, ConfirmPopover } from '..'
 import { videoMachine } from '../../../machines';
 import { getVideo, deleteVideo, addModelToVideo, addModel, removeModelFromVideo } from '../../../connector';
+import { Flex } from '../../../styled';
 
 
 export const useVideoDrawer = (onRefresh) => {
@@ -105,11 +106,11 @@ const VideoDrawer = ({  diagnosticProps, state, handleDrop,
   <>
    <Drawer anchor="left" onClose={handleClose} open={open} data-testid="test-for-VideoDrawer">
     <Box sx={{ borderBottom: 1, borderColor: 'divider'}}>
-      <Stack direction="row" sx={{p: 1, justifyContent: 'space-between'}}>
-      <Typography>Edit Video</Typography>
-      {JSON.stringify(state.value)}
-      <i className="fa-solid fa-pen"></i>
-      </Stack>
+      <Flex sx={{ p: 1 }} between>
+        <Typography>Edit Video</Typography>
+        {/* {JSON.stringify(state.value)} */}
+        <i className="fa-solid fa-pen"></i>
+      </Flex>
     </Box>
      <Box sx={{maxWidth:  400,overflow: 'hidden',p:2}}>
       <img src={video.image} alt={video.title} style={{

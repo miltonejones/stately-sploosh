@@ -106,7 +106,20 @@ const VideoCard = ( { video, small, medium, send, favoriteClicked, editClicked, 
  
 
 
-  const { models = []} = video;
+  const { models: modelList = []} = video;
+
+  const modelObj = modelList.reduce((out, res) => {
+    out[res.ID] = res;
+    return out;
+  }, {});
+
+  const models = Object.keys(modelObj).reduce((out, res) => {
+    out.push(modelObj[res]);
+    return out;
+  }, [])
+  
+
+
   const modelProps = models[0] ?? {
     Name: <b style={{color: 'red'}}>add model</b>
   };  
@@ -175,15 +188,15 @@ const VideoCard = ( { video, small, medium, send, favoriteClicked, editClicked, 
         </CardContent>}
       {!small && <CardContent sx={{ p: t => t.spacing(1) + ' !important' }}>
         <Stack direction="row" spacing={1}>
-          <Box>
+          {!!modelProps.image && <Box>
             <Avatar src={modelProps.image} onClick={() => photoClicked && photoClicked(modelProps.Name, modelProps.ID)} variant="rounded" />
-          </Box>
+          </Box>}
           <Stack> 
               <ScrollingText
                 variant="body2"
                 sx={{ whiteSpace: 'nowrap', 
                 fontWeight:  !!video.favorite ? 600 : 400,
-                textOverflow: 'ellipsis', overflow: 'hidden', width: 160}}
+                textOverflow: 'ellipsis', overflow: 'hidden', width: !!modelProps.image ? 160 : 200}}
                 color={!!video.favorite ? "error" : "text.primary"}
               >
                 {video.title}
