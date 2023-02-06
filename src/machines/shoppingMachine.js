@@ -543,7 +543,7 @@ export const shoppingMachine = createMachine(
 const combine = (source, destination) => {
   const trimmed = source?.filter(src => !destination?.find(dest => !!dest && !!src && dest.URL === src.URL));
   const combined = destination.concat(trimmed);
-  const timed = combined.filter(file => !file.CalculatedTime || file.CalculatedTime > 599);
+  const timed = combined.filter(file => !file.CalculatedTime || file.CalculatedTime > 899);
   console.log ({
     combined,
     timed

@@ -63,14 +63,14 @@ export const useShoppingDrawer = (onRefresh) => {
         const { title } = track_to_save;
         const { stars } = track_info;
         if (stars?.length) {
-          const wanted = stars.filter(f => !title.toLowerCase().indexOf(f.toLowerCase()) > -1);
+          // const wanted = stars.filter(f => !title.toLowerCase().indexOf(f.toLowerCase()) > -1);
 
-          if (!wanted?.length) {
-            return false;
-          }
+          // if (!wanted?.length) {
+          //   return false;
+          // }
 
           const downloaded = await Promise.all(
-            wanted.map((s) => getModelsByName(s))
+            stars.map((s) => getModelsByName(s))
           );
 
           if (downloaded?.length) {
@@ -97,8 +97,7 @@ export const useShoppingDrawer = (onRefresh) => {
 
    
 
-        const key =
-        URL.indexOf('xvideo') > 0
+        const key = URL.indexOf('xvideo') > 0
             ? /\.com\/(.*)/.exec(URL)
             : /([a-z|A-Z]+[-\s]\d+)/.exec(title);
 
@@ -343,7 +342,7 @@ const ShoppingDrawer = ({ counter, handleRetry, latest, diagnosticProps, stars_t
 
   <Collapse orientation="horizontal" in={!!stars_to_add?.length  && state.matches('save.cast.pause')}>
     {!!stars_to_add?.length && <Flex spacing={2} sx={{p: 2}}>{stars_to_add.map(star => (
-  <ModelCard key={star.ID} model={star} />
+  <ModelCard small={stars_to_add.length > 3} key={star.ID} model={star} />
   ))}</Flex>}
   </Collapse>
 
