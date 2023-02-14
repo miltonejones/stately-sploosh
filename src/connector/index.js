@@ -121,8 +121,23 @@ export const removeModelFromVideo = async (trackFk, modelFk) => {
   return await response.json();
 };
 
+const modelExistsInVideo = async (trackFk, modelFk) => {
+  const track = await getVideo(trackFk);
+  if (track?.models) {
+    return track.models.some(f => f.ID === modelFk);
+  }
+
+  return false;
+}
+
 
 export const addModelToVideo = async (trackFk, modelFk) => {
+  const exists = await modelExistsInVideo(trackFk, modelFk);
+  if (exists) {
+    return {
+      message: `Model ${modelFk} already exists on video ${trackFk}`
+    }
+  }
   const requestOptions = {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
