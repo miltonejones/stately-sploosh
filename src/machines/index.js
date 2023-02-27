@@ -1,3 +1,4 @@
+import { useDedupe } from './dedupeMachine';
 import { appMachine } from "./appMachine";
 import { modelMachine } from "./modelMachine";
 import { splooshMachine } from "./splooshMachine";
@@ -11,6 +12,7 @@ import { imageMachine } from "./imageMachine";
 import { useCast } from './castMachine';
 
 export {
+  useDedupe,
   appMachine,
   useCast,
   useMenu,

@@ -25,6 +25,7 @@ import { ModelMenu } from "..";
 import { IconTextField } from "../../../styled";
 import { Flex } from "../../../styled";
 import { useCast } from "../../../machines";
+import { useDedupe } from "../../../machines/dedupeMachine";
 
 const U = styled("u")(() => ({
   cursor: "pointer",
@@ -175,6 +176,8 @@ const ModelModal = ({
   // const [tab, setTab] = React.useState(0)
   // const pages = usePagination(costars, { pageCount: 10, page})
   const tab = Number(tabnum);
+  const dedupe = useDedupe(refresh);
+
   if (!model?.videos?.records) return <i />;
   const pageSize = Math.abs(tab) === 1 ? 18 : 16;
   const recordCount =
@@ -193,6 +196,14 @@ const ModelModal = ({
       Name: "Find images online",
     },
   ];
+
+  const handleDedupe = (trackFk,modelFk) => {
+    dedupe.send({
+      type: 'DEDUPE',
+      modelFk,
+      trackFk
+    })
+  }
 
   const handleModelMenu = async (value) => {
     if (value === 1) {
@@ -376,6 +387,7 @@ const ModelModal = ({
                 favoriteClicked={favoriteClicked}
                 selectedID={star.ID}
                 modelClicked={openModel}
+                handleDedupe={handleDedupe}
                 small
                 video={record}
               />
