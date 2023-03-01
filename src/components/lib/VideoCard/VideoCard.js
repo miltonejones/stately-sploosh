@@ -368,7 +368,7 @@ export const ModelMenu = ({
 
 
 const ModelItem  =  ({ model, onClick, selectedID, modelList, handleDedupe }) => {
-  const count = modelList.filter(f => f.ID === model.ID);
+  const count = modelList?.filter(f => f.ID === model.ID);
   return <>
   <MenuItem onClick={onClick}>
       <Stack direction="row" sx={{ alignItems: "center" }} spacing={1}>

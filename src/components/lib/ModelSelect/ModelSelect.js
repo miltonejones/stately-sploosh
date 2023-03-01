@@ -1,7 +1,8 @@
 import React from "react";
-import { styled, Autocomplete, Avatar, TextField, Box } from "@mui/material";
+import { styled, Autocomplete, Avatar, TextField, Stack, Box } from "@mui/material";
 import throttle from "lodash/throttle";
-import { getModelsByName } from "../../../connector";
+import { Nowrap } from "../../../styled";
+import { findVideos, getModelsByName } from "../../../connector";
 
 const Layout = styled(Box)(({ theme }) => ({
   margin: theme.spacing(0),
@@ -25,10 +26,12 @@ const ModelSelect = (props) => {
   const onValueChanged = async ({ value }) => {
     if (!value?.length) return;
     const opts = await getModelsByName(value);
+    const vids = await findVideos(value);
     setOptions(
       [
         {
           name: `Create new model named "${value}"`,
+          caption: vids?.records?.length ? `Found in ${vids.records.length} videos` : "",
           value,
           create: 1,
         },
@@ -49,7 +52,13 @@ const ModelSelect = (props) => {
           {option.name}
         </Box>
       );
-    return <Box {...props}>{option.name}</Box>;
+    return <>
+    <Stack {...props}>
+      <Nowrap>{option.name}</Nowrap>
+    {!!option.caption && <Nowrap variant="caption">{option.caption}</Nowrap>}
+    </Stack>
+
+    </>;
   };
 
   const fetch = React.useMemo(

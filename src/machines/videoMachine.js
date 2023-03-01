@@ -71,7 +71,7 @@ export const videoMachine = createMachine({
                     target: '#video_machine.idle',
                     actions: assign({ 
                       videos: [],
-                      open: false
+                      // open: false
                     })
                   }
                 ]
@@ -300,11 +300,11 @@ export const videoMachine = createMachine({
         src: 'refreshList',
         onDone: [
           {
-            target: '#video_machine.idle',
-            actions: assign({ 
-              videos: [],
-              open: false
-            })
+            target: '#video_machine.opened',
+            // actions: assign({ 
+            //   videos: [],
+            //   open: false
+            // })
           }
         ]
       }
@@ -368,7 +368,8 @@ export const videoMachine = createMachine({
               target: "#video_machine.idle",
               actions:  assign({ 
                 open: false,
-                // videos: []
+                videos: null,
+                video: null
               }),
             }
           }
