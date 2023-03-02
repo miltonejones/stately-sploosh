@@ -44,6 +44,7 @@ import {
 } from "../../../connector";
 import { ScrollingText, Photo, ModelCard } from "..";
 import { usePhoto } from "..";
+import HilitText from "../../../styled/HilitText";
 
 const cookieName = "selected-parser-items";
 
@@ -267,6 +268,7 @@ const Row = styled(Box)(({ selected }) => ({
 // const ERR_IMAGE = 'https://s3.amazonaws.com/sploosh.me.uk/assets/XXX.jpg';
 const PhotoCard = ({
   active,
+  param,
   Text,
   Photo,
   Time,
@@ -308,7 +310,7 @@ const PhotoCard = ({
             }}
             color="text.primary"
           >
-            {Text}
+            <HilitText value={param}>{Text}</HilitText>
           </ScrollingText>
           <Stack sx={{ justifyContent: "space-between" }} direction="row">
             <Typography variant="caption">{Time}</Typography>
@@ -578,6 +580,7 @@ const ShoppingDrawer = ({
               <>
                 {!!result?.URL && (
                   <PhotoCard
+                    param={param}
                     active={chosen?.indexOf(result.URL) > -1}
                     onClick={(e) => handleChoose(result.URL)}
                     key={o}

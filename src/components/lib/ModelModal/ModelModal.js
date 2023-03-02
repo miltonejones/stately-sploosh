@@ -23,7 +23,7 @@ import {
 import { VideoCard, ModelSelect, FloatingMenu, ModelCard } from "..";
 import { ModelMenu } from "..";
 import { IconTextField } from "../../../styled";
-import { Flex } from "../../../styled";
+import { Flex, Spacer } from "../../../styled";
 import { useCast } from "../../../machines";
 import { useDedupe } from "../../../machines/dedupeMachine";
 
@@ -402,17 +402,27 @@ const ModelModal = ({
               {!!progress && (
                 <LinearProgress variant="determinate" value={progress} />
               )}
-              {progress}
+              {/* {progress} */}
             </Box>
-            <Stack direction="row">
-              <u onClick={() => handleSelect(missing.map((f) => f.ID))}>
-                select all
-              </u>
+            <Stack spacing={1} direction="row"> 
               <Chip
-                label={`Add model to  ${selected?.length} videos`}
+                size="small"
+                label={`select all`}
+                variant="outlined"
+                color="success" 
+                onClick={() => handleSelect(missing.map((f) => f.ID))}
+              />
+             {!!selected?.length && <Chip
+                size="small"
+                label={`Add model to  ${selected.length} videos`}
                 color="warning"
                 onClick={handleBatch}
-              />
+              />}
+              <Spacer />
+              <i
+                onClick={() => setTab(0)} 
+                className="fa-solid fa-xmark"
+              /> 
             </Stack>
             <Grid>
               {missing.map((record) => (

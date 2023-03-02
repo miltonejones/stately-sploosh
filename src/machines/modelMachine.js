@@ -40,7 +40,8 @@ export const modelMachine = createMachine({
                 cond: context => context.add_index < context.selected.length
               },
               {
-                target: "#model_modal.opened"
+                target: "#model_modal.opened",
+                actions: assign({ progress: 0})
               }
             ]
           }

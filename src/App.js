@@ -227,6 +227,14 @@ function Application() {
   const removeTab = async (doomed) => {
     const searches = tabs.filter((t) => t.param !== doomed);
     await store.setItem("search-tabs", JSON.stringify(searches));
+    if (param  !== doomed) { 
+      send({
+        type: 'VIDEO',
+        page,
+        param,
+      }); 
+      return;
+    }
     navigate(`/video/1`);
   };
 
