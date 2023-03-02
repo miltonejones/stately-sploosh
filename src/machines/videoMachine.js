@@ -368,7 +368,7 @@ export const videoMachine = createMachine({
               target: "#video_machine.idle",
               actions:  assign({ 
                 open: false,
-                videos: null,
+                videos: [],
                 video: null
               }),
             }

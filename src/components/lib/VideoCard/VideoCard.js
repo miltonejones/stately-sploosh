@@ -361,11 +361,20 @@ export const ModelMenu = ({
             </Stack>
           </MenuItem>
         )}
+        {/* {!!clipText && <MenuItem onClick={() => window.open ( googlePhotoLink(models[0].name))}>
+          find {models[0].Name}
+        </MenuItem>} */}
       </Menu>
     </>
   );
 };
 
+// function googlePhotoLink(title) {
+//   return `https://www.google.com/search?q=${title.replace(
+//     /\s/g,
+//     '+'
+//   )} xxx&source=lnms&tbm=isch`;
+// }
 
 const ModelItem  =  ({ model, onClick, selectedID, modelList, handleDedupe }) => {
   const count = modelList?.filter(f => f.ID === model.ID);
