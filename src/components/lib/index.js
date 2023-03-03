@@ -13,6 +13,7 @@ import ConfirmPopover from './ConfirmPopover/ConfirmPopover';
 import Diagnostics from './Diagnostics/Diagnostics';
 import Photo, { usePhoto } from './Photo/Photo';
 import SettingsMenu from './SettingsMenu/SettingsMenu';
+import Librarian from './Librarian/Librarian';
 
 import ModelGrid from './ModelGrid/ModelGrid';
 
@@ -31,6 +32,7 @@ export {
   useModelModal,
   usePagination,
   ModelMenu,
+  Librarian,
   usePhotoModal,
   VideoDrawer,
   ModelSelect,

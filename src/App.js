@@ -18,6 +18,7 @@ import {
   useShoppingDrawer,
   useVideoDrawer,
   SettingsMenu,
+  Librarian
 } from "./components/lib";
 import { useWindowManager, VideoPersistService } from "./services";
 
@@ -48,7 +49,7 @@ import {
   getVideoKeys,
 } from "./connector";
 import { useMachine } from "@xstate/react";
-import { splooshMachine } from "./machines";
+import { splooshMachine, useLibrarian } from "./machines";
 import dynamoStorage from "./services/DynamoStorage";
 import "./App.css";
 
@@ -96,6 +97,9 @@ function App() {
 
 function Application() {
   const WindowManager = useWindowManager();
+  const librarian = useLibrarian(() => {
+    send("REFRESH");
+  });
   const editor = useVideoDrawer(() => {
     send("REFRESH");
   });
@@ -201,7 +205,7 @@ function Application() {
   });
 
   React.useEffect(() => {
-    if (!type) return;
+    if (!type) return; 
     send({
       type: type.toUpperCase(),
       page,
@@ -406,7 +410,14 @@ function Application() {
               ? "fa-solid fa-rotate App-logo"
               : "fa-solid fa-cart-shopping"
           }
-        ></i>
+        ></i>  
+       
+        
+          <i
+        onClick={() => librarian.send('OPEN')}
+        className="fa-solid fa-book"
+      ></i>
+
         {/* <i onClick={() =>  send('REFRESH')} className="fa-solid fa-rotate"></i>
 {!editor.videos?.length && <i onClick={() =>  editor.selectMode()} className={editor.multiple?"fa-solid fa-check red":"fa-solid fa-check"}></i>}
 {!!editor.videos?.length && <i onClick={() =>  editor.editMultiple()} className="fa-solid fa-pen"></i>} */}
@@ -429,6 +440,8 @@ function Application() {
     if (n === 0) return navigate('/video/1')
     navigate(`/search/1/${tabList[n - 1].param}`)
   }} */}
+
+  {/* {JSON.stringify(librarian.state.value)} */}
       {!!tabList && !state.matches("dash") && view !== "model" && (
         <Flex
           sx={{ borderBottom: 1, borderColor: busy ? "primary" : "divider" }}
@@ -587,6 +600,7 @@ function Application() {
           </Stack>
         )}
       </div>
+      <Librarian librarian={librarian} />
       <FloatingMenu fixed />
       <VideoDrawer {...editor} />
       <SearchDrawer {...finder} />

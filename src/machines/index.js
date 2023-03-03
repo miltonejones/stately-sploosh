@@ -1,3 +1,4 @@
+import { useLibrarian } from './librarianMachine';
 import { useDedupe } from './dedupeMachine';
 import { appMachine } from "./appMachine";
 import { modelMachine } from "./modelMachine";
@@ -12,6 +13,7 @@ import { imageMachine } from "./imageMachine";
 import { useCast } from './castMachine';
 
 export {
+  useLibrarian,
   useDedupe,
   appMachine,
   useCast,

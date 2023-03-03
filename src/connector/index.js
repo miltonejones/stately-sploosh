@@ -87,6 +87,20 @@ export const toggleVideoFavorite = async (ID) => {
   return await response.json();
 };
 
+
+
+export const getVideosByKey = async (Keys) => {
+  const requestOptions = {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ Keys }),
+  };
+  const response = await fetch(API_ENDPOINT + '/video-keys', requestOptions);
+  return await response.json();
+};
+
+
+
 export const getVideoKeys = async (Keys) => {
   const requestOptions = {
     method: "PUT",
@@ -97,9 +111,17 @@ export const getVideoKeys = async (Keys) => {
   return await response.json();
 };
 
-export const getModelsByName = async (name) => {
+export const getModelsByName = async (name, exact) => {
   const response = await fetch(API_ENDPOINT + `/model-name/${name}`);
-  return await response.json();
+
+  const stars = await response.json();
+  if (!exact) {
+    return stars;
+  }
+
+  if (!stars?.length) return false;
+
+  return stars.find(f => f.name === name);
 }
 
 export const getModelCostars = async (id) => {
