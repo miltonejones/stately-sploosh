@@ -22,15 +22,11 @@ const librarianMachine = createMachine({
           on: {
             OPEN: {
               target: "opening",
-              actions: assign({ open: true, title: "", hide: false, queryPage: 1})
+              actions: ["assignOpen", "clearProps"]
             },
             AUTO: {
               target: "auto",
-              actions: assign((_, event) => ({
-                key: event.key,
-                name: event.name,
-                open: true
-              }))
+              actions: "assignAuto"
             },
           },
         },
@@ -65,31 +61,48 @@ const librarianMachine = createMachine({
             },
             CLOSE: {
               target: "closed",
-              actions: assign({ open: false, path: "", history: [], responses: []})
+              actions: ["assignClose", "clearProps"]
             },
           },
         },
 
-
         auto: {
-          entry: assign((context ) => ({ status: `Getting path for model '${context.name}'` })),
-          invoke: {
-            src: "autoInvoke",
-            onError: [
-              {
-                target: 'closed',
-                actions: "assignClose"
+          entry: "statusAuto",
+          initial: "auto_load",
+          states: {
+            auto_load: {
+              invoke: {
+                src: "autoInvoke",
+                onDone: [
+                  {
+                    target: "#librarian.get_keys",
+                    actions: [
+                      "assignOpen",
+                      "clearProps",
+                      "assignPath"
+                    ]
+                  }
+                ],
+                onError: [
+                  {
+                    target: "auto_error",
+                    actions: "assignProblem"
+                  }
+                ]
               }
-            ],
-            onDone: [
-              {
-                target: "#librarian.get_keys",
-                actions: ["assignOpen", "clearProps", "assignPath"], 
+            },
+            auto_error: {
+              on: {
+                RECOVER: {
+                  target: "#librarian.idle",
+                  actions: "assignClose"
+                }
               }
-            ]
+            }
           }
-        }, 
-        
+        },
+
+ 
       },
     },
 
@@ -111,6 +124,38 @@ const librarianMachine = createMachine({
             })),
           },
         ],
+      },
+    },
+
+
+    recast: {
+      entry: assign((context ) => ({ status: `Recasting ${context.uncastTracks.length} tracks` })),
+      description: "add models to videos",
+      initial: "next_track",
+      states: {
+        next_track: {
+          always: [
+            {
+              target: "cast_track",
+              cond: "moreTracks",
+              actions: "assignTrack"
+            },
+            {
+              target: "#librarian.check_keys.next_keys"
+            }
+          ]
+        },
+        cast_track: {
+          invoke: {
+            src: "castItem",
+            onDone: [
+              {
+                target: "next_track",
+                actions: "incrementTrackIndex"
+              }
+            ]
+          }
+        }
       },
     },
 
@@ -161,9 +206,14 @@ const librarianMachine = createMachine({
             src: 'checkKeys',
             onDone: [
               {
-                target: 'next_keys',
-                actions: 'appendKeys',
+                target: "next_keys",
+                cond: "fullCast",
+                actions: "appendKeys"
               },
+              {
+                target: "#librarian.recast",
+                actions: ["appendKeys", "assignMissing"]
+              }
             ],
             onError: [
               {
@@ -180,6 +230,13 @@ const librarianMachine = createMachine({
           on: {
             RESUME: {
               target: "load_keys"
+            },
+            SEE: {
+              target: "#librarian.viewing",
+              actions: assign((_, event) => ({
+                item: event.item,
+                source: 'lookup'
+              })) 
             },
             RESET: {
               target: "#librarian.get_keys",
@@ -201,8 +258,6 @@ const librarianMachine = createMachine({
       },
     },
  
-
-
     search: {
       initial: "next",
       on: {
@@ -287,6 +342,13 @@ const librarianMachine = createMachine({
                 currentPage: event.page
               }))
             },
+            SEE: {
+              target: "#librarian.viewing",
+              actions: assign((_, event) => ({
+                item: event.item,
+                source: 'search'
+              }))  
+            },
             RESUME: {
               target: "next"
             }
@@ -295,7 +357,6 @@ const librarianMachine = createMachine({
 
       },
     },
-
 
     done: {
       entry: assign(() => ({ status: `Operation complete` })),
@@ -316,7 +377,8 @@ const librarianMachine = createMachine({
         SEE: {
           target: "viewing",
           actions: assign((_, event) => ({
-            item: event.item
+            item: event.item,
+            source: null
           }))
         },
 
@@ -329,7 +391,6 @@ const librarianMachine = createMachine({
         }
       }
     },
-
 
     viewing: {
       initial: 'load',
@@ -385,14 +446,23 @@ const librarianMachine = createMachine({
                 }
               }))]
             },
-            CLOSE: {
-              target: '#librarian.done',
-              actions: assign({
-                models: [],
-                stars: [],
-                item: null
-              })
-            },
+            CLOSE: [
+              {
+                target: "#librarian.done",
+                cond: "emptySource",
+                actions: "clearStars"
+              },
+              {
+                target: "#librarian.search.paused",
+                cond: "searchSource",
+                actions: "clearStars"
+              },
+              {
+                target: "#librarian.check_keys.paused",
+                cond: "keySource",
+                actions: "clearStars"
+              },
+               ],
           },
         },
         view_error: {
@@ -412,10 +482,8 @@ const librarianMachine = createMachine({
           always: [
             {
               target: 'add',
-              cond: context => context.add_index < context.candidates.length,
-              actions: assign(context => ({
-                item: context.candidates[context.add_index]
-              })),
+              cond: "moreCandidates",
+              actions: "assignNextImport",
             },
             {
               target: "bye", 
@@ -428,7 +496,7 @@ const librarianMachine = createMachine({
             onDone: [
               {
                 target: "#librarian.idle.closed",
-                actions: assign({ open: false, path: "", history: [], responses: []})
+                actions: ["assignClose", "clearProps"]
                 // target: '#librarian.done',
               },
             ]
@@ -483,14 +551,12 @@ const librarianMachine = createMachine({
                 onDone: [
                   {
                     target: '#librarian.import_items.next_item',
-                    cond:  (_, event) => typeof event.data === 'object',
-                    actions: assign({ stars: [], item: null })
+                    cond:  "invalidTrack",
+                    actions: ["clearStars", "incrementAddIndex"]
                   },
                   {
                     target: 'cast',
-                    actions: assign((_, event) => ({
-                      ID: event.data 
-                    })),
+                    actions: "assignCastID",
                   },
                 ],
                 onError: [
@@ -505,7 +571,7 @@ const librarianMachine = createMachine({
               after: {
                 1999: {
                   target: '#librarian.import_items.next_item',
-                  actions: assign({ stars: [], item: null })
+                  actions: "clearStars"
                 }
               }
             },
@@ -516,9 +582,7 @@ const librarianMachine = createMachine({
                 onDone: [
                   {
                     target: '#librarian.import_items.add.pause',
-                    actions: assign((context) => ({
-                      add_index: context.add_index + 1
-                    })),
+                    actions: "incrementAddIndex",
                   },
                 ],
                 onError: [
@@ -541,9 +605,7 @@ const librarianMachine = createMachine({
             },
             SKIP: {
               target: '#librarian.import_items.next_item',
-              actions: assign((context) => ({
-                add_index: context.add_index + 1
-              })),
+              actions: "incrementAddIndex",
             },
           },
         },
@@ -558,19 +620,76 @@ const librarianMachine = createMachine({
 
 {
   guards: {
+    fullCast: (context, event) => {
+      const files = event.data?.filter(f => !!f);
+      const { modelfk } = context;
+      console.log ({ files, modelfk });
+      if (!context.modelfk || !files?.length) return true
+      const uncastTracks = files
+        .filter(file => !file.models?.find(star => star.ID === context.modelfk))
+
+      return !uncastTracks.length
+    },
+    emptySource:  (context) => !context.source,
+    searchSource:  (context) => context.source === 'search',
+    keySource:  (context) => context.source === 'lookup',
+    invalidTrack:  (_, event) => typeof event.data === 'object',
     morePages: context => context.response.pages && 
       context.response.pages.find(p => !isNaN(p.page) && Number(p.page) > Number(context.currentPage)),
     moreKeys: context => !!(context.response?.keys?.length > context.search_index),
+    moreTracks: context => !!(context.uncastTracks?.length > context.cast_index),
+    moreCandidates: context => context.add_index < context.candidates.length,
   },
   actions: {
-    assignOpen: assign({ open: true}),
+    statusAuto: assign((context ) => ({ status: `Getting path for model '${context.name}'` })),
+    assignMissing: assign((context, event) => {
+      const files = event.data?.filter(f => !!f);
+      const uncastTracks = files
+        .filter(file => !file.models?.find(star => star.ID === context.modelfk));
+      return {
+        uncastTracks,
+        cast_index: 0
+      }
+    }),
+    incrementTrackIndex: assign((context) => ({
+      cast_index: context.cast_index + 1
+    })),
+    incrementAddIndex: assign((context) => ({
+      add_index: context.add_index + 1
+    })),
+    assignOpen: assign({ open: true }),
     assignPath: assign((_, event) => ({ path: event.data })),
-    assignClose: assign({ open: false }),
+    assignAuto: assign((_, event) => ({
+      key: event.key,
+      name: event.name,
+      modelfk: event.modelfk,
+      image: event.image,
+      open: true
+    })),
+    assignCastID: assign((_, event) => ({ ID: event.data })),
+    assignTrack: assign((context) => {
+      const { ID } = context.uncastTracks[context.cast_index];
+      return {
+        stars: [{
+          ID: context.modelfk
+        }],
+        ID
+      }
+    }),
+    assignNextImport: assign(context => ({
+      item: context.candidates[context.add_index],
+      progress: 100 * (context.add_index/context.candidates.length)
+    })),
+    assignClose: assign({ image: null, open: false, path: "" }),
+    clearStars: assign({ models: [], stars: [], item: null }), 
     clearProps: assign({ 
-      hide: false,
+      hide: false, 
       response: {},
       responses: [], 
-      currentPage: 1 
+      currentPage: 1 ,
+      queryPage: 1, 
+      modelfk: null,   
+      history: [],   
     }),
     appendKeys: assign((context, event) => { 
       const files = event.data?.filter(f => !!f && !['javdoe.tv','javdoe.com','javfinder.la'].some(d => f.domain === d));

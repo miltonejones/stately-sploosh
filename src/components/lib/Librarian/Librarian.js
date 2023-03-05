@@ -8,7 +8,7 @@ import { getPagination } from "..";
  
 const Layout = styled(Box)(({ theme, thin, short }) => ({
   margin: theme.spacing(0),
-  height: short ? '60vh' : (thin ? 120 : '100vh'),
+  height: short ? '60vh' : (thin ? 140 : '100vh'),
   transition: 'height 0.3s linear'
  }));
  
@@ -47,9 +47,9 @@ const Librarian = ({ librarian }) => {
   
  return (
   <BacklessDrawer anchor="bottom" open={librarian.open} onClose={() => librarian.send('CLOSE')}>
-   <Layout short={is(['import_items', 'viewing'])} thin={is(['idle.opened']) || librarian.thin}>
+   <Layout short={is(['import_items', 'viewing'])} thin={is(['idle.opened', 'idle.auto']) || librarian.thin}>
 
-  {is('import_items.add_error') && <Flex>
+  {is(['import_items.add_error', 'auto.auto_error']) && <Flex>
    <Stack sx={{p: 1}}>
     <Typography color="error">
       {librarian.error}
@@ -72,177 +72,227 @@ const Librarian = ({ librarian }) => {
     
     </Flex>}
 
-      {!is(['done', 'viewing.ready']) && <Stack> 
+      {!is(['done', 'viewing.ready', 'import_items']) && <Stack> 
         {!!pageProg && <LinearProgress variant="determinate" color="secondary" value={pageProg} />}
         {!!progress && <LinearProgress variant="determinate" value={progress} />}
         {!!buffering && <LinearProgress variant="indeterminate" color="error"/>}
         <Typography variant="caption">{JSON.stringify(librarian.status)}   </Typography>
       </Stack>}
 
-      <Flex sx={{p: 1}} spacing={1}>
-{/* 
-      <Box> search_index:
-        {JSON.stringify(search_index)}</Box>
-      <Box> keys:
-        {JSON.stringify(response?.keys?.length)}</Box> */}
-      {/* <pre>  page:
-        {JSON.stringify(state,0,2)}/{maxPage}</pre>  */}
+      {is([ 'import_items']) && librarian.progress && <Stack>  
+        {!!librarian.progress && <LinearProgress variant="determinate" value={librarian.progress} />} 
+        <Typography variant="caption">{JSON.stringify(librarian.status)}   </Typography>
+      </Stack>}
 
 
-        {!is(['import_items', 'viewing']) && !!pages.visible && !!librarian.thin && <Stack>
-        <Flex spacing={1} >
-                
-                {!!librarian.response?.title && is(["search", 'get_keys', 'check_keys']) && <Typography variant="subtitle2">
-                  {librarian.response.title}
-                </Typography>}
-        
-                {pages.pageCount > 1 &&  <Pagination
-                  count={Number(pages.pageCount)}
-                  page={Number(queryPage)} 
-                  onChange={(a, num) => setState('queryPage', num)}
-                />}
-        
-                {!!found?.length && <Box onClick={() => setState('hide', !librarian.hide)} > {found?.length} <Plural count={found.length}>item</Plural> found  </Box>}
-             </Flex>
-        
-          
-        <Flex spacing={1}>
-          {pages.visible.map((res, e) =>( 
-          <Box 
-            sx={{  outline: t => res.selected ? `solid 2px ${t.palette.primary.main}` : ""  }} 
-            onClick={() => itemDetail(res)}>
-              <Photo
-              backup={ERR_IMAGE}
-              style={{
-              width: 60,
-              aspectRatio: "12 / 9",
-              borderRadius: 2, 
-              opacity: !!res.ID ? 0.5 : 1
-            }} 
-              key={e}
-             alt={res.title} src={res.image.replace(/"/g, "")} 
-            />
-          </Box>))}
-          </Flex>
-
-          </Stack>}
-      
-
-
-          {!!librarian.response?.title && !librarian.thin && is(["search", 'get_keys', 'check_keys', 'done']) && <Typography variant="subtitle2">
-                  {librarian.response.title}
-                </Typography>}
-
-
-       {!!maxPage && !is("idle.opened") && !librarian.thin && <Pagination
-          disabled={!is(['check_keys.paused', 'search.paused'])}
-          color={is(['check_keys.paused', 'search.paused'])?"primary":"divider"}
-          count={Number(maxPage)}
-          page={Number(currentPage)} 
-          onChange={(_, num) => { 
-
-
-            const datum = response.pages.find(f => Number(f.page) === num);
-            if (datum?.href && datum.href.indexOf('javlibrary') > 0) {
-              const path = datum.href.split('/').pop();
-              librarian.send({
-                type: 'RESET',
-                path,
-                page: datum.page
-              })
-            }  
+    <Flex sx={{width: '100%'}}>
+     {!librarian.thin && !!librarian.image && <Box sx={{p: 1}}>
+        <Photo 
+          src={librarian.image}
+          style={{
+            width: 60,
+            aspectRatio: '12 / 16',
+            borderRadius: 3
           }}
-        />}
-{/* [{librarian.path}][{currentPage}] */}
-
-      {is('idle.opened') && <Flex sx={{p: 1}} spacing={2}>
-          <TextField
-            size="small"
-            label="Path"
-            value={state.context.path}
-            autoFocus
-            autoComplete="off"
-            onChange={e => {
-              const { value } = e.target;
-              if (!value) return;
-              setState('path', value.split('/').pop()) 
-            }}
           />
+      </Box>}
+      <Stack sx={{width: '100%' }}>
+
+        {/* librarian toolbar  */}
+          <Flex sx={{p: 1}} spacing={1}>
+    
+
+          {/* display panel for THIN view */}
+            {!is(['import_items', 'viewing']) && !!pages.visible && !!librarian.thin && <Flex>
+            {!!librarian.image && <Box sx={{p: 1}}>
+              <Photo 
+                src={librarian.image}
+                style={{
+                  width: 60,
+                  aspectRatio: '12 / 16',
+                  borderRadius: 3
+                }}
+                />
+            </Box>}
+              
+              <Stack>
+            <Flex spacing={1} >
+                    
+                    {!!librarian.response?.title && is(["search", 'get_keys', 'check_keys']) && <Typography variant="subtitle2">
+                      {librarian.response.title}
+                    </Typography>}
+            
+                    {pages.pageCount > 1 && !is('done') && <Pagination
+                      count={Number(pages.pageCount)}
+                      page={Number(queryPage)} 
+                      onChange={(a, num) => setState('queryPage', num)}
+                    />}
+            
+                    {!!found?.length && <Box onClick={() => setState('hide', !librarian.hide)} > {found?.length} <Plural count={found.length}>item</Plural> found  </Box>}
+                </Flex>
+            
+              
+            <Flex spacing={1}>
+              {pages.visible.map((res, e) =>( 
+              <Box 
+                sx={{  outline: t => res.selected ? `solid 2px ${t.palette.primary.main}` : ""  }} 
+                onClick={() => itemDetail(res)}>
+                  <Photo
+                  backup={ERR_IMAGE}
+                  style={{
+                  width: 60,
+                  aspectRatio: "12 / 9",
+                  borderRadius: 2, 
+                  opacity: !!res.ID ? 0.5 : 1
+                }} 
+                  key={e}
+                alt={res.title} src={res.image.replace(/"/g, "")} 
+                />
+              </Box>))}
+              </Flex>
+
+              </Stack></Flex>}
           
-          <Button onClick={() => librarian.send('FIND')} variant="contained" disabled={!librarian.path}>
-            search
-          </Button>
+
+          {/* library provided title */}
+              {!!librarian.response?.title && !librarian.thin && is(["search", 'get_keys', 'check_keys', 'done']) && <Typography variant="subtitle2">
+                      {librarian.response.title}
+                    </Typography>}
+
+          {/* library provided pagination  */}
+          {!!maxPage && !is("idle.opened") && !librarian.thin && <Pagination
+              disabled={!is(['check_keys.paused', 'search.paused'])}
+              color={is(['check_keys.paused', 'search.paused'])?"primary":"divider"}
+              count={Number(maxPage)}
+              page={Number(currentPage)} 
+              onChange={(_, num) => { 
 
 
-          {/* <Button variant="outlined" onClick={() => librarian.send('CLOSE')}>
-            close
-          </Button>
-    */}
+                const datum = response.pages.find(f => Number(f.page) === num);
+                if (datum?.href && datum.href.indexOf('javlibrary') > 0) {
+                  const path = datum.href.split('/').pop();
+                  librarian.send({
+                    type: 'RESET',
+                    path,
+                    page: datum.page
+                  })
+                }  
+              }}
+            />}
+
+    
+            {/* text field for manual path entry  */}
+          {is('idle.opened') && <Flex sx={{p: 1}} spacing={2}>
+              <TextField
+                size="small"
+                label="Path"
+                value={state.context.path}
+                autoFocus
+                autoComplete="off"
+                onChange={e => {
+                  const { value } = e.target;
+                  if (!value) return;
+                  setState('path', value.split('/').pop()) 
+                }}
+              />
+              
+              <Button onClick={() => librarian.send('FIND')} variant="contained" disabled={!librarian.path}>
+                search
+              </Button>
+
+
+              {/* <Button variant="outlined" onClick={() => librarian.send('CLOSE')}>
+                close
+              </Button>
+        */}
+
+            </Flex>}
+
+
+              <Spacer />
+          {/* <Box>state: {JSON.stringify(state.value)}   </Box> */}
+
+          {/* control buttons  */}
+            {is(['check_keys', 'search']) && <>
+            <i className={`fa-solid fa-circle-${is(['check_keys.paused', 'search.paused'])?"play":"pause"}`} 
+                onClick={() => librarian.send(is(['check_keys.paused', 'search.paused'])?'RESUME':'PAUSE')}></i>
+            </>}
+
+
+
+            {is('done') && <> 
+
+              <Flex spacing={2}>
+              {!!found?.length &&  <i className={hide?"fa-solid fa-eye-slash":"fa-solid fa-eye"}
+                onClick={() =>  setState('hide',  !librarian.hide)  }
+                  />}
+
+
+                    <i
+                      onClick={() => {
+                        pages.visible
+                          .filter((f) => !f.ID)
+                          .map(f => selectItem(f.URL));
+                        // handleAppend(ids);
+                        // alert (JSON.stringify(ids));
+                      }}
+                      class="fa-solid fa-check"
+                    ></i>
+
+
+                <Badge
+                  onClick={handleSave}
+                  sx={{ cursor: "pointer" }}
+                  badgeContent={candidates?.length}
+                  color="secondary"
+                >
+                  <i onClick={handleSave} class="fa-solid fa-floppy-disk"></i>
+                </Badge>
+
+                <i onClick={() =>  setState('thin',  !librarian.thin)  } className={`fa-solid fa-window-${librarian.thin?"maximize":"restore"}`} />
+                <i onClick={() => librarian.send('EXIT')} className="fa-solid fa-xmark" />
+                
+              </Flex>
+    
+            </>}
+
+            {is(['search','check_keys','get_keys']) &&  (
+              <>
+                    {!!found?.length &&  <i className={hide?"fa-solid fa-eye-slash":"fa-solid fa-eye"}
+                onClick={() =>  setState('hide',  !librarian.hide) }
+                  />}
+    
+                <i onClick={() =>  setState('thin',  !librarian.thin)  } className={`fa-solid fa-window-${librarian.thin?"maximize":"restore"}`} />
+                <i onClick={() => librarian.send('CANCEL')} className="fa-solid fa-xmark" />
+    
+              </>
+            )}
+    
+            {is(['idle.opened','viewing']) &&  (
+                <i onClick={() => librarian.send('CLOSE')} className="fa-solid fa-xmark" /> 
+            )}
+
+          </Flex>
+    
+        {/* track list toolbar */}
+        {!is(['import_items', 'viewing']) && !!pages.visible && !librarian.thin && pages.pageCount > 1 && <Flex spacing={1} sx={{ p: 1}}> 
+
+            <Pagination
+              count={Number(pages.pageCount)}
+              page={Number(queryPage)} 
+              onChange={(a, num) => setState('queryPage',  num) }
+            />
+
+            {!!found?.length && <> {found?.length} <Plural count={found.length}>item</Plural> found  </>} 
 
         </Flex>}
 
 
-          <Spacer />
-      {/* <Box>state: {JSON.stringify(state.value)}   </Box> */}
-         {is(['check_keys', 'search']) && <>
-         <i className={`fa-solid fa-circle-${is(['check_keys.paused', 'search.paused'])?"play":"pause"}`} 
-            onClick={() => librarian.send(is(['check_keys.paused', 'search.paused'])?'RESUME':'PAUSE')}></i>
-         </>}
-        {is('done') && <> 
 
-          <Flex spacing={2}>
-           {!!found?.length &&  <i className={hide?"fa-solid fa-eye-slash":"fa-solid fa-eye"}
-             onClick={() =>  setState('hide',  !librarian.hide)  }
-              />}
+      </Stack>
+    </Flex>
 
-
-                <i
-                  onClick={() => {
-                    pages.visible
-                      .filter((f) => !f.ID)
-                      .map(f => selectItem(f.URL));
-                    // handleAppend(ids);
-                    // alert (JSON.stringify(ids));
-                  }}
-                  class="fa-solid fa-check"
-                ></i>
-
-
-            <Badge
-              onClick={handleSave}
-              sx={{ cursor: "pointer" }}
-              badgeContent={candidates?.length}
-              color="secondary"
-            >
-              <i onClick={handleSave} class="fa-solid fa-floppy-disk"></i>
-            </Badge>
-
-            <i onClick={() =>  setState('thin',  !librarian.thin)  } className={`fa-solid fa-window-${librarian.thin?"maximize":"restore"}`} />
-            <i onClick={() => librarian.send('EXIT')} className="fa-solid fa-xmark" />
-            
-          </Flex>
- 
-        </>}
-
-        {is(['search','check_keys','get_keys']) &&  (
-          <>
-                {!!found?.length &&  <i className={hide?"fa-solid fa-eye-slash":"fa-solid fa-eye"}
-             onClick={() =>  setState('hide',  !librarian.hide) }
-              />}
- 
-            <i onClick={() =>  setState('thin',  !librarian.thin)  } className={`fa-solid fa-window-${librarian.thin?"maximize":"restore"}`} />
-            <i onClick={() => librarian.send('CANCEL')} className="fa-solid fa-xmark" />
- 
-          </>
-         )}
- 
-        {is(['idle.opened','viewing']) &&  (
-            <i onClick={() => librarian.send('CLOSE')} className="fa-solid fa-xmark" /> 
-         )}
-
-      </Flex>
-
-
+    {/* preview/import panel */}
     <Collapse in={is(['import_items', 'viewing.ready', 'viewing.match'])}>
       {/* [{librarian.add_index}] */}
       <Flex sx={{p: 1}}>
@@ -291,26 +341,8 @@ const Librarian = ({ librarian }) => {
     </Collapse>
    
 
-
-    {!is(['import_items', 'viewing']) && !!pages.visible && !librarian.thin && <>
-
-     <Flex spacing={1} sx={{ p: 1}}>
-                
-        {/* {!!librarian.response?.title && is(["search", 'get_keys', 'check_keys']) && <Typography variant="subtitle2">
-          {librarian.response.title}
-        </Typography>} */}
-
-        {pages.pageCount > 1 &&  <Pagination
-          count={Number(pages.pageCount)}
-          page={Number(queryPage)} 
-          onChange={(a, num) => setState('queryPage',  num) }
-        />}
-
-        {!!found?.length && <> {found?.length} <Plural count={found.length}>item</Plural> found  </>}
-
-
-
-     </Flex>
+    {/* main track list */}
+    {!is(['import_items', 'viewing']) && !!pages.visible && !librarian.thin && <> 
 
     <Columns sx={{
       alignItems: "flex-start", m: 1
@@ -345,15 +377,7 @@ const Librarian = ({ librarian }) => {
     </>}
 
 
-     {/* <hr />
-     {librarian.path} */}
-     {/* <hr/>
-<pre>
-   [  {JSON.stringify(librarian.response?.pages, 0, 2)}]
-   </pre>   
-     <hr/> */}
-
-     {/* {JSON.stringify(librarian.responses)} vl_star.php?s=ay6so */}
+   
    </Layout>
    </BacklessDrawer>
  );

@@ -318,7 +318,7 @@ const ModelModal = ({
             ></i>
 {!!model?.videos?.records?.length && <i 
       onClick={() => {
-        bookClicked(model.videos.records[0].Key, star.name);
+        bookClicked(model.videos.records[0].Key, star.name, star.ID, star.image);
         handleClose()
       }}
         className="fa-solid fa-book"

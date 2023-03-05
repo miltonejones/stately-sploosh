@@ -609,9 +609,9 @@ function Application() {
         searchClicked={shop.handleClick}
         deleteClicked={removeVideo}
         favoriteClicked={addFavorite}
-        bookClicked={(key, name) => {
+        bookClicked={(key, name, modelfk, image) => { 
           librarian.send({
-            type: 'AUTO', key, name
+            type: 'AUTO', key, name, modelfk, image
           })
         }}
         {...modal}
