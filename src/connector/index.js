@@ -61,9 +61,12 @@ export const getModel = async (id, page = 1, favorite = false, param) => {
   return await response.json();
 };
 
-export const findVideos = async (param, page = 1) => {
+export const findVideos = async (param, page = 1, exact) => {
   const response = await fetch(API_ENDPOINT + `/find/${param}/${page}`);
-  return await response.json();
+  const res = await response.json();
+  if (!exact) return res;
+  if (!res.records) return false;
+  return res.records[0];
 };
 
 // export const addVideo = async (URL) => {

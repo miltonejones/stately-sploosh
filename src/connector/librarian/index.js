@@ -15,4 +15,14 @@ export const searchJavdo = async (key) => {
   return await response.json();
 };
 
-// requestOptions
+export const getJavNames = async (key, name) => {
+  const response = await fetch(API_ENDPOINT + `/names/${key}`);
+  const res = await response.json();
+  const obj = res.names?.find(f => f.title === name);
+  if (obj) {
+    return obj.href
+  }
+  return false
+};
+
+// https://jhdcmv7zhi.execute-api.us-east-1.amazonaws.com/find/names/nnpj-414

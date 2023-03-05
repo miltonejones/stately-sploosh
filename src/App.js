@@ -609,6 +609,11 @@ function Application() {
         searchClicked={shop.handleClick}
         deleteClicked={removeVideo}
         favoriteClicked={addFavorite}
+        bookClicked={(key, name) => {
+          librarian.send({
+            type: 'AUTO', key, name
+          })
+        }}
         {...modal}
       />
 

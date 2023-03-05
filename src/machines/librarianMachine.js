@@ -1,11 +1,13 @@
 
 import { createMachine, assign } from 'xstate';
 import { useMachine } from "@xstate/react";
-import { getJavKeys, searchJavdo } from '../connector/librarian'
+import { getJavKeys, getJavNames, searchJavdo } from '../connector/librarian'
 import { getVideoInfo, addModelToVideo, getModelsByName, findVideos, saveVideo } from '../connector'
 import { 
   getVideoByURL, 
 } from "../connector/parser";
+
+const SEARCH_SPEED = 5;
 
 
 // add machine code
@@ -20,7 +22,15 @@ const librarianMachine = createMachine({
           on: {
             OPEN: {
               target: "opening",
-              actions: assign({ open: true, title: "", hide: false})
+              actions: assign({ open: true, title: "", hide: false, queryPage: 1})
+            },
+            AUTO: {
+              target: "auto",
+              actions: assign((_, event) => ({
+                key: event.key,
+                name: event.name,
+                open: true
+              }))
             },
           },
         },
@@ -36,6 +46,7 @@ const librarianMachine = createMachine({
                 target: "#librarian.get_keys",
                 actions: assign((_, event) => ({
                   path: event.data,
+                  response: {},
                   responses: [], currentPage: 1 
                 }))
               }
@@ -58,36 +69,140 @@ const librarianMachine = createMachine({
             },
           },
         },
+
+
+        auto: {
+          entry: assign((context ) => ({ status: `Getting path for model '${context.name}'` })),
+          invoke: {
+            src: "autoInvoke",
+            onError: [
+              {
+                target: 'closed',
+                actions: "assignClose"
+              }
+            ],
+            onDone: [
+              {
+                target: "#librarian.get_keys",
+                actions: ["assignOpen", "clearProps", "assignPath"], 
+              }
+            ]
+          }
+        }, 
+        
       },
     },
+
     get_keys: {
+      entry: assign((context ) => ({ status: `Getting keys for ${context.path}` })),
       invoke: {
         src: "getKeysFromPath",
         onDone: [
           {
-            target: "search",
+            target: "check_keys",
             actions: assign((_, event) => ({
               response: event.data,
               history: [],
+              keyset: event.data.keys,
               // hide: false,
               // responses: [],
+              // key_index: 0,
               search_index: 0
             })),
           },
         ],
       },
     },
-    // check_keys: {
-    //   invoke: {
-    //     src: "checkKeys",
-    //     onDone: [
-    //       {
-    //         target: "search",
-    //         actions: (_, event) => console.log (event.data)
-    //       }
-    //     ]
-    //   }
-    // },
+
+    check_keys: {
+      on: {
+        CHANGE: {
+          actions: "applyChange"
+        },
+        CHOOSE: {
+          actions: "assignSelect"
+        },
+        CANCEL: {
+          target: "done"
+        },
+        PAUSE: {
+          target: ".paused"
+        }
+      },
+      initial: 'next_keys',
+      states: {
+        next_keys: {
+          always: [
+            {
+              target: 'load_keys',
+              cond: 'moreKeys',
+            },
+            {
+              target: '#librarian.search', 
+              actions: assign((context) => ({
+                search_index: 0,
+                response: {
+                  ...context.response,
+                  keys: context.keyset
+                }
+              }))
+            },
+          ],
+        },
+        load_keys: {
+          entry: assign((context) => {
+            const { response, search_index} = context;
+            const batch = response.keys.slice(search_index, search_index + SEARCH_SPEED);
+            return { 
+              status: `Looking up keys '${batch.join(', ')}'` 
+            }
+          }),
+          invoke: {
+            src: 'checkKeys',
+            onDone: [
+              {
+                target: 'next_keys',
+                actions: 'appendKeys',
+              },
+            ],
+            onError: [
+              {
+                target: 'check_error',
+                actions: 'assignProblem',
+              },
+            ],
+          },
+        },
+
+        paused: {
+          entry: assign(() => ({ status: `Lookup paused` })),
+          description: "Pause to allow repaging",
+          on: {
+            RESUME: {
+              target: "load_keys"
+            },
+            RESET: {
+              target: "#librarian.get_keys",
+              actions: assign((_, event) => ({
+                path: event.path,
+                currentPage: event.page
+              }))
+            }
+          }
+        },
+
+        check_error: {
+          on: {
+            RECOVER: {
+              target: '#librarian.idle',
+            },
+          },
+        },
+      },
+    },
+ 
+
+
     search: {
       initial: "next",
       on: {
@@ -100,12 +215,15 @@ const librarianMachine = createMachine({
         CANCEL: {
           target: "done"
         },
+        PAUSE: {
+          target: ".paused"
+        }
       },
       states: {
         next: {
           always: [
             {
-              target: "check_key",
+              target: "lookup",
               cond: "moreKeys",
               actions: assign((context) => ({
                 key: context.response.keys[context.search_index], 
@@ -128,27 +246,10 @@ const librarianMachine = createMachine({
               target: "#librarian.done",
             },
           ],
-        },
-        check_key: {
-          invoke: {
-            src: "checkKey",
-            onDone: [
-              {
-                target: "lookup",
-                cond: (_, event) => !event.data.records?.length 
-              },
-              {
-                target: "next",
-                actions: assign((context, event) => ({
-                  responses: context.responses.concat(event.data.records[0]),
-                  search_index: context.search_index + 1
-                })),
-              },
-            ],
-          }
-        },
+        }, 
 
         lookup: {
+          entry: assign((context) => ({ status: `Sending search request for ${context.key}` })),
           invoke: {
             src: "sendSearchRequest",
             onDone: [
@@ -175,9 +276,29 @@ const librarianMachine = createMachine({
             },
           },
         },
+        paused: {
+          entry: assign(() => ({ status: `Search is paused` })),
+          description: "Pause to allow repaging",
+          on: {
+            RESET: {
+              target: "#librarian.get_keys",
+              actions: assign((_, event) => ({
+                path: event.path,
+                currentPage: event.page
+              }))
+            },
+            RESUME: {
+              target: "next"
+            }
+          }
+        }
+
       },
     },
+
+
     done: {
+      entry: assign(() => ({ status: `Operation complete` })),
       invoke: {
         src: "onComplete"
       },
@@ -191,6 +312,14 @@ const librarianMachine = createMachine({
         EXIT:  {
           target: "#librarian.idle.opened",
         },
+
+        SEE: {
+          target: "viewing",
+          actions: assign((_, event) => ({
+            item: event.item
+          }))
+        },
+
         ADD: {
           target: "import_items",
           actions: assign(context => ({
@@ -201,6 +330,80 @@ const librarianMachine = createMachine({
       }
     },
 
+
+    viewing: {
+      initial: 'load',
+      states: {
+        load: {
+          entry: assign(() => ({ status: `Loading details..` })),
+          invoke: {
+            src: 'curateItem',
+            onDone: [
+              {
+                target: 'match',
+                actions: assign((_, event) => ({
+                  models: event.data.stars
+                })),
+              },
+            ],
+            onError: [
+              {
+                target: 'view_error',
+                actions: 'assignProblem',
+              },
+            ],
+          },
+        },
+
+        match: {
+          invoke: {
+            src: 'matchModels',
+            onDone: [
+              {
+                target: 'ready',
+                actions: assign((_, event) => ({
+                  stars: event.data?.filter(f => !!f)
+                })),
+              },
+            ],
+            onError: [
+              {
+                target: '#librarian.import_items.add_error',
+                actions: 'assignProblem',
+              },
+            ],
+          },
+        },
+
+        ready: {
+          on: {
+            CHOOSE: {
+              actions: ["assignSelect", assign((context) => ({
+                item: {
+                  ...context.item,
+                  selected: !context.item.selected
+                }
+              }))]
+            },
+            CLOSE: {
+              target: '#librarian.done',
+              actions: assign({
+                models: [],
+                stars: [],
+                item: null
+              })
+            },
+          },
+        },
+        view_error: {
+          on: {
+            RECOVER: {
+              target: '#librarian.done',
+            },
+          },
+        },
+      },
+    },
 
     import_items: {
       initial: 'next_item',
@@ -215,14 +418,27 @@ const librarianMachine = createMachine({
               })),
             },
             {
-              target: '#librarian.done',
+              target: "bye", 
             },
           ],
+        },
+        bye: {
+          invoke: {
+            src: 'onComplete',
+            onDone: [
+              {
+                target: "#librarian.idle.closed",
+                actions: assign({ open: false, path: "", history: [], responses: []})
+                // target: '#librarian.done',
+              },
+            ]
+          }
         },
         add: {
           initial: 'curate',
           states: {
             curate: {
+              entry: assign((context) => ({ status: `Curating item ${context.item.title}` })),
               invoke: {
                 src: 'curateItem',
                 onDone: [
@@ -261,9 +477,15 @@ const librarianMachine = createMachine({
               },
             },
             add_item: {
+              entry: assign((context) => ({ status: `Adding item ${context.item.title}` })),
               invoke: {
                 src: 'addItem',
                 onDone: [
+                  {
+                    target: '#librarian.import_items.next_item',
+                    cond:  (_, event) => typeof event.data === 'object',
+                    actions: assign({ stars: [], item: null })
+                  },
                   {
                     target: 'cast',
                     actions: assign((_, event) => ({
@@ -288,6 +510,7 @@ const librarianMachine = createMachine({
               }
             },
             cast: {
+              entry: assign((context) => ({ status: `Casting models for ${context.ID}` })),
               invoke: {
                 src: 'castItem',
                 onDone: [
@@ -340,6 +563,25 @@ const librarianMachine = createMachine({
     moreKeys: context => !!(context.response?.keys?.length > context.search_index),
   },
   actions: {
+    assignOpen: assign({ open: true}),
+    assignPath: assign((_, event) => ({ path: event.data })),
+    assignClose: assign({ open: false }),
+    clearProps: assign({ 
+      hide: false,
+      response: {},
+      responses: [], 
+      currentPage: 1 
+    }),
+    appendKeys: assign((context, event) => { 
+      const files = event.data?.filter(f => !!f && !['javdoe.tv','javdoe.com','javfinder.la'].some(d => f.domain === d));
+      const keyset = context.keyset.filter(key => !files.find(f => f.Key?.toUpperCase() === key.toUpperCase()))
+      console.log ({ files , keyset})
+      return {
+        responses: (files||[]).concat(context.responses),
+        keyset ,
+        search_index: context.search_index + SEARCH_SPEED
+      }
+    }),
     applyChange: assign((_, event) => ({
       [event.key]: event.value
     })),
@@ -362,6 +604,13 @@ export const useLibrarian = (refresh) => {
       onComplete: async() => { 
         return refresh && refresh()
       },
+      autoInvoke: async(context) => {
+        const datum = await getJavNames(context.key, context.name)
+        if (datum?.indexOf('javlibrary') > 0) {
+          return datum.split('/').pop()
+        } 
+        return false
+      },
       onOpen: async() => {
        const datum = await navigator.clipboard.readText();
         if (datum?.indexOf('javlibrary') > 0) {
@@ -374,6 +623,11 @@ export const useLibrarian = (refresh) => {
       },
       sendSearchRequest: async(context) => {
         return await searchJavdo(context.key)
+      },
+      checkKeys: async(context) => {
+        const { response, search_index} = context;
+        const batch = response.keys.slice(search_index, search_index + SEARCH_SPEED);
+        return await Promise.all(batch.map(s => findVideos(s,1,1))); 
       },
       checkKey: async(context) => {
         return await findVideos(context.key)

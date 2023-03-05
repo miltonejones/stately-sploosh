@@ -158,6 +158,7 @@ const ModelModal = ({
   favoriteClicked,
   deleteClicked,
   searchClicked,
+  bookClicked,
   handleSelect,
   handleBatch,
   aliasMode,
@@ -315,6 +316,14 @@ const ModelModal = ({
               }}
               className="fa-solid fa-cart-shopping"
             ></i>
+{!!model?.videos?.records?.length && <i 
+      onClick={() => {
+        bookClicked(model.videos.records[0].Key, star.name);
+        handleClose()
+      }}
+        className="fa-solid fa-book"
+      ></i>}
+      
 
             <i onClick={handleAlias} className="fa-solid fa-people-arrows"></i>
 
