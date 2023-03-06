@@ -1,15 +1,23 @@
 
 import React from 'react';
-import { Drawer } from '@mui/material';
+import { Drawer, Card, styled } from '@mui/material';
 
-const BacklessDrawer = ({children, debug, ...props}) => {
+
+const Backless = styled(Card)(({ open }) => ({
+  height: open ? "fit-content" : 0,
+  position: 'fixed',
+  top: 'auto',
+  bottom: 0,
+  right: 0,
+  width: '100vw',
+  backgroundColor: "#fff",
+  zIndex: 400
+}))
+
+
+const BacklessDrawer = ({children,  ...props}) => {
   return (
-   <Drawer 
-     sx={{
-       '& .MuiPaper-root': {
-         left: debug ? 360 : 0
-       }
-     }}
+   <Backless  
      ModalProps={{
        slots: { backdrop: "div" },
        slotProps: {
@@ -25,7 +33,7 @@ const BacklessDrawer = ({children, debug, ...props}) => {
        },
        }}  {...props}>
  {children}
-     </Drawer>
+     </Backless>
   );
  }
 

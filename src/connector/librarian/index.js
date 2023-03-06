@@ -15,9 +15,12 @@ export const searchJavdo = async (key) => {
   return await response.json();
 };
 
-export const getJavNames = async (key, name) => {
+export const getJavNames = async (key, name, studio) => {
   const response = await fetch(API_ENDPOINT + `/names/${key}`);
   const res = await response.json();
+  if (studio) {
+    return res?.studio
+  }
   const obj = res.names?.find(f => f.title === name);
   if (obj) {
     return obj.href

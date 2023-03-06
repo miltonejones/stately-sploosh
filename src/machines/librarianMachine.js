@@ -36,21 +36,17 @@ const librarianMachine = createMachine({
             onDone: [
               {
                 target: 'opened', 
-                cond: (_, event) => !event.data
+                cond: "emptyData"
               },
               {
                 target: "#librarian.get_keys",
-                actions: assign((_, event) => ({
-                  path: event.data,
-                  response: {},
-                  responses: [], currentPage: 1 
-                }))
+                actions: "assignKeys"
               }
             ]
           }
         },
         opened: {
-          entry: assign({ responses: [], currentPage: 1   }),
+          entry: "clearProps",
           on: {
             CHANGE: {
               actions: "applyChange"
@@ -106,27 +102,47 @@ const librarianMachine = createMachine({
       },
     },
 
+    find_model: {
+      initial: "start",
+      states: {
+        start: {
+          always: [
+            {
+              target: "locate",
+              cond: "needsModel",
+              actions: "assignModelName"
+            },
+            {
+              target: "#librarian.check_keys"
+            }
+          ]
+        },
+        locate: {
+          invoke: {
+            src: "getModelFromPath",
+            onDone: [
+              {
+                target: "#librarian.check_keys",
+                actions: "assignImage"
+              }
+            ]
+          }
+        }
+      }
+    },
+
     get_keys: {
       entry: assign((context ) => ({ status: `Getting keys for ${context.path}` })),
       invoke: {
         src: "getKeysFromPath",
         onDone: [
           {
-            target: "check_keys",
-            actions: assign((_, event) => ({
-              response: event.data,
-              history: [],
-              keyset: event.data.keys,
-              // hide: false,
-              // responses: [],
-              // key_index: 0,
-              search_index: 0
-            })),
+            target: "find_model",
+            actions: "assignKeysOfPath",
           },
         ],
       },
     },
-
 
     recast: {
       entry: assign((context ) => ({ status: `Recasting ${context.uncastTracks.length} tracks` })),
@@ -280,22 +296,12 @@ const librarianMachine = createMachine({
             {
               target: "lookup",
               cond: "moreKeys",
-              actions: assign((context) => ({
-                key: context.response.keys[context.search_index], 
-              })),
+              actions: "assignNextKey",
             },
             {
               target: "#librarian.get_keys",
               cond: "morePages",
-              actions: assign((context) => {
-                const { href, page } = context.response.pages.find(f => !isNaN(f.page) && Number(f.page) > Number(context.currentPage));
-                const parts = href.split('/');
-                return {
-                  history: context.history.concat(context.path),
-                  path: parts.pop(),
-                  currentPage: page
-                }
-              }),
+              actions: "assignNextPage",
             },
             {
               target: "#librarian.done",
@@ -310,10 +316,7 @@ const librarianMachine = createMachine({
             onDone: [
               {
                 target: "next",
-                actions: assign((context, event) => ({
-                  responses: context.responses.concat(event.data),
-                  search_index: context.search_index + 1
-                })),
+                actions: "assignNextResponse",
               },
             ],
             onError: [
@@ -630,6 +633,11 @@ const librarianMachine = createMachine({
 
       return !uncastTracks.length
     },
+    needsModel: (context) => {
+      const { image, response } = context;
+      return !image && /Videos starring (.*)/.exec(response.title)
+    },
+    emptyData:  (_, event) => !event.data,
     emptySource:  (context) => !context.source,
     searchSource:  (context) => context.source === 'search',
     keySource:  (context) => context.source === 'lookup',
@@ -641,7 +649,47 @@ const librarianMachine = createMachine({
     moreCandidates: context => context.add_index < context.candidates.length,
   },
   actions: {
-    statusAuto: assign((context ) => ({ status: `Getting path for model '${context.name}'` })),
+    statusAuto: assign((context) => ({ status: context.studio 
+        ? `Getting path for studio key '${context.key}'`
+        : `Getting path for model '${context.name}'`  })),
+    assignNextPage:  assign((context) => {
+      const { href, page } = context.response.pages.find(f => !isNaN(f.page) && Number(f.page) > Number(context.currentPage));
+      const parts = href.split('/');
+      return {
+        history: context.history.concat(context.path),
+        path: parts.pop(),
+        currentPage: page
+      }
+    }),
+    assignImage: assign((_, event) => ({
+       image: event.data
+    })),
+    assignModelName: assign((context, event) => {
+      const { image, response } = context;
+      const regex = /Videos starring (.*)/.exec(response.title)
+      return {
+        star: regex[1]
+      }
+    }),
+    assignNextResponse:  assign((context, event) => ({
+      responses: context.responses.concat(event.data),
+      search_index: context.search_index + 1
+    })),
+    assignNextKey: assign((context) => ({
+      key: context.response.keys[context.search_index], 
+    })),
+    assignKeysOfPath:  assign((_, event) => {
+      const response = event.data;
+      return {
+          response: {
+            ...response,
+            keys: Array.from(new Set(response.keys))
+          },
+          history: [],
+          keyset: event.data.keys, 
+          search_index: 0
+        }
+    }),
     assignMissing: assign((context, event) => {
       const files = event.data?.filter(f => !!f);
       const uncastTracks = files
@@ -651,6 +699,12 @@ const librarianMachine = createMachine({
         cast_index: 0
       }
     }),
+    assignKeys:  assign((_, event) => ({
+        path: event.data,
+        response: {},
+        responses: [], 
+        currentPage: 1 
+      })),
     incrementTrackIndex: assign((context) => ({
       cast_index: context.cast_index + 1
     })),
@@ -664,6 +718,7 @@ const librarianMachine = createMachine({
       name: event.name,
       modelfk: event.modelfk,
       image: event.image,
+      studio: event.studio,
       open: true
     })),
     assignCastID: assign((_, event) => ({ ID: event.data })),
@@ -680,7 +735,7 @@ const librarianMachine = createMachine({
       item: context.candidates[context.add_index],
       progress: 100 * (context.add_index/context.candidates.length)
     })),
-    assignClose: assign({ image: null, open: false, path: "" }),
+    assignClose: assign({ image: null, studio: null, open: false, path: "" }),
     clearStars: assign({ models: [], stars: [], item: null }), 
     clearProps: assign({ 
       hide: false, 
@@ -696,7 +751,7 @@ const librarianMachine = createMachine({
       const keyset = context.keyset.filter(key => !files.find(f => f.Key?.toUpperCase() === key.toUpperCase()))
       console.log ({ files , keyset})
       return {
-        responses: (files||[]).concat(context.responses),
+        responses:  context.responses.concat(files), // (files||[]).concat(),
         keyset ,
         search_index: context.search_index + SEARCH_SPEED
       }
@@ -720,11 +775,17 @@ const librarianMachine = createMachine({
 export const useLibrarian = (refresh) => {
   const [state, send] = useMachine(librarianMachine, {
     services: { 
+      getModelFromPath: async(context) => { 
+        const star = await getModelsByName(context.star, 1);
+        // console.log ({ name })
+        return star?.image
+      },
       onComplete: async() => { 
         return refresh && refresh()
       },
       autoInvoke: async(context) => {
-        const datum = await getJavNames(context.key, context.name)
+        const datum = await getJavNames(context.key, context.name, context.studio);
+        console.log (context.name, context.key, datum)
         if (datum?.indexOf('javlibrary') > 0) {
           return datum.split('/').pop()
         } 

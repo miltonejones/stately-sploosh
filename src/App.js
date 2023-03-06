@@ -575,6 +575,11 @@ function Application() {
                     editClicked={editor.handleClick}
                     deleteClicked={removeVideo}
                     favoriteClicked={addFavorite}
+                    bookClicked={(options) => { 
+                      librarian.send({
+                        type: 'AUTO', ...options
+                      })
+                    }}
                     studioClicked={(val) => navigate(`/search/1/${val}-`)}
                     domainClicked={(val) => navigate(`/domain/1/${val}`)}
                     photoClicked={photo.openPhoto}
@@ -609,9 +614,9 @@ function Application() {
         searchClicked={shop.handleClick}
         deleteClicked={removeVideo}
         favoriteClicked={addFavorite}
-        bookClicked={(key, name, modelfk, image) => { 
+        bookClicked={(options) => { 
           librarian.send({
-            type: 'AUTO', key, name, modelfk, image
+            type: 'AUTO', ...options
           })
         }}
         {...modal}

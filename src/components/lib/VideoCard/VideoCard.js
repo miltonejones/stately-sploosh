@@ -12,6 +12,7 @@ import {
   Tooltip,
   styled,
 } from "@mui/material";
+import { Spacer} from "../../../styled";
 import { RegionMenu, usePhoto, ConfirmPopover } from "..";
 // import { useWindowManager } from '../../../services';
 import Marquee from "react-fast-marquee";
@@ -112,6 +113,7 @@ const VideoCard = ({
   domainClicked,
   deleteClicked,
   photoClicked,
+  bookClicked,
   selected,
   selectedID,
   modelClicked,
@@ -290,19 +292,32 @@ const VideoCard = ({
               </Typography>
             </Stack>
           </Stack>
-          <Stack direction="row" sx={{ justifyContent: "space-between" }}>
+          <Stack spacing={1} direction="row" sx={{ justifyContent: "space-between" }}>
             <Typography
               onClick={() => domainClicked && domainClicked(video.domain)}
               variant="caption"
             >
               {video.domain}
             </Typography>
+            <Spacer />
             <Typography
               onClick={() => studioClicked && studioClicked(video.studio)}
               variant="caption"
             >
               {video.studio}
             </Typography>
+
+          {!!bookClicked && <i 
+              onClick={() => {
+                bookClicked( {
+                  key: video.Key,
+                  studio: true
+                }); 
+              }}
+            className="fa-solid fa-book"
+          ></i>}
+          
+          
           </Stack>
         </CardContent>
       )}

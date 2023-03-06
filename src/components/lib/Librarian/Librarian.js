@@ -8,6 +8,7 @@ import { getPagination } from "..";
  
 const Layout = styled(Box)(({ theme, thin, short }) => ({
   margin: theme.spacing(0),
+  padding: theme.spacing(1),
   height: short ? '60vh' : (thin ? 140 : '100vh'),
   transition: 'height 0.3s linear'
  }));
@@ -49,7 +50,7 @@ const Librarian = ({ librarian }) => {
   <BacklessDrawer anchor="bottom" open={librarian.open} onClose={() => librarian.send('CLOSE')}>
    <Layout short={is(['import_items', 'viewing'])} thin={is(['idle.opened', 'idle.auto']) || librarian.thin}>
 
-  {is(['import_items.add_error', 'auto.auto_error']) && <Flex>
+  {is(['import_items.add_error', 'idle.auto.auto_error']) && <Flex>
    <Stack sx={{p: 1}}>
     <Typography color="error">
       {librarian.error}
@@ -72,20 +73,20 @@ const Librarian = ({ librarian }) => {
     
     </Flex>}
 
-      {!is(['done', 'viewing.ready', 'import_items']) && <Stack> 
+      {!is(['done', 'viewing.ready', 'import_items']) && <Stack sx={{p: 2}}> 
         {!!pageProg && <LinearProgress variant="determinate" color="secondary" value={pageProg} />}
         {!!progress && <LinearProgress variant="determinate" value={progress} />}
         {!!buffering && <LinearProgress variant="indeterminate" color="error"/>}
         <Typography variant="caption">{JSON.stringify(librarian.status)}   </Typography>
       </Stack>}
 
-      {is([ 'import_items']) && librarian.progress && <Stack>  
+      {is([ 'import_items']) && !!librarian.progress && <Stack sx={{p: 2}}>  
         {!!librarian.progress && <LinearProgress variant="determinate" value={librarian.progress} />} 
         <Typography variant="caption">{JSON.stringify(librarian.status)}   </Typography>
       </Stack>}
 
 
-    <Flex sx={{width: '100%'}}>
+   {!is('import_items') && <Flex sx={{width: '100%'}}>
      {!librarian.thin && !!librarian.image && <Box sx={{p: 1}}>
         <Photo 
           src={librarian.image}
@@ -99,7 +100,7 @@ const Librarian = ({ librarian }) => {
       <Stack sx={{width: '100%' }}>
 
         {/* librarian toolbar  */}
-          <Flex sx={{p: 1}} spacing={1}>
+          <Flex sx={{p: 1}} spacing={2}>
     
 
           {/* display panel for THIN view */}
@@ -290,7 +291,7 @@ const Librarian = ({ librarian }) => {
 
 
       </Stack>
-    </Flex>
+    </Flex>}
 
     {/* preview/import panel */}
     <Collapse in={is(['import_items', 'viewing.ready', 'viewing.match'])}>

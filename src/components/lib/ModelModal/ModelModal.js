@@ -316,14 +316,22 @@ const ModelModal = ({
               }}
               className="fa-solid fa-cart-shopping"
             ></i>
-{!!model?.videos?.records?.length && <i 
-      onClick={() => {
-        bookClicked(model.videos.records[0].Key, star.name, star.ID, star.image);
-        handleClose()
-      }}
-        className="fa-solid fa-book"
-      ></i>}
-      
+    
+    
+    
+          {!!model?.videos?.records?.length && <i 
+              onClick={() => {
+                bookClicked( {
+                  key: model.videos.records[0].Key,
+                  name: star.name, 
+                  modelfk: star.ID ,
+                  image: star.image
+                });
+                handleClose()
+              }}
+            className="fa-solid fa-book"
+          ></i>}
+          
 
             <i onClick={handleAlias} className="fa-solid fa-people-arrows"></i>
 
@@ -398,6 +406,7 @@ const ModelModal = ({
                 selectedID={star.ID}
                 modelClicked={openModel}
                 handleDedupe={handleDedupe}
+                bookClicked={bookClicked}
                 small
                 video={record}
               />
