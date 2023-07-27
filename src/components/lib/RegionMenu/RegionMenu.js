@@ -14,7 +14,7 @@ const Region = styled(Box)(({ open }) => ({
 export default function RegionMenu({ width, height, open, click }) {
   const areas = [];
   WINDOW_REGIONS.map((region) => {
-    const ratioX = width / 1600;
+    const ratioX = width / 1920;
     areas.push({
       width: region.width * ratioX - 4,
       height: region.height * ratioX - 4,

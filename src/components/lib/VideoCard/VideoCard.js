@@ -162,7 +162,7 @@ const VideoCard = ({
       <i />
     );
 
-  const size = small ? 200 : medium ? "260" : 260;
+  const size = small ? 200 : medium ? "230" : 230;
   const opacity = WindowManager.visited(video) ? 0.5 : 1;
   return (
     <Block cursor={cursor} opacity={opacity} width={size} selected={selected}>

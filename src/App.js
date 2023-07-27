@@ -21,6 +21,7 @@ import {
   Librarian
 } from "./components/lib";
 import { useWindowManager, VideoPersistService } from "./services";
+import VideoForm from './components/pages/Save/Save.js'
 
 import {
   Avatar,
@@ -87,6 +88,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Application />} />
+        <Route path="/save" element={<VideoForm />} />
         <Route path="/:type" element={<Application />} />
         <Route path="/:type/:page" element={<Application />} />
         <Route path="/:type/:page/:param" element={<Application />} />
