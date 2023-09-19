@@ -18,10 +18,10 @@ import {
   useShoppingDrawer,
   useVideoDrawer,
   SettingsMenu,
-  Librarian
+  Librarian,
 } from "./components/lib";
 import { useWindowManager, VideoPersistService } from "./services";
-import VideoForm from './components/pages/Save/Save.js'
+import VideoForm from "./components/pages/Save/Save.js";
 
 import {
   Avatar,
@@ -36,6 +36,7 @@ import {
   // TextField,
   Typography,
   styled,
+  Chip,
 } from "@mui/material";
 import {
   getVideos,
@@ -92,6 +93,7 @@ function App() {
         <Route path="/:type" element={<Application />} />
         <Route path="/:type/:page" element={<Application />} />
         <Route path="/:type/:page/:param" element={<Application />} />
+        <Route path="/:type/:page/:param/:domain" element={<Application />} />
       </Routes>
     </BrowserRouter>
   );
@@ -120,7 +122,7 @@ function Application() {
     "search.page",
     "search.find",
   ].some(shop.state.matches);
-  const { type, page = 1, param } = useParams();
+  const { type, page = 1, param, domain } = useParams();
   const [state, send] = useMachine(splooshMachine, {
     services: {
       getParam: async (context) => param,
@@ -179,7 +181,7 @@ function Application() {
       },
       searchVideos: async (context) => {
         await appendTab(param, "search");
-        return await findVideos(param, page);
+        return await findVideos(param, page, false, domain);
       },
     },
   });
@@ -207,7 +209,7 @@ function Application() {
   });
 
   React.useEffect(() => {
-    if (!type) return; 
+    if (!type) return;
     send({
       type: type.toUpperCase(),
       page,
@@ -222,6 +224,7 @@ function Application() {
   const setPage = (e, num) => {
     const path = [type, num];
     if (param) path.push(param);
+    if (domain) path.push(domain);
     navigate("/" + path.join("/"));
   };
 
@@ -233,12 +236,12 @@ function Application() {
   const removeTab = async (doomed) => {
     const searches = tabs.filter((t) => t.param !== doomed);
     await store.setItem("search-tabs", JSON.stringify(searches));
-    if (param  !== doomed) { 
+    if (param !== doomed) {
       send({
-        type: 'VIDEO',
+        type: "VIDEO",
         page,
         param,
-      }); 
+      });
       return;
     }
     navigate(`/video/1`);
@@ -260,20 +263,21 @@ function Application() {
 
   const { windowLength } = WindowManager;
 
-  const floatingProps = (windowLength
-    ? [
-        {
-          icon: <i className="fa-solid fa-users-viewfinder" />,
-          action: () => WindowManager.focus(),
-          name: "Focus all windows",
-        },
-        {
-          icon: <i className="fa-solid fa-xmark" />,
-          action: () => WindowManager.exit(),
-          name: "Close all windows",
-        },
-      ]
-    : []
+  const floatingProps = (
+    windowLength
+      ? [
+          {
+            icon: <i className="fa-solid fa-users-viewfinder" />,
+            action: () => WindowManager.focus(),
+            name: "Focus all windows",
+          },
+          {
+            icon: <i className="fa-solid fa-xmark" />,
+            action: () => WindowManager.exit(),
+            name: "Close all windows",
+          },
+        ]
+      : []
   ).concat([
     //   { icon: <i className="fa-solid fa-clipboard-check"/>, action: () =>  {
     //     send({
@@ -312,6 +316,14 @@ function Application() {
     "domain.loading",
   ].some(state.matches);
   const modelPageCount = Math.ceil(state.context.models?.count / 36);
+
+  const domains = state.context.videos?.records?.reduce((out, res) => {
+    out[res.domain] = res;
+    return out;
+  }, {});
+
+  // console.log({ domains });
+
   return (
     <AppStateContext.Provider
       value={{ WindowManager, active_machine, floatingProps }}
@@ -412,13 +424,12 @@ function Application() {
               ? "fa-solid fa-rotate App-logo"
               : "fa-solid fa-cart-shopping"
           }
-        ></i>  
-       
-        
-          <i
-        onClick={() => librarian.send('OPEN')}
-        className="fa-solid fa-book"
-      ></i>
+        ></i>
+
+        <i
+          onClick={() => librarian.send("OPEN")}
+          className="fa-solid fa-book"
+        ></i>
 
         {/* <i onClick={() =>  send('REFRESH')} className="fa-solid fa-rotate"></i>
 {!editor.videos?.length && <i onClick={() =>  editor.selectMode()} className={editor.multiple?"fa-solid fa-check red":"fa-solid fa-check"}></i>}
@@ -443,7 +454,7 @@ function Application() {
     navigate(`/search/1/${tabList[n - 1].param}`)
   }} */}
 
-  {/* {JSON.stringify(librarian.state.value)} */}
+      {/* {JSON.stringify(librarian.state.value)} */}
       {!!tabList && !state.matches("dash") && view !== "model" && (
         <Flex
           sx={{ borderBottom: 1, borderColor: busy ? "primary" : "divider" }}
@@ -523,89 +534,122 @@ function Application() {
       <div className="App">
         {state.matches("dash") && <Dash />}
 
-        {view === "model" && !state.matches("dash") && !!state.context.models && (
-          <Stack>
-            <Flex spacing={1} sx={{ mt: 1 }}>
-              {modelPageCount > 1 && (
-                <Pagination
-                  count={modelPageCount}
-                  page={Number(page)}
-                  onChange={setPage}
-                />
-              )}
-              <Typography variant="caption">
-                {state.context.models?.count} models
-              </Typography>
-              {!!param && (
-                <Typography
-                  onClick={() => navigate("/model/1")}
-                  variant="caption"
-                >
-                  {" "}
-                  like "<b>{param}</b>" <i className="fa-solid fa-xmark" />
-                </Typography>
-              )}
-            </Flex>
-            <ModelGrid
-              modelClicked={modal.openModel}
-              models={state.context.models.records}
-            />
-          </Stack>
-        )}
-
-        {!state.matches("dash") && !!state.context.videos && view !== "model" && (
-          <Stack spacing={1}>
-            {pageCount > 1 && (
-              <Flex sx={{ mt: 1 }}>
-                <Pagination
-                  count={Number(pageCount)}
-                  page={Number(page)}
-                  onChange={setPage}
-                />
-
-                <Typography variant="caption">
-                  {videos?.count} videos
-                </Typography>
-              </Flex>
-            )}
-            <Box sx={{ ml: 2 }}>
-              <PhotoGrid sx={{ width: "97vw" }}>
-                {state.context.videos.records.map((video) => (
-                  <VideoCard
-                    medium
-                    selected={editor.videos?.find((f) => f.ID === video.ID)}
-                    editClicked={editor.handleClick}
-                    deleteClicked={removeVideo}
-                    favoriteClicked={addFavorite}
-                    bookClicked={(options) => { 
-                      librarian.send({
-                        type: 'AUTO', ...options
-                      })
-                    }}
-                    studioClicked={(val) => navigate(`/search/1/${val}-`)}
-                    domainClicked={(val) => navigate(`/domain/1/${val}`)}
-                    photoClicked={photo.openPhoto}
-                    modelClicked={(id) => {
-                      modal.openModel(id);
-                    }}
-                    video={video}
-                    key={video.ID}
+        {view === "model" &&
+          !state.matches("dash") &&
+          !!state.context.models && (
+            <Stack>
+              <Flex spacing={1} sx={{ mt: 1 }}>
+                {modelPageCount > 1 && (
+                  <Pagination
+                    count={modelPageCount}
+                    page={Number(page)}
+                    onChange={setPage}
                   />
-                ))}
-              </PhotoGrid>
-            </Box>
+                )}
+                <Typography variant="caption">
+                  {state.context.models?.count} models
+                </Typography>
+                {!!param && (
+                  <Typography
+                    onClick={() => navigate("/model/1")}
+                    variant="caption"
+                  >
+                    {" "}
+                    like "<b>{param}</b>" <i className="fa-solid fa-xmark" />
+                  </Typography>
+                )}
+              </Flex>
+              <ModelGrid
+                modelClicked={modal.openModel}
+                models={state.context.models.records}
+              />
+            </Stack>
+          )}
 
-            {pageCount > 1 && (
-              <Box sx={{ ml: 1 }}>
-                <Pagination
-                  count={Number(pageCount)}
-                  page={Number(page)}
-                  onChange={setPage}
-                />
+        {!state.matches("dash") &&
+          !!state.context.videos &&
+          view !== "model" && (
+            <Stack spacing={1}>
+              {pageCount > 1 && (
+                <Flex sx={{ mt: 1 }}>
+                  <Pagination
+                    count={Number(pageCount)}
+                    page={Number(page)}
+                    onChange={setPage}
+                  />
+
+                  <Typography variant="caption">
+                    {videos?.count} videos
+                  </Typography>
+                </Flex>
+              )}
+              <Box sx={{ ml: 2 }}>
+                <PhotoGrid sx={{ width: "97vw" }}>
+                  {state.context.videos.records.map((video) => (
+                    <VideoCard
+                      medium
+                      selected={editor.videos?.find((f) => f.ID === video.ID)}
+                      editClicked={editor.handleClick}
+                      deleteClicked={removeVideo}
+                      favoriteClicked={addFavorite}
+                      bookClicked={(options) => {
+                        librarian.send({
+                          type: "AUTO",
+                          ...options,
+                        });
+                      }}
+                      studioClicked={(val) => navigate(`/search/1/${val}-`)}
+                      domainClicked={(val) => navigate(`/domain/1/${val}`)}
+                      photoClicked={photo.openPhoto}
+                      modelClicked={(id) => {
+                        modal.openModel(id);
+                      }}
+                      video={video}
+                      key={video.ID}
+                    />
+                  ))}
+                </PhotoGrid>
               </Box>
-            )}
-          </Stack>
-        )}
+
+              {!!domains && state.context.view === "search" && (
+                <Stack
+                  spacing={1}
+                  direction="row"
+                  sx={{ p: 2, alignItems: "center" }}
+                >
+                  <Typography variant="caption">Domains</Typography>
+                  {Object.keys(domains).map((key) => (
+                    <Chip
+                      disabled={busy}
+                      onClick={() =>
+                        navigate(`/search/1/${search_param}/${key}`)
+                      }
+                      onDelete={
+                        !domain
+                          ? null
+                          : () => navigate(`/search/1/${search_param}`)
+                      }
+                      key={key}
+                      size="small"
+                      variant="filled"
+                      color={!domain ? "default" : "success"}
+                      label={key}
+                    />
+                  ))}
+                </Stack>
+              )}
+
+              {pageCount > 1 && (
+                <Box sx={{ ml: 1 }}>
+                  <Pagination
+                    count={Number(pageCount)}
+                    page={Number(page)}
+                    onChange={setPage}
+                  />
+                </Box>
+              )}
+            </Stack>
+          )}
       </div>
       <Librarian librarian={librarian} />
       <FloatingMenu fixed />
@@ -616,10 +660,11 @@ function Application() {
         searchClicked={shop.handleClick}
         deleteClicked={removeVideo}
         favoriteClicked={addFavorite}
-        bookClicked={(options) => { 
+        bookClicked={(options) => {
           librarian.send({
-            type: 'AUTO', ...options
-          })
+            type: "AUTO",
+            ...options,
+          });
         }}
         {...modal}
       />
