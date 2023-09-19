@@ -66,6 +66,7 @@ import {
 import "./App.css";
 import { SearchPersistService } from "./services";
 import { Flex, PhotoGrid, IconTextField } from "./styled";
+import DomainMenu from "./components/lib/DomainMenu/DomainMenu";
 
 const Btn = styled(Button)(({ theme }) => ({
   textTransform: "capitalize",
@@ -317,12 +318,15 @@ function Application() {
   ].some(state.matches);
   const modelPageCount = Math.ceil(state.context.models?.count / 36);
 
-  const domains = state.context.videos?.records?.reduce((out, res) => {
-    out[res.domain] = res;
-    return out;
-  }, {});
+  const domains = state.context.videos?.domains
+    ?.sort((a, b) => (a.amt < b.amt ? 1 : -1))
+    .reduce((out, res) => {
+      out[res.domain] = res;
+      return out;
+    }, {});
 
   // console.log({ domains });
+  const domainProps = { domains, domain, search_param, busy, navigate };
 
   return (
     <AppStateContext.Provider
@@ -473,11 +477,13 @@ function Application() {
 
               <i
                 onClick={() => {
-                  const parameter =
+                  const parameter = [
                     param.indexOf("*") > 0
                       ? param.replace("*", "")
-                      : `${param}*`;
-                  navigate(`/search/1/${parameter}`);
+                      : `${param}*`,
+                  ];
+                  if (domain) parameter.push(domain);
+                  navigate(`/search/1/${parameter.join("/")}`);
                 }}
                 className={`${
                   param.indexOf("*") > 0 ? "red fa-solid" : "fa-regular"
@@ -612,31 +618,57 @@ function Application() {
               </Box>
 
               {!!domains && state.context.view === "search" && (
-                <Stack
-                  spacing={1}
-                  direction="row"
-                  sx={{ p: 2, alignItems: "center" }}
-                >
-                  <Typography variant="caption">Domains</Typography>
-                  {Object.keys(domains).map((key) => (
-                    <Chip
-                      disabled={busy}
-                      onClick={() =>
-                        navigate(`/search/1/${search_param}/${key}`)
-                      }
-                      onDelete={
-                        !domain
-                          ? null
-                          : () => navigate(`/search/1/${search_param}`)
-                      }
-                      key={key}
-                      size="small"
-                      variant="filled"
-                      color={!domain ? "default" : "success"}
-                      label={key}
-                    />
-                  ))}
-                </Stack>
+                <DomainMenu {...domainProps} />
+                // <Stack
+                //   spacing={1}
+                //   direction="row"
+                //   sx={{
+                //     p: 2,
+                //     alignItems: "center",
+                //     maxWidth: "90vw",
+                //     overflow: "hidden",
+                //   }}
+                // >
+                //   <Typography variant="caption">Domains</Typography>
+                //   {Object.keys(domains).map((key) => (
+                //     <Chip
+                //       disabled={busy}
+                //       onClick={() => {
+                //         const prefix = !domain
+                //           ? [key]
+                //           : domain.split(",").concat(key);
+                //         navigate(
+                //           `/search/1/${search_param}/${prefix.join(",")}`
+                //         );
+                //       }}
+                //       onDelete={
+                //         domain?.indexOf(key) < 0
+                //           ? null
+                //           : () => {
+                //               if (!domain || domain.indexOf(key) < 0) {
+                //                 return navigate(`/search/1/${search_param}`);
+                //               }
+                //               const prefix = domain
+                //                 .split(",")
+                //                 .filter((name) => name !== key)
+                //                 .join(",");
+                //               return navigate(
+                //                 `/search/1/${search_param}/${prefix}`
+                //               );
+                //             }
+                //       }
+                //       key={key}
+                //       size="small"
+                //       variant="filled"
+                //       color={
+                //         !domain || domain.indexOf(key) < 0
+                //           ? "default"
+                //           : "success"
+                //       }
+                //       label={key}
+                //     />
+                //   ))}
+                // </Stack>
               )}
 
               {pageCount > 1 && (
