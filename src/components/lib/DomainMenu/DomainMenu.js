@@ -1,13 +1,26 @@
+import React from "react";
 import {
   Chip,
-  FormControl,
-  InputLabel,
   MenuItem,
-  Select,
   Stack,
+  TextField,
+  Menu,
+  Link,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
+import { Nowrap } from "../../../styled";
+
+function addOrRemoveStringFromArray(arr, str) {
+  const index = arr.indexOf(str);
+
+  if (index !== -1) {
+    arr.splice(index, 1);
+  } else {
+    arr.push(str);
+  }
+
+  return arr;
+}
 
 /*
  * The DomainMenu component renders a row of chips representing different domains
@@ -38,6 +51,16 @@ export default function DomainMenu({
     },
     [[], []]
   );
+
+  const [menuAnchor, setMenuAnchor] = React.useState();
+
+  const handleMenuClose = () => {
+    setMenuAnchor(null);
+  };
+
+  const handleMenuOpen = (event) => {
+    setMenuAnchor(event.target);
+  };
 
   // Keep track of the selected domains in the dropdown
   // const [dropdownSelection, setDropdownSelection] = useState(
@@ -75,6 +98,7 @@ export default function DomainMenu({
       const url = `/search/1/${search_param}/${prefix}`;
       navigate(url);
     }
+    handleMenuClose();
   };
 
   /*
@@ -84,7 +108,10 @@ export default function DomainMenu({
   const handleDropdownChange = (event) => {
     const { value } = event.target;
     // alert(typeof value);
-    handleDropdownClose([...new Set(value)]);
+    // alert(JSON.stringify({ dropdownSelection }, 0, 2));
+    // alert(value);
+    const sel = addOrRemoveStringFromArray(domain.split(","), value);
+    handleDropdownClose([...new Set(sel)]);
   };
 
   /*
@@ -92,30 +119,25 @@ export default function DomainMenu({
    * new URL and navigates to the search page with the selected domains as a prefix.
    */
   const handleDropdownClose = (sel) => {
-    const prefix = domain
-      ? domain
-          .split(",")
-          .filter((f) => sel.indexOf(f) < 0)
-          .concat(sel)
-      : sel;
     const url = `/search/1/${search_param}/${sel.join(",")}`;
     navigate(url);
-    // alert(sel);
-    // setDropdownSelection(sel);
+    handleMenuClose();
   };
+
+  const Component = !!dropdownSelection.length ? TextField : Menu;
 
   return (
     <Stack
       spacing={1}
       direction="row"
       sx={{
-        p: 2,
         alignItems: "center",
         maxWidth: "90vw",
         overflow: "hidden",
+        pt: 1,
       }}
     >
-      <Typography variant="caption">Domains</Typography>
+      {/* <Typography variant="caption">Domains</Typography> */}
       {selectedDomains.map((domainName) => (
         <Chip
           key={domainName}
@@ -130,39 +152,72 @@ export default function DomainMenu({
           disabled={busy}
         />
       ))}
-      {dropdownDomains.length > 0 && (
-        <FormControl>
-          <InputLabel id="domain-select-label">More Domains</InputLabel>
-          <Select
-            size="small"
-            labelId="domain-select-label"
-            id="domain-select"
-            multiple
-            sx={{ minWidth: 300 }}
-            value={dropdownSelection}
-            onChange={handleDropdownChange}
-            renderValue={(selected) => (
-              <>
-                {selected.map((sel) => (
-                  <Chip
-                    size="small"
-                    label={sel}
-                    key={sel}
-                    onClick={() => handleChipDelete(sel)}
-                    onDelete={() => handleChipDelete(sel)}
-                  />
-                ))}
-              </>
-            )}
-          >
-            {dropdownDomains.map((domainName) => (
-              <MenuItem key={domainName} value={domainName}>
-                {domainName}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+
+      {!dropdownSelection?.length && (
+        <Nowrap
+          hover
+          variant="caption"
+          onClick={handleMenuOpen}
+          disabled={busy}
+          sx={{ cursor: "pointer" }}
+        >
+          More Domains
+        </Nowrap>
       )}
+
+      {dropdownDomains.length > 0 && (
+        <Component
+          size="small"
+          label="More Domains"
+          anchorEl={menuAnchor}
+          open={Boolean(menuAnchor)}
+          onClose={handleMenuClose}
+          select
+          value=""
+          sx={{ minWidth: 300, m: 2 }}
+          InputProps={{
+            startAdornment: (
+              <ChipList
+                selected={dropdownSelection}
+                handleChipDelete={handleChipDelete}
+              />
+            ),
+          }}
+        >
+          {dropdownDomains.map((domainName) => (
+            <MenuItem
+              onClick={() =>
+                handleDropdownChange({
+                  target: {
+                    value: domainName,
+                  },
+                })
+              }
+              key={domainName}
+              value={domainName}
+            >
+              {domainName}
+            </MenuItem>
+          ))}
+        </Component>
+      )}
+    </Stack>
+  );
+}
+
+function ChipList({ handleChipDelete, selected }) {
+  return (
+    <Stack spacing={1} direction="row">
+      {selected.map((sel) => (
+        <Chip
+          size="small"
+          label={sel}
+          key={sel}
+          color="success"
+          onClick={() => handleChipDelete(sel)}
+          onDelete={() => handleChipDelete(sel)}
+        />
+      ))}
     </Stack>
   );
 }
