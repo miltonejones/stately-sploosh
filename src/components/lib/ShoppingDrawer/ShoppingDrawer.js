@@ -12,6 +12,7 @@ import {
   LinearProgress,
   TextField,
   Collapse,
+  Alert,
 } from "@mui/material";
 import { useMachine } from "@xstate/react";
 import { shoppingMachine } from "../../../machines";
@@ -45,6 +46,7 @@ import {
 import { ScrollingText, Photo, ModelCard } from "..";
 import { usePhoto } from "..";
 import HilitText from "../../../styled/HilitText";
+import { useCartMachine } from "../../../services";
 
 const cookieName = "selected-parser-items";
 
@@ -52,12 +54,16 @@ const ERR_IMAGE = "https://s3.amazonaws.com/sploosh.me.uk/assets/XXX.jpg";
 
 export const useShoppingDrawer = (onRefresh) => {
   const store = dynamoStorage();
+  const curator = useCartMachine(onRefresh);
+
   const [state, send] = useMachine(shoppingMachine, {
     services: {
+      signalSave: async (context) => {
+        curator.beginImport(context.chosen);
+      },
       refreshList: async () => {
         onRefresh && onRefresh();
       },
-
       castModels: async (context) => {
         const { stars_to_add, track_to_save } = context;
         if (stars_to_add?.length) {
@@ -73,7 +79,6 @@ export const useShoppingDrawer = (onRefresh) => {
         }
         return false;
       },
-
       loadModels: async (context) => {
         // const { track_to_save, track_info } = context;
         // const { title } = track_to_save;
@@ -110,7 +115,6 @@ export const useShoppingDrawer = (onRefresh) => {
         }
         return false;
       },
-
       curateVideo: async (context) => {
         const { track_to_save } = context;
         const { title, image, URL } = track_to_save;
@@ -235,6 +239,7 @@ export const useShoppingDrawer = (onRefresh) => {
       ...shoppingMachine,
       state,
     },
+    curator,
     state,
     setPage,
     handleClose,
@@ -322,6 +327,132 @@ const PhotoCard = ({
   );
 };
 
+const CuratorCard = ({ curator, minimal, handleMode }) => {
+  const saving = !["ready"].some(curator.state.matches);
+  const { track_to_save, stars_to_add } = curator.state.context;
+
+  if (!(!!saving && !!track_to_save)) {
+    return <i />;
+  }
+  return (
+    <Snackbar anchorOrigin={{ vertical: "bottom", horizontal: "right" }} open>
+      <Card onClick={handleMode}>
+        <Flex>
+          <Stack sx={{ p: 2, minWidth: 360 }} spacing={1}>
+            {!minimal && (
+              <Photo
+                backup={ERR_IMAGE}
+                src={track_to_save.image}
+                alt={track_to_save.title}
+                style={{
+                  width: 360,
+                  aspectRatio: "16 / 9",
+                  borderRadius: 4,
+                }}
+              />
+            )}
+            <Stack direction="row" sx={{ alignItems: "center" }} spacing={1}>
+              {!!minimal && (
+                <Avatar
+                  sx={{ aspectRatio: "16/9" }}
+                  variant="square"
+                  src={track_to_save.image}
+                />
+              )}
+              <Typography sx={{ maxWidth: 360 }} variant="body2">
+                {curator.message}
+              </Typography>
+            </Stack>
+            <Typography sx={{ maxWidth: 360 }} variant="caption">
+              {track_to_save.title}
+            </Typography>
+
+            {curator.state.matches("error") && (
+              <Stack>
+                <Nowrap muted>
+                  There was an error processing this request
+                </Nowrap>
+                <Nowrap width={360}>{curator.message} </Nowrap>
+                <Nowrap width={360}>
+                  {JSON.stringify(curator.state.value)}{" "}
+                </Nowrap>
+                <Flex spacing={2}>
+                  <Button
+                    variant="contained"
+                    onClick={() => curator.send("recover")}
+                  >
+                    Next
+                  </Button>
+                </Flex>
+              </Stack>
+            )}
+
+            <LinearProgress
+              variant={!curator.progress ? "indeterminate" : "determinate"}
+              value={curator.progress}
+            />
+          </Stack>
+
+          <Collapse
+            orientation="horizontal"
+            in={!!stars_to_add?.length && curator.state.matches("cast.pause")}
+          >
+            {!!stars_to_add?.length && (
+              <Flex spacing={2} sx={{ p: 2 }}>
+                {stars_to_add.map((star) => (
+                  <ModelCard
+                    small={stars_to_add.length > 3}
+                    key={star.ID}
+                    model={star}
+                  />
+                ))}
+              </Flex>
+            )}
+          </Collapse>
+        </Flex>
+      </Card>
+    </Snackbar>
+  );
+};
+
+const PreviewCard = ({
+  busy,
+  handleMode,
+  message,
+  progress,
+  results,
+  minimal,
+  latest: result,
+}) => {
+  if (!(busy && results?.length)) {
+    return <i />;
+  }
+  if (!result) return <i />;
+  return (
+    <Snackbar open>
+      <Card onClick={handleMode}>
+        <Stack spacing={2} sx={{ width: 360, p: 1 }}>
+          {!minimal && <PhotoCard size={360} {...result} />}
+          <Stack direction="row" sx={{ alignItems: "center" }} spacing={1}>
+            {!!minimal && <Avatar src={result.Photo} />}
+            <Typography
+              variant="caption"
+              sx={{ maxWidth: 360, overflow: "hidden" }}
+            >
+              {message}
+            </Typography>
+          </Stack>
+        </Stack>
+
+        <LinearProgress
+          variant={!progress ? "indeterminate" : "determinate"}
+          value={progress}
+        />
+      </Card>
+    </Snackbar>
+  );
+};
+
 const Grid = styled(Box)(({ theme }) => ({
   width: "fit-content",
   padding: theme.spacing(2),
@@ -330,162 +461,70 @@ const Grid = styled(Box)(({ theme }) => ({
   gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr 1fr",
 }));
 const timeSort = (a, b) => (a.CalculatedTime > b.CalculatedTime ? -1 : 1);
-const ShoppingDrawer = ({
-  counter,
-  handleRetry,
-  latest,
-  diagnosticProps,
-  stars_to_add,
-  track_to_save,
-  state,
-  handleError,
-  results,
-  page = 1,
-  auto_search,
-  message,
-  handleChoose,
-  handleSelect,
-  handleSave,
-  saved,
-  chosen,
-  setPage,
-  progress,
-  handleClear,
-  handleClose,
-  handleSearch,
-  handleAppend,
-  param,
-  handleChange,
-  selected,
-  parsers,
-  open,
-  busy,
-  minimal,
-  handleMode,
-}) => {
+const ShoppingDrawer = (props) => {
+  const {
+    latest,
+    state,
+    results,
+    page = 1,
+    message,
+    handleChoose,
+    handleSelect,
+    handleSave,
+    chosen,
+    setPage,
+    progress,
+    handleClear,
+    handleClose,
+    handleSearch,
+    handleAppend,
+    param,
+    handleChange,
+    selected,
+    parsers,
+    open,
+    busy,
+    minimal,
+    handleMode,
+    curator,
+  } = props;
   const pages = getPagination(results?.sort(timeSort), { page, pageSize: 24 });
-  const saving = ["save.next", "save.load", "save"].some(state.matches);
+  const saveEnabled = curator.state.can("start");
 
-  if (!!saving && !!track_to_save) {
-    return (
-      <>
-        <Snackbar open>
-          <Card onClick={handleMode}>
-            <Flex>
-              <Stack sx={{ p: 2, minWidth: 360 }} spacing={1}>
-                {!minimal && (
-                  <Photo
-                    backup={ERR_IMAGE}
-                    src={track_to_save.image}
-                    alt={track_to_save.title}
-                    style={{
-                      width: 360,
-                      aspectRatio: "16 / 9",
-                      borderRadius: 4,
-                    }}
-                  />
-                )}
-                <Stack
-                  direction="row"
-                  sx={{ alignItems: "center" }}
-                  spacing={1}
-                >
-                  {!!minimal && (
-                    <Avatar
-                      sx={{ aspectRatio: "16/9" }}
-                      variant="square"
-                      src={track_to_save.image}
-                    />
-                  )}
-                  <Typography sx={{ maxWidth: 360 }} variant="body2">
-                    {message}
-                  </Typography>
-                </Stack>
-                <Typography sx={{ maxWidth: 360 }} variant="caption">
-                  {track_to_save.title}
-                </Typography>
+  // if (busy && results?.length) {
+  //   const result = latest;
+  //   if (!result) return <i />;
+  //   return (
+  //     <>
+  //       <Snackbar open>
+  //         <Card onClick={handleMode}>
+  //           <Stack spacing={2} sx={{ width: 360, p: 1 }}>
+  //             {!minimal && <PhotoCard size={360} {...result} />}
+  //             <Stack direction="row" sx={{ alignItems: "center" }} spacing={1}>
+  //               {!!minimal && <Avatar src={result.Photo} />}
+  //               <Typography
+  //                 variant="caption"
+  //                 sx={{ maxWidth: 360, overflow: "hidden" }}
+  //               >
+  //                 {message}
+  //               </Typography>
+  //             </Stack>
+  //           </Stack>
 
-                {state.matches("save.cast.error") && (
-                  <Stack>
-                    <Nowrap muted>
-                      There was an error processing this request [{counter}]
-                    </Nowrap>
-                    <Nowrap width={360}>{message} </Nowrap>
-                    <Flex spacing={2}>
-                      <Button onClick={handleRetry}>Retry</Button>
-                      <Button variant="contained" onClick={handleError}>
-                        Next
-                      </Button>
-                    </Flex>
-                  </Stack>
-                )}
-
-                <LinearProgress
-                  variant={!progress ? "indeterminate" : "determinate"}
-                  value={progress}
-                />
-              </Stack>
-
-              <Collapse
-                orientation="horizontal"
-                in={!!stars_to_add?.length && state.matches("save.cast.pause")}
-              >
-                {!!stars_to_add?.length && (
-                  <Flex spacing={2} sx={{ p: 2 }}>
-                    {stars_to_add.map((star) => (
-                      <ModelCard
-                        small={stars_to_add.length > 3}
-                        key={star.ID}
-                        model={star}
-                      />
-                    ))}
-                  </Flex>
-                )}
-              </Collapse>
-            </Flex>
-          </Card>
-        </Snackbar>
-      </>
-    );
-  }
-
-  if (busy && results?.length) {
-    const result = latest; //results[results.length - 1];
-    if (!result) return <i />;
-    return (
-      <>
-        <Snackbar open>
-          <Card onClick={handleMode}>
-            <Stack spacing={2} sx={{ width: 360, p: 1 }}>
-              {!minimal && <PhotoCard size={360} {...result} />}
-              <Stack direction="row" sx={{ alignItems: "center" }} spacing={1}>
-                {!!minimal && <Avatar src={result.Photo} />}
-                <Typography
-                  variant="caption"
-                  sx={{ maxWidth: 360, overflow: "hidden" }}
-                >
-                  {message}
-                </Typography>
-              </Stack>
-              {/* <Nowrap onClick={() => window.open(result.Photo)} variant="caption" sx={{maxWidth:360,overflow:'hidden'}}>
-          {result.Photo}
-          </Nowrap> */}
-            </Stack>
-            {/* <pre>
-          {JSON.stringify(result,0,2)}
-        </pre> */}
-            <LinearProgress
-              variant={!progress ? "indeterminate" : "determinate"}
-              value={progress}
-            />
-          </Card>
-        </Snackbar>
-      </>
-    );
-  }
+  //           <LinearProgress
+  //             variant={!progress ? "indeterminate" : "determinate"}
+  //             value={progress}
+  //           />
+  //         </Card>
+  //       </Snackbar>
+  //     </>
+  //   );
+  // }
 
   return (
     <>
+      <CuratorCard {...props} />
+      <PreviewCard {...props} />
       <Drawer anchor="left" onClose={(e) => handleClose()} open={open}>
         <Box sx={{ borderBottom: 1, minWidth: 360, borderColor: "divider" }}>
           <Stack direction="row" sx={{ p: 1, justifyContent: "space-between" }}>
@@ -570,11 +609,15 @@ const ShoppingDrawer = ({
 
                 <i onClick={handleClear} className="fa-solid fa-xmark" />
               </Stack>
+
+              {/* {!saveEnabled && (
+                <Alert severity="warning">The importer is not ready</Alert>
+              )} */}
             </Stack>
           </>
         )}
 
-        {!!results?.length && !saving && (
+        {!!results?.length && (
           <Grid>
             {pages.visible.map((result, o) => (
               <>
@@ -592,11 +635,6 @@ const ShoppingDrawer = ({
           </Grid>
         )}
 
-        {/* <pre>
- {JSON.stringify(chosen,0,2)} 
- </pre> */}
-        {/* {param}
-         */}
         {!!parsers && !results?.length && (
           <Stack sx={{ width: 360, p: 2 }}>
             {parsers

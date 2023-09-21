@@ -153,7 +153,7 @@ export default function DomainMenu({
         />
       ))}
 
-      {!dropdownSelection?.length && (
+      {!dropdownSelection?.length && !!dropdownDomains.length && (
         <Nowrap
           hover
           variant="caption"

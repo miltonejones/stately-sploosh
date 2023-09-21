@@ -12,6 +12,7 @@ const Layout = styled(Box)(({ theme, fixed }) => ({
   position: fixed ? "fixed" : "absolute",
   bottom: 50,
   right: 50,
+  zIndex: 25000,
 }));
 
 const FloatingMenu = ({ fixed }) => {

@@ -1,8 +1,8 @@
 import { createMachine, assign } from "xstate";
-import { useMachine } from "@xstate/react";
 
 export const shoppingMachine = createMachine(
   {
+    /** @xstate-layout N4IgpgJg5mDOIC5SwBYHsAOB9AtgQwGMUBLAOzADpiIAbMAYgHkAFAUQDkBtABgF1FQGNLGIAXYmlICQAD0QB2AEwBmCgEYAnAA4NANm4AWXQFYDyzQBoQAT0TLlZiorMHti+RuPH5ugL6+rVExcQhJyClgwPAAnIgoMGMisBOi8HFh6GVhRPFFKPAAzPOiACgMDAEp6IOx8IjJKSJi4lKSUtNgefiQQIRFxSWk5BGVjLV0KZQ0fY10DbiVFcatbBBU1CZNZ7jUtY2UlXUV-QPRa0IaIqNiUCnIZUWSYtMzs3PyisFLyqpqQ+vCTRudzADyeqRwXWkfTEEikPWGykUS3Uank3GUug8aiWWhWiGcyi0FCO8hxGLUsy0ahOID+dTCjWucXuj3aOFeOTyFEKxTKlWqZ3+jKuzVurPBaU4am6gmEsMGCLs3EU3Ao+wMyK02u4ujxNkQagWBgoe3k9nkxl2GkUagMtPpF0BzNuZDEnPePM+pTUvyFDMuQLibtEUJ6MIG8NAw0UGgcFEMOM8docBnxa2MngoNu4ngW+w03AxDv9TqZYpBDw93N5XxKvsFwQDzorrLDcv6cKGdj18lNekUmf0GiMlvT5njA7GOLJg40JabZdFwNZ1Y+fIbjoB5ZXoNDMuh8sj3ZGuns6spBnkmrmu31q3cegvo1MB2MC1GC-O2+XLL3a69Dc-UXH8g3FPdOEUWVeiPLslRGWZFBJLwz3cZFdD1dNFH0CYkQ0OMtAcPQdi-YVAxdeI8BgegIEkSgyAANzQABrRpS1AiiEhgBBGLQAhcjhLp2xgztFWjOxMQmMZbX2fRTCvccDG8dUdk1ak71MPwAjpdiRTAyjqIAWUYAARVhhIjODxJGPZVEMaluHkpZc10ccjjVTEtCUK1KXsA5SObHc4i+aI0GiADa2+fCNGA789IokKwos2CxNkQ0vLVfYMTPcZryxYwsLNCgPEtLzym1Ex5ACpd9IKMgIBouiqFIJjWIiXTyIrOrSAgHiWr4gTJCEvhD1EqM0rWPZjHVVU4x2HNsOUcc1BxJxMSLfYiRfe1tK3eKuvq+hEuieIaFyAowpwdqQP24Fut63j+MjYboMs1KY01NVE17A4bWwwq0ScLQdjmbDcyJHbThuzq7sO4yzOSsaTzQqStDMZRczRPRMSwrEJk0OYPHfZFTGqn9ojgABXGhRAyZgAEEAHFzJG8MUvG4YAFpppWwi+d0bR0StJaDQQHFgYocoh1VRy8shnTofCCnYGp2n6AAYQAGVYemACVEYVDnEE5+Zpvs7hxl7HElnTNFdXUZF5GBkxdR2ZQyZFZXVYyABlemADUWde9mT052M1VjUwR0tSkXNtg4kPcp33zGTE9A9y4vZpjJ1YACUYRgfaD0bDdDjCNATaZYw2IxdDUKZbecyWlIHDa8qq3aOqVqns-oenmDYdgTIN494M5jC+ytDQ0XNImdDUdNxjs+vHItnQ5OOTvFcoTAwHICAKBoNA8AgMgoCuOgCDyBraPCXi2r2y5d-3w-j9P0hz8iS-r76pinsEvgI8rITR5uMAwuxNDUm0EcUYy0nZOD0N4WMPg0SbyhnFJ+GA96QFfifM+F8wBX0gI1O+-UH5dx3lgl+R88EfwIUQh6-V-5DUAQeNmSN4I6D7NMC2uY4zyB8BoOBxJYyVWQXXJQGdwjPxwTQ9+59WhfAyLfeiZC2LbwoDIg+cj8GKOiLAX+A1nqANZh2UuY8kQmktHGcBj5nZplFsgtQ2YNhoiRI5cYzgpGUOwQfL+hDxAfxIao1q6iMHSKoTg-xV8z6GOYaQF6JdR7WS8JLLws8pjaDKveHsqTjDIivLqa83gO7oLIhE3xuCIDELzvTdgzMgHvWNliSYRIMSOSMCoBxqxRg7HUCqTJ3klALG8ZoyJDUi56zzo0o2YsBEiLRGMLy9dFg5NPGebMBg0aZjRkTbCoytFVOIUXbW6sAAqMzkaUjWvPNGcwJwFVFqMTETgnaDnyeiIwBzxlHIalrQuxd2HmOsvXI4pptREQwqnUwil7bo0tEoBwXlJFb3CUyHqAACWAeAGJgCxcQKApA8A0GCc1UJ100VXExdi3F+LCXEriYNBJJjg4cOsmHDCxUtlIi8NoKYswsIrSQpSQiKpkTR3KP4bSpA0DVPgD0R+5AknAK5mSPsuYlDTzmBheuQjRYCOmsLO0aMjDTE0KM6gdBlVNLFgLVQRx9DIncPYEc44DiqBKvw20GM66jLAta2Zto5jZnwj4HYYqlJYQtoa7Ueg67uGFmghWlL9KKMlOkANJ5nl9g8AU7GEiHCCvNAmWNWzXyaBxH6iiEp2SZvgqMcYTgxh6G1DeI0rlHHlUlvhSO0b9CStReUoKrpSBiDrdZJE5h1RTAcrHXKuNDAILruMeu+SjDy0VcOysohx0TQcH06eYq4z2CUooZa55OkwOmNoaYVaKxcTALuxEJgJgOW0B+OYOhHk9PKM4rQyIFhGnySu0pyah2-luMdJ9BJbRIWimGo0BTv0EhNcVTwcY9TAe9Xe2GPVoOTX2JLcw4xooywEYVIsThTZFhXpmYwoys603w5zKYziVoYlVB4QwGJumGgtqoEmmoli2nKPswdgUxm+OY2eaa09tg+H0DXNZj4ebTG8NSZt2FQObsk9Qt+Z9mNjG4ZSfQCmQZbMKv+kkamsQqjJGib5lSdF0OidfZjBxswgxkhSNw8gsI8PUGprwX6MYorKRJw5zmFGJCUYZqYLj5MYXM8pgLmhLTBc8KFpNOnDmuYM0C5JIDX0IvMIWeYSY1lEnyeoMko5DDDg3RQ3Tsi36QHw0aL6I58l6lGIODCHaekHGJNs+5OpTONY0ZEalOK8UiHpTQdzi69hXlknaAR9XbZIIvEZosFIdr+CAA */
     id: "shop_machine",
     initial: "idle",
     states: {
@@ -17,6 +17,8 @@ export const shoppingMachine = createMachine(
             }),
           },
         },
+
+        description: `Modal is closed and idle.`,
       },
 
       search: {
@@ -51,6 +53,7 @@ export const shoppingMachine = createMachine(
                   actions: assign({
                     message: "",
                     busy: false,
+                    open: true,
                     chosen: [],
                     param: (context) => context.param_list.join(" OR "),
                   }),
@@ -113,9 +116,7 @@ export const shoppingMachine = createMachine(
           },
           error: {
             after: {
-              4999: {
-                target: "#shop_machine.idle",
-              },
+              4999: "#shop_machine.opened",
             },
           },
           find: {
@@ -145,201 +146,7 @@ export const shoppingMachine = createMachine(
           },
         },
       },
-      save: {
-        initial: "load",
-        states: {
-          next: {
-            after: {
-              100: [
-                {
-                  target: "load",
-                  cond: (context) => context.save_index < context.chosen.length,
-                },
-                {
-                  target: "#shop_machine.refresh",
-                  actions: assign({
-                    results: [],
-                    message: "",
-                    progress: 0,
-                    auto_search: false,
-                  }),
-                },
-              ],
-            },
-          },
-          commit: {
-            entry: assign({
-              message: (context) => `Saving video details...'`,
-            }),
-            invoke: {
-              src: "saveVideoObject",
-              onDone: [
-                {
-                  target: "next",
-                  cond: (context, event) => !context.track_info?.stars,
-                  actions: "incrementSave",
-                },
-                {
-                  target: "cast",
-                  actions: assign((context, event) => ({
-                    track_to_save: {
-                      ...context.track_to_save,
-                      ID: event.data,
-                    },
-                  })),
-                },
-              ],
-            },
-          },
-          cast: {
-            initial: "load",
-            states: {
-              load: {
-                entry: assign({
-                  message: (context) => `Getting models...'`,
-                }),
-                invoke: {
-                  src: "loadModels",
-                  onDone: {
-                    target: "apply",
-                    actions: assign({
-                      stars_to_add: (context, event) => event.data,
-                    }),
-                  },
-                  onError: {
-                    target: "error",
-                    actions: assign({
-                      message: (context, event) => event.data.message,
-                    }),
-                  },
-                },
-              },
-              error: {
-                initial: "start",
-                states: {
-                  start: {
-                    after: {
-                      1: {
-                        target: "count",
-                        actions: assign({
-                          counter: 0,
-                        }),
-                      },
-                    },
-                  },
-                  count: {
-                    after: {
-                      100: [
-                        {
-                          target: "count",
-                          cond: (context) => context.counter < 7999,
-                          actions: assign({
-                            counter: (context) => context.counter + 100,
-                          }),
-                        },
-                        {
-                          target: "done",
-                        },
-                      ],
-                    },
-                  },
-                  done: {
-                    target: "#shop_machine.save.next",
-                    actions: "incrementSave",
-                  },
-                },
 
-                on: {
-                  RECOVER: {
-                    target: "#shop_machine.save.next",
-                    actions: "incrementSave",
-                  },
-                  RETRY: {
-                    target: "#shop_machine.save.next",
-                  },
-                },
-              },
-
-              pause: {
-                after: {
-                  1999: {
-                    target: "#shop_machine.save.next",
-                  },
-                },
-              },
-              apply: {
-                invoke: {
-                  src: "castModels",
-                  onDone: {
-                    target: "pause",
-                    actions: "incrementSave",
-                  },
-                  onError: {
-                    target: "error",
-                    actions: assign({
-                      message: (context, event) => event.data.message,
-                    }),
-                  },
-                },
-              },
-            },
-          },
-          error: {},
-          curate: {
-            entry: assign({
-              message: (context) => `Looking up video details...'`,
-            }),
-            invoke: {
-              src: "curateVideo",
-              onDone: [
-                {
-                  target: "commit",
-                  actions: assign((context, event) => ({
-                    track_info: event.data,
-                    track_to_save: {
-                      ...context.track_to_save,
-                      title: event.data?.title || context.track_to_save.title,
-                    },
-                  })),
-                },
-              ],
-              onError: [
-                {
-                  target: "error",
-                  actions: assign((context, event) => ({
-                    error: event.data.message,
-                    stack: event.data.stack,
-                  })),
-                },
-              ],
-            },
-          },
-          load: {
-            on: {
-              MODE: {
-                actions: "assignProps",
-              },
-            },
-            invoke: {
-              src: "loadByURL",
-              onDone: [
-                {
-                  target: "curate",
-                  actions: assign({
-                    track_to_save: (context, event) => event.data,
-                  }),
-                  // actions: assign({
-                  //   saved: (context, event) => event.data,
-                  //   message: context => `Saved ${context.save_index} of ${context.chosen.length}`,
-                  //   progress: context => 100 * ((context.save_index + 1) / context.chosen.length),
-                  //   save_index: context => context.save_index + 1
-                  // })
-                },
-              ],
-            },
-          },
-        },
-      },
       results: {
         on: {
           PAGE: {
@@ -355,7 +162,7 @@ export const shoppingMachine = createMachine(
             }),
           },
           SAVE: {
-            target: "save",
+            target: "send save signal",
             actions: assign({
               save_index: 0,
             }),
@@ -374,19 +181,13 @@ export const shoppingMachine = createMachine(
             }),
           },
         },
+
+        description: `Drawer is displaying search results.`,
       },
-      refresh: {
-        invoke: {
-          src: "refreshList",
-          onDone: [
-            {
-              target: "opened",
-            },
-          ],
-        },
-      },
+
       opened: {
         initial: "loading",
+
         states: {
           //
           loading: {
@@ -409,7 +210,7 @@ export const shoppingMachine = createMachine(
                       actions: assign((context, event) => ({
                         param: context.auto_search,
                         selected: event.data,
-                        open: true,
+                        open: false,
                         param_list: [],
                         param_index: 0,
                       })),
@@ -446,6 +247,8 @@ export const shoppingMachine = createMachine(
                 },
               ],
             },
+
+            description: `A parser is being selected or removed.`,
           },
 
           loaded: {
@@ -455,19 +258,14 @@ export const shoppingMachine = createMachine(
                   param: (context, event) => event.value,
                 }),
               },
-              SEARCH: {
-                target: "#shop_machine.search",
-                actions: assign({
-                  param_list: [],
-                  param_index: 0,
-                }),
-              },
+
               SELECT: {
                 target: "#shop_machine.opened.selecting",
                 actions: assign({
                   parser: (context, event) => event.value,
                 }),
               },
+
               CLOSE: {
                 target: "#shop_machine.idle",
                 actions: assign({
@@ -476,7 +274,36 @@ export const shoppingMachine = createMachine(
                 }),
               },
             },
+
+            description: `Shopping cart is ready for search params`,
           },
+        },
+
+        on: {
+          SEARCH: {
+            target: "search",
+            actions: assign({
+              param_list: [],
+              param_index: 0,
+              open: false,
+            }),
+          },
+        },
+      },
+
+      "send save signal": {
+        invoke: {
+          src: "signalSave",
+          onDone: [
+            {
+              target: "opened",
+              actions: assign({
+                results: [],
+                auto_search: false,
+                open: true,
+              }),
+            },
+          ],
         },
       },
     },
