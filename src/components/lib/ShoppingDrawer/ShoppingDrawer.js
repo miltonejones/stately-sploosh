@@ -12,12 +12,12 @@ import {
   LinearProgress,
   TextField,
   Collapse,
-  Alert,
+  Checkbox,
+  FormControlLabel,
 } from "@mui/material";
 import { useMachine } from "@xstate/react";
 import { shoppingMachine } from "../../../machines";
 import { Flex, Nowrap } from "../../../styled";
-
 import {
   // Avatar,
   Card,
@@ -194,12 +194,18 @@ export const useShoppingDrawer = (onRefresh) => {
 
   const handleClose = () => send("CLOSE");
   const handleClick = (value) => {
+    if (state.can("append")) {
+      return send({
+        type: "append",
+        param: value,
+      });
+    }
     send({
       type: "OPEN",
       value,
     });
   };
-  const handleSearch = () => send("SEARCH");
+  const handleSearch = () => send(state.can("append") ? "append" : "SEARCH");
   const handleClear = () => send("CLEAR");
   const handleChoose = (ID) => {
     send({
@@ -242,6 +248,7 @@ export const useShoppingDrawer = (onRefresh) => {
     curator,
     state,
     setPage,
+    send,
     handleClose,
     handleClick,
     handleChange,
@@ -423,16 +430,30 @@ const PreviewCard = ({
   results,
   minimal,
   latest: result,
+  param_list,
+  send,
 }) => {
+  const [temp, setTemp] = React.useState("");
+  const handleClick = () => {
+    send({
+      type: "append",
+      param: temp.split("|"),
+    });
+    setTemp("");
+  };
+
   if (!(busy && results?.length)) {
     return <i />;
   }
   if (!result) return <i />;
   return (
     <Snackbar open>
-      <Card onClick={handleMode}>
+      <Card>
         <Stack spacing={2} sx={{ width: 360, p: 1 }}>
-          {!minimal && <PhotoCard size={360} {...result} />}
+          {/* {JSON.stringify(param_list)} */}
+          {!minimal && (
+            <PhotoCard onClick={handleMode} size={360} {...result} />
+          )}
           <Stack direction="row" sx={{ alignItems: "center" }} spacing={1}>
             {!!minimal && <Avatar src={result.Photo} />}
             <Typography
@@ -443,7 +464,22 @@ const PreviewCard = ({
             </Typography>
           </Stack>
         </Stack>
-
+        <Flex>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleClick();
+            }}
+          >
+            <StyledTextField
+              fullWidth
+              onChange={(e) => setTemp(e.target.value)}
+              size="small"
+              label="search"
+              value={temp}
+            />
+          </form>
+        </Flex>
         <LinearProgress
           variant={!progress ? "indeterminate" : "determinate"}
           value={progress}
@@ -452,6 +488,24 @@ const PreviewCard = ({
     </Snackbar>
   );
 };
+
+export const StyledTextField = styled(TextField)(() => ({
+  "& .MuiInputBase-root": {
+    borderRadius: 30,
+    // backgroundColor: "#fff",
+    paddingLeft: 16,
+    paddingRight: 16,
+  },
+  "& .MuiOutlinedInput-notchedOutline": {
+    border: "none",
+  },
+  "& .MuiInputAdornment-positionEnd": {
+    marginRight: 8,
+  },
+  "& .MuiInputAdornment-root": {
+    color: "rgba(0, 0, 0, 0.54)",
+  },
+}));
 
 const Grid = styled(Box)(({ theme }) => ({
   width: "fit-content",
@@ -463,7 +517,6 @@ const Grid = styled(Box)(({ theme }) => ({
 const timeSort = (a, b) => (a.CalculatedTime > b.CalculatedTime ? -1 : 1);
 const ShoppingDrawer = (props) => {
   const {
-    latest,
     state,
     results,
     page = 1,
@@ -483,44 +536,20 @@ const ShoppingDrawer = (props) => {
     selected,
     parsers,
     open,
-    busy,
-    minimal,
-    handleMode,
-    curator,
   } = props;
-  const pages = getPagination(results?.sort(timeSort), { page, pageSize: 24 });
-  const saveEnabled = curator.state.can("start");
 
-  // if (busy && results?.length) {
-  //   const result = latest;
-  //   if (!result) return <i />;
-  //   return (
-  //     <>
-  //       <Snackbar open>
-  //         <Card onClick={handleMode}>
-  //           <Stack spacing={2} sx={{ width: 360, p: 1 }}>
-  //             {!minimal && <PhotoCard size={360} {...result} />}
-  //             <Stack direction="row" sx={{ alignItems: "center" }} spacing={1}>
-  //               {!!minimal && <Avatar src={result.Photo} />}
-  //               <Typography
-  //                 variant="caption"
-  //                 sx={{ maxWidth: 360, overflow: "hidden" }}
-  //               >
-  //                 {message}
-  //               </Typography>
-  //             </Stack>
-  //           </Stack>
+  const [existingChecked, setExistingChecked] = React.useState(false);
+  const sortedResults = results?.sort(timeSort);
+  const curatedResults = !existingChecked
+    ? sortedResults
+    : sortedResults?.filter((f) => !f.existing);
+  console.log({ sortedResults });
 
-  //           <LinearProgress
-  //             variant={!progress ? "indeterminate" : "determinate"}
-  //             value={progress}
-  //           />
-  //         </Card>
-  //       </Snackbar>
-  //     </>
-  //   );
-  // }
+  const pages = getPagination(curatedResults, { page, pageSize: 24 });
 
+  const handleCheckboxChange = (event) => {
+    setExistingChecked(event.target.checked);
+  };
   return (
     <>
       <CuratorCard {...props} />
@@ -568,6 +597,19 @@ const ShoppingDrawer = (props) => {
               direction="row"
               sx={{ alignItems: "center", justifyContent: "space-between" }}
             >
+              <Box sx={{ flexGrow: 1 }} />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={existingChecked}
+                    onChange={handleCheckboxChange}
+                    name="existingChecked"
+                    color="primary"
+                  />
+                }
+                label="Hide Existing Videos"
+              />
+
               {pages.pageCount > 1 && state.matches("results") && (
                 <Box sx={{ ml: 1 }}>
                   <Pagination

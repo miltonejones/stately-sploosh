@@ -2,7 +2,7 @@ import { createMachine, assign } from "xstate";
 
 export const shoppingMachine = createMachine(
   {
-    /** @xstate-layout N4IgpgJg5mDOIC5SwBYHsAOB9AtgQwGMUBLAOzADpiIAbMAYgHkAFAUQDkBtABgF1FQGNLGIAXYmlICQAD0QB2AEwBmCgEYAnAA4NANm4AWXQFYDyzQBoQAT0TLlZiorMHti+RuPH5ugL6+rVExcQhJyClgwPAAnIgoMGMisBOi8HFh6GVhRPFFKPAAzPOiACgMDAEp6IOx8IjJKSJi4lKSUtNgefiQQIRFxSWk5BGVjLV0KZQ0fY10DbiVFcatbBBU1CZNZ7jUtY2UlXUV-QPRa0IaIqNiUCnIZUWSYtMzs3PyisFLyqpqQ+vCTRudzADyeqRwXWkfTEEikPWGykUS3Uank3GUug8aiWWhWiGcyi0FCO8hxGLUsy0ahOID+dTCjWucXuj3aOFeOTyFEKxTKlWqZ3+jKuzVurPBaU4am6gmEsMGCLs3EU3Ao+wMyK02u4ujxNkQagWBgoe3k9nkxl2GkUagMtPpF0BzNuZDEnPePM+pTUvyFDMuQLibtEUJ6MIG8NAw0UGgcFEMOM8docBnxa2MngoNu4ngW+w03AxDv9TqZYpBDw93N5XxKvsFwQDzorrLDcv6cKGdj18lNekUmf0GiMlvT5njA7GOLJg40JabZdFwNZ1Y+fIbjoB5ZXoNDMuh8sj3ZGuns6spBnkmrmu31q3cegvo1MB2MC1GC-O2+XLL3a69Dc-UXH8g3FPdOEUWVeiPLslRGWZFBJLwz3cZFdD1dNFH0CYkQ0OMtAcPQdi-YVAxdeI8BgegIEkSgyAANzQABrRpS1AiiEhgBBGLQAhcjhLp2xgztFWjOxMQmMZbX2fRTCvccDG8dUdk1ak71MPwAjpdiRTAyjqIAWUYAARVhhIjODxJGPZVEMaluHkpZc10ccjjVTEtCUK1KXsA5SObHc4i+aI0GiADa2+fCNGA789IokKwos2CxNkQ0vLVfYMTPcZryxYwsLNCgPEtLzym1Ex5ACpd9IKMgIBouiqFIJjWIiXTyIrOrSAgHiWr4gTJCEvhD1EqM0rWPZjHVVU4x2HNsOUcc1BxJxMSLfYiRfe1tK3eKuvq+hEuieIaFyAowpwdqQP24Fut63j+MjYboMs1KY01NVE17A4bWwwq0ScLQdjmbDcyJHbThuzq7sO4yzOSsaTzQqStDMZRczRPRMSwrEJk0OYPHfZFTGqn9ojgABXGhRAyZgAEEAHFzJG8MUvG4YAFpppWwi+d0bR0StJaDQQHFgYocoh1VRy8shnTofCCnYGp2n6AAYQAGVYemACVEYVDnEE5+Zpvs7hxl7HElnTNFdXUZF5GBkxdR2ZQyZFZXVYyABlemADUWde9mT052M1VjUwR0tSkXNtg4kPcp33zGTE9A9y4vZpjJ1YACUYRgfaD0bDdDjCNATaZYw2IxdDUKZbecyWlIHDa8qq3aOqVqns-oenmDYdgTIN494M5jC+ytDQ0XNImdDUdNxjs+vHItnQ5OOTvFcoTAwHICAKBoNA8AgMgoCuOgCDyBraPCXi2r2y5d-3w-j9P0hz8iS-r76pinsEvgI8rITR5uMAwuxNDUm0EcUYy0nZOD0N4WMPg0SbyhnFJ+GA96QFfifM+F8wBX0gI1O+-UH5dx3lgl+R88EfwIUQh6-V-5DUAQeNmSN4I6D7NMC2uY4zyB8BoOBxJYyVWQXXJQGdwjPxwTQ9+59WhfAyLfeiZC2LbwoDIg+cj8GKOiLAX+A1nqANZh2UuY8kQmktHGcBj5nZplFsgtQ2YNhoiRI5cYzgpGUOwQfL+hDxAfxIao1q6iMHSKoTg-xV8z6GOYaQF6JdR7WS8JLLws8pjaDKveHsqTjDIivLqa83gO7oLIhE3xuCIDELzvTdgzMgHvWNliSYRIMSOSMCoBxqxRg7HUCqTJ3klALG8ZoyJDUi56zzo0o2YsBEiLRGMLy9dFg5NPGebMBg0aZjRkTbCoytFVOIUXbW6sAAqMzkaUjWvPNGcwJwFVFqMTETgnaDnyeiIwBzxlHIalrQuxd2HmOsvXI4pptREQwqnUwil7bo0tEoBwXlJFb3CUyHqAACWAeAGJgCxcQKApA8A0GCc1UJ100VXExdi3F+LCXEriYNBJJjg4cOsmHDCxUtlIi8NoKYswsIrSQpSQiKpkTR3KP4bSpA0DVPgD0R+5AknAK5mSPsuYlDTzmBheuQjRYCOmsLO0aMjDTE0KM6gdBlVNLFgLVQRx9DIncPYEc44DiqBKvw20GM66jLAta2Zto5jZnwj4HYYqlJYQtoa7Ueg67uGFmghWlL9KKMlOkANJ5nl9g8AU7GEiHCCvNAmWNWzXyaBxH6iiEp2SZvgqMcYTgxh6G1DeI0rlHHlUlvhSO0b9CStReUoKrpSBiDrdZJE5h1RTAcrHXKuNDAILruMeu+SjDy0VcOysohx0TQcH06eYq4z2CUooZa55OkwOmNoaYVaKxcTALuxEJgJgOW0B+OYOhHk9PKM4rQyIFhGnySu0pyah2-luMdJ9BJbRIWimGo0BTv0EhNcVTwcY9TAe9Xe2GPVoOTX2JLcw4xooywEYVIsThTZFhXpmYwoys603w5zKYziVoYlVB4QwGJumGgtqoEmmoli2nKPswdgUxm+OY2eaa09tg+H0DXNZj4ebTG8NSZt2FQObsk9Qt+Z9mNjG4ZSfQCmQZbMKv+kkamsQqjJGib5lSdF0OidfZjBxswgxkhSNw8gsI8PUGprwX6MYorKRJw5zmFGJCUYZqYLj5MYXM8pgLmhLTBc8KFpNOnDmuYM0C5JIDX0IvMIWeYSY1lEnyeoMko5DDDg3RQ3Tsi36QHw0aL6I58l6lGIODCHaekHGJNs+5OpTONY0ZEalOK8UiHpTQdzi69hXlknaAR9XbZIIvEZosFIdr+CAA */
+    /** @xstate-layout N4IgpgJg5mDOIC5SwBYHsAOB9AtgQwGMUBLAOzADpiIAbMAYgHkAFAUQDkBtABgF1FQGNLGIAXYmlICQAD0QB2AEwBmCgEYAnAA4NANm4AWXQFYDyzQBoQAT0TLlZiorMHti+RuPH5ugL6+rVExcQhJyClgwPAAnIno8DAwwUggefiQQIRFxSWk5BEVuZXkKYxU1Ay1uDTNqgytbBE1vCnk2tTKNZW5jHQN-QPRsfCIySkiYogoMGMisGei8HFh6GVhRPFFKPAAzLeiACgMASnog4dCxiKjYlGnZsHmYpdg06SyxCSkM-OVvVQ0Gm4PgMRX0al0ugaiEUihqTi0HmUug08iKyg0AxA5xCo3CE1uFHIMlET0WOFW6022z2YEOBhOZyGuLC4xuU2JpIWSzeGQ+OW+oF+sK06jUaORHjUii0WmhBTMot07mlRQ6ui0aixOJGrOukzunLJS0pGy2FF2+yOjJ1l3x7MNYBJxpwnDU6UEwk+uR+dm4hVKDhFsu4GvlamBBgoWn+xWMah0igq2uZuquBKmZDEpupFtphzUp1teLZBqopDEvM92S+eRhWmR0e4WmcLfFEOM8sUvVUoc8bUKaP9KeCaftZc5OfNlrpB0LTNHdtLhM5VcyXoFdYQyMR0b03b0dV08k7NjsagcFH3vWl8mlxkxAWxqaX+pXTtEU5pVvnxb1GcdEk3Q9dcax9IU7F0exSg6Ax5AMRRdAMBM5TPAoPF0GC-lMONgT+EcLhLN8OQ-L88x-IsXyIgCiQ-ThFBA-la19bdjGVCgTDY5R3FhSFUMaRDQwobjAWUBtXHBAiWXTB17hgegIEkSgyAANzQABrcYqP-WSZhgBBVLQAhNi+NI1yY8DZDsZFMN6JNjGRHoGXkeUHBaYxuAqGU1BQ0w-CfP8ZLLPSGAAWUYAARVhzI3ZiIO3GNe0qCNTAQqo9Fc5VuGEjUlHjDp7GKKSx2XKY6WiNBojImd6UBDRKMXajZPKyqYrAwUrKaRFsocsExOPIwTy7GMSg8E9EQZWUTHkYrXxonYyAgBSlPLNTNIibSgsJBaUgM0g1OMgUzL4d5Yss-IZS8UpCi6TyNEKRDlFcnzFCcRyensBsvH6ALNvHbbFvoFrommGhNh2SqcA2xqdLLHaID2g6TMkY7GLOjqLoQ7LDAhRFinuxDhvFBFPKQwSui0H7Bhhrapnh+hwqitrvQx88KiveNKagspdHFLs9DUJxUuqLwilcWaiOiOAAFcaFEFZmAAQQAcWik6+XRrcAFpjDFBt9ZRbr4yetDpSqCgGQfLKengpCJb1KXYFl+X6AAYQAGVYRWACVmc3FitdBXXDCqLQ+LvEVwzRTDpXcKoTFDTzlHtq5HedlYAGVFYANTVtH2u1uFsrhUwahPDpqihU3ilerL5BjHoGxRfzqcIh2ZbllZXYACUYRgM7z06C4DyENAoaolA0CEjF5jFwxlbLLf3bgbcGlPwjTzv6EV5g2HYCK-bizqtchEp4yntp8d6Kf5TD3sLx6ZsdH0Mp18oTBkkgegB59nvD-OxA4p65OHFL0REF4lAykylBK8lQDAPkph4Hmb8KAf3IBACgNA0B4AgGQKA1w6AEC2EtRS4RDLrUCuENBkBMHYNwaQfBkRCHEMRkZZGpBUZDxZluXWCYkIJk0JqbQyo-jPWAXCaacIfDikUCg6hGCsE4LwQQsARCv6kOUvtDSWkaZUKSOg2hSiGEqLUQjQyh1TJ8GAlw-28UdAlFRM2aoXQ2gojEaKCR3gpG8yUHI-RNDFH0PwQsSI0QVgaNWto6GbcrjyMMUE+4YS6SwFYRYlGVj1bVm4QHbiUYTxdGQu4bQoZ6hoSkYLKePjuKN2VFTZ8uj37+IwUw1R4gGHLTIVoihf1Gmf2aWAZheDUnsM4RrYe8UrrwP+PIDE2gJr8UgldMozho7wW8DNX6DTUFNPiV-Huit2Cq3-qzBAJ8SifSKE5ERpTGh-E8uof0sy8pKGBH4vpuyloD09q7AAKscrc9k3o6ATEYMwF5Ty3IcphOO3YyhoiMG8gxgS9nu37oPMZ2T4oXnYrKcSegTBfRuXYUEmEzBxiUA4REvjNkxPtCkAABLAPAKkwCMuIFAUgeAaAdM0WtHRtK2QMqZSytlHKuXDKOhk-OmLj6IUwvBBssLtAYjYl2F66gez+lhGXBk-gnykDQBAOA0hKFgBsUffIWs7wlAnnCaekILwaHlG0XWxsIQnngpXWRNLpJkNoGajFtjOoQi6BxQSsJ3D2BqK5YoqgxouKTN0XmKCALmoAQUaeV5AQ+E8lq+BXZmyutlI4oM3FqWt19aVO4ITHjcmWGmk5fxiitAJhJZE4oHBqpmePYtlQcKaGlCm2SRo60Nq3H8MOQtn6ygQrzUMXZJoW0BCXQt+hdU+pKsRO4WZRBjpYtxcwgZtARgrmHFyZS11OAFmHcFzg7YbrmsOj8e74oOHuVPLVXR7DwMUM9aCRhEIqFRNoVEQ7gp4BgC+zqyI2LRgjMUmZSEdAQuJchaMsJgQpRlD4sDhJgZQYukmV6dUc0RlhPmsplM8meC6BqMobZk4PqanDRaBH6wOQtuYMOdVCjAnPQJKoxcg4rwfg+YwKDN7yzY6cjEgsfJFEHECUEnbTbNlULCUwIokwMkQoiyA0mT5-CvOqYEkJSaVC7Eg9QqJvDAqBFPcTTG9RxMCXggzvQHEmZ8OCJDw0WwcRswNTDgI9MKLocolppiDPNqBBCeyao3D8ZhI46zJ4vDIe6OW+pArtnvNc8YmtYT3MYmM2xUzPmLNlJS5oNL19epZdNblgxkW2lQGk7BxE-xNCGE8nCBZCUyjqDvINQw+gaihY+dJiM2Mag8y+t2SEVdbnFFFJTNiip46RiHUK5lrKRBipoNFww0ZTAnnbXBeFS3AFeJgh5leaofr+CAA */
     id: "shop_machine",
     initial: "idle",
     states: {
@@ -23,10 +23,11 @@ export const shoppingMachine = createMachine(
 
       search: {
         initial: "parse_params",
+
         states: {
           parse_params: {
             after: {
-              44: {
+              4: {
                 target: "next_param",
                 actions: assign({
                   param_list: (context) => context.param.split("|"),
@@ -145,13 +146,22 @@ export const shoppingMachine = createMachine(
             },
           },
         },
+
+        on: {
+          append: {
+            actions: assign({
+              param_list: (context, event) =>
+                context.param_list.concat(event.param),
+            }),
+          },
+        },
       },
 
       results: {
         on: {
           PAGE: {
             actions: assign({
-              page: (context, event) => event.page,
+              page: (_, event) => event.page,
             }),
           },
           CLEAR: {
@@ -255,7 +265,7 @@ export const shoppingMachine = createMachine(
             on: {
               CHANGE: {
                 actions: assign({
-                  param: (context, event) => event.value,
+                  param: (_, event) => event.value,
                 }),
               },
 
@@ -310,17 +320,17 @@ export const shoppingMachine = createMachine(
   },
   {
     actions: {
-      incrementSave: assign((context, event) => {
-        return {
-          saved: event.data,
-          message: `Saved ${context.save_index} of ${context.chosen.length}`,
-          progress: 100 * ((context.save_index + 1) / context.chosen.length),
-          save_index: context.save_index + 1,
-          // track_to_save: null,
-          track_info: null,
-          // stars_to_add: null
-        };
-      }),
+      // incrementSave: assign((context, event) => {
+      //   return {
+      //     saved: event.data,
+      //     message: `Saved ${context.save_index} of ${context.chosen.length}`,
+      //     progress: 100 * ((context.save_index + 1) / context.chosen.length),
+      //     save_index: context.save_index + 1,
+      //     // track_to_save: null,
+      //     track_info: null,
+      //     // stars_to_add: null
+      //   };
+      // }),
       assignResults: assign((context, event) => {
         const currentDomain = context.selected[context.search_index];
         const { videos = [], pages } = event.data;
@@ -338,7 +348,9 @@ export const shoppingMachine = createMachine(
           latest: results[0] || context.latest,
           results,
 
-          message: `Searching ${currentDomain}. ${context.results.length} matches for "${context.param}"...`,
+          message: `Searching ${currentDomain}. ${
+            context.results.length
+          } matches for "${context.param_list.join(" or ")}"...`,
           addresses,
           page_index: 0,
           currentDomain,
@@ -357,7 +369,9 @@ export const shoppingMachine = createMachine(
         return {
           latest: results[0] || context.latest,
           results,
-          message: `Searching ${context.currentDomain}. ${context.results.length} matches for "${context.param}"...`,
+          message: `Searching ${context.currentDomain}. ${
+            context.results.length
+          } matches for "${context.param_list.join(" or ")}"...`,
           page_index: context.page_index + 1,
         };
       }),
