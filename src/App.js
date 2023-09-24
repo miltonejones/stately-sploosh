@@ -67,6 +67,7 @@ import "./App.css";
 import { SearchPersistService } from "./services";
 import { Flex, PhotoGrid, IconTextField } from "./styled";
 import DomainMenu from "./components/lib/DomainMenu/DomainMenu";
+import ExPagination from "./components/lib/ExPagination/ExPagination";
 
 const Btn = styled(Button)(({ theme }) => ({
   textTransform: "capitalize",
@@ -326,7 +327,13 @@ function Application() {
     }, {});
 
   // console.log({ domains });
-  const domainProps = { domains, domain, search_param, busy, navigate };
+  const domainProps = {
+    domains,
+    domain,
+    search_param,
+    busy,
+    navigate: (suffix) => navigate(`/search/1/${search_param}/${suffix}`),
+  };
 
   return (
     <AppStateContext.Provider
@@ -546,10 +553,10 @@ function Application() {
             <Stack>
               <Flex spacing={1} sx={{ mt: 1 }}>
                 {modelPageCount > 1 && (
-                  <Pagination
+                  <ExPagination
                     count={modelPageCount}
                     page={Number(page)}
-                    onChange={setPage}
+                    setPage={setPage}
                   />
                 )}
                 <Typography variant="caption">
@@ -578,10 +585,10 @@ function Application() {
             <Stack spacing={1}>
               {pageCount > 1 && (
                 <Flex sx={{ mt: 1 }}>
-                  <Pagination
+                  <ExPagination
                     count={Number(pageCount)}
                     page={Number(page)}
-                    onChange={setPage}
+                    setPage={setPage}
                   />
 
                   <Typography variant="caption">
@@ -673,10 +680,10 @@ function Application() {
 
               {pageCount > 1 && (
                 <Box sx={{ ml: 1 }}>
-                  <Pagination
+                  <ExPagination
                     count={Number(pageCount)}
                     page={Number(page)}
-                    onChange={setPage}
+                    setPage={setPage}
                   />
                 </Box>
               )}

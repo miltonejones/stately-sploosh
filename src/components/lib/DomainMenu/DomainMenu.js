@@ -37,13 +37,13 @@ export default function DomainMenu({
   navigate,
   domains,
   domain,
-  search_param,
+  limit = 6,
   busy,
 }) {
   // Determine which domains to display as chips and which to display in the dropdown
   const [selectedDomains, dropdownDomains] = Object.keys(domains).reduce(
     ([selected, dropdown], domainName, index) => {
-      if (index < 6) {
+      if (index < limit) {
         return [[...selected, domainName], dropdown];
       } else {
         return [selected, [...dropdown, domainName]];
@@ -76,7 +76,7 @@ export default function DomainMenu({
    */
   const handleChipClick = (domainName) => {
     const prefix = domain ? domain.split(",").concat(domainName) : [domainName];
-    const url = `/search/1/${search_param}/${prefix.join(",")}`;
+    const url = `${prefix.join(",")}`;
     navigate(url);
   };
 
@@ -88,14 +88,14 @@ export default function DomainMenu({
   const handleChipDelete = (domainName) => {
     if (!domain || domain.indexOf(domainName) < 0) {
       // If the deleted domain was not selected, just navigate to the search page
-      navigate(`/search/1/${search_param}`);
+      navigate(``);
     } else {
       // Otherwise, construct a new prefix without the deleted domain
       const prefix = domain
         .split(",")
         .filter((name) => name !== domainName)
         .join(",");
-      const url = `/search/1/${search_param}/${prefix}`;
+      const url = `${prefix}`;
       navigate(url);
     }
     handleMenuClose();
@@ -119,12 +119,15 @@ export default function DomainMenu({
    * new URL and navigates to the search page with the selected domains as a prefix.
    */
   const handleDropdownClose = (sel) => {
-    const url = `/search/1/${search_param}/${sel.join(",")}`;
+    const url = `${sel.join(",")}`;
     navigate(url);
     handleMenuClose();
   };
 
   const Component = !!dropdownSelection.length ? TextField : Menu;
+  if (selectedDomains?.length < 2) {
+    return <i />;
+  }
 
   return (
     <Stack

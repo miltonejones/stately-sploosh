@@ -49,9 +49,15 @@ export const deleteVideo = async (id) => {
   return await response.json();
 };
 
-export const getModel = async (id, page = 1, favorite = false, param) => {
+export const getModel = async (
+  id,
+  { page = 1, favorite = false, param, domain }
+) => {
   const suffix = favorite ? "/1" : "";
   let address = `/model/${id}/${page}${suffix}`;
+  if (!!domain?.length) {
+    address = `/model-domain/${id}/${page}/${domain}`;
+  }
   if (!!param?.length) {
     address = `/model-filter/${id}/${page}/${param}`;
   }

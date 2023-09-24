@@ -2,7 +2,7 @@ import { createMachine, assign } from "xstate";
 
 export const cartMachine = createMachine(
   {
-    /** @xstate-layout N4IgpgJg5mDOIC5QGMCGAnALgfQLauQAsBLAOzADpyAPTAYmtk1U0tQDNX0AKARgAZ+ASjposeAiXJUwtANr8AuolAAHAPaximYutIqQ1RAFoArADZeFAEwBmACwAOW716PztxwHYANCACeiG5ephT2vLamjk7mjqamXuYAvkl+Yjj4RGSUNPSMzKwUHFx8giLpElnSuXK8ykggGlo6egZGCMYR-PYUXvZevB5enhGWfoEIbvbmFACc9tO2iZ6zjtb2KWkYGZLZFMjquLjadBB6lGQAbuoA1pQVmVL3h8eYCFfqaC2kCoq-Bk1tLp9A12utbL1rMNTLZrNZYolpuMguFQgJrLM4eZwrFrJsQA9dtIDkcTmdpB87vttpUnvsXtp3qRrl9gb9avU1Joga1QUF+LMvDZ1k5+HFzKt+OZkZNURR0bMEi5rKYBbZ8YSqs9SfQwOh0Op0BRVAAbFjsQ24aniR57EmvJkslhspT-BqA75tRCRGaCOJLUyDaYxGVeVYUUyi-i8DGmWYuDU023E1BMCgm9SoCCnc4USn3JNEgtpjNZx2fZ16dlKAHcz18yZLIWOVwqlwS2zdGUxqzTeNS7wLXheaOJm1F6klzPZvUGo2m82W607LWTzDp6fl1lV1019114FehDmCVhcKDeHYk+ubuwihrLxQwNuRz8H1jld0tBp1SoACusBgAwTAsGwnB6nwsxQeUhart+66-gBYBulyzSHg2w6BhQ-DWPwkYtoq8Iwt23ihOEkTRO4cQJMkqQErBX6puuqCqKa-g5hSzK3AW45wUxRSsSa-hbpWPy7pyjQHryoDtMO4QUA4qy8KKgpOLYMr2JE2HYjEXghF4LaRB+tJ2vxLFsXQs6GsaZqYBa6BWpqjFpuZQkid81YSR66EyYgjjuHMb7WNR2IwrwpjdrMVgWP0phQlK8RRMZyaUFZ6B0OgYAHJceooZJaHSYYJhxbM8odp4eGtlB3bmNYYRRcpI6zJV8TJROyB-ugoEcRcXFUk5dqdaB7kun8e6oTyIK+ZMUQKbV8JxNMUIqjK7ihJ2eEthYeEhLMbVwUNrCWfq1kLnZS4DcSh1gCNO5jV5UlTUVCDWAIFDmGK-kqqsUGKrwGkjjYUTRCEsIwoK+10qW2bkr11z9QxezQ7dYn3bWBVPe0ay9PYca2M10b2MF3gyg4QoGVtdixLjMJeJDeyZVm7EgVgeXeYV7TGP5MwwhK8TrHpRPqQE3rmEK6yvpYAgeJ4-T09I7BkMQsCED1eZ9Txn57IrpDK4QKOeejk1Hp0dilQKEsCETUT9Kt3g40TYYxgZkamPLQHmWApAQGzj0m+Fr69N0qpRQZYZxTKxguI495OPYb6vhYCIpHRpDqBAcAGJdYBG-W02dJEdV9AMQwjLYYwix0irynF822IpzWeO7Mi0LnPnPTGPQSm4zXBfYzVfSRwU2GGbb4wsfTN-a2htxzQQnve3gvgsmmuLM3b8AZ96YuEI7OIG3hT0xs+Y-yUH3vXRMLJYjhRfYkdCuYtfxY+vAE27dHZ2uG5ZifR6uP0C+DgRQ3zvqGUqINy4ESlOiRwR8fz-kAn-DCfQIRwnmPER8cJogRUrmsfgNhcZ9H3mFPC8DmKCQmBNPOHdlhnmGHCBYmJ8a+ErspGOm8Qjx2mGsGMZDP6I2kGlZB011ilTjHYYc+NaqChjN2OMYRIj9Hrq+OErgp7XRER3cugVJahw+m-CIMpLAQkFEME8cJIy1WbtDLRnMD7vXhJ4bua0MSkwXv0IhelVhUzpgI3idJGYQCoflY2DZTYLBsPjeusxaq40FKTFsEYojRjDNiVSvBm46z1nYkwMY4rvUEMFMWwxujWG7AIR+Qt3Ankvt0FOSQgA */
+    /** @xstate-layout N4IgpgJg5mDOIC5QGMCGAnALgfQLauQAsBLAOzAGJUAHasUiAbQAYBdRUage1mM2K6kOIAB6IAtAEYArAA5mAOgDszACzTmATklLZSzdIBMAGhABPCQGZJshbNX3ml+dIBsrvQF9PptFjwEJOQK5CKYFCKwmKiYYAqoAGax6AAUkszMAJQUfjj4RGRxoZgs7Egg3Lz8gsJiCOJukgqGlg7WNq7OSqYWCDZK0gqqkpZyDh7S0kqu3r4YeYGFIWBhEVExcYnJaRnZuQEFwcWMkmWcPHwCQuV1UpZqyqpKkp1KziOukj2INqquCppVH9LNNnJpZIZVLMQPt8kE4sguLhcHwKBBBHEyAA3LgAawR8wO8IUiORfAQ2K4aGqpFKpWElUuNRuiEhlmUhje0kshkMHmmf2+fWGg3Shk0vNcww8hmhsMWwVJKPC6OClPxJMJcKWSvJlOpVzppwZFxptR+WiUzUhDmYsjc4OYriFkhFCjFBjekkMGk0ljlWoVCKRyooYHQ6C46AU1AANjEElHcJr-NrFSG9aQcQbBHS2CaqldzQgQU0XvI-jZDN63kL5Fbq8wptNQVppAHU0HNVEFLGuKgIGiMQp1QTO4cCT2+wOKVmqTFDWx6eVGWaWcKVO6nU9np9XPoXTy7JzOdJJDZ5KMZj4YYGJ93ML3+4Pw5Ho3GE0mUwt72gp8-Z2zBdcyXfMV1NIt13cTQhmGF4+Sldxz0PQxjyUU9z1kS83A7H9iT-R9qFQABXWBKEiaJYniJJwzSTR6L2O98NQHsiNIsBl3OQtmVAOodDPBRmEMJsHEkAw+W5F09EGYZRnsWQJima85nHZiexoOMzCHNU5w1eVfxYx8NNjMxAPnGk8zOCoIJ40QfiUYYFFacFXXkTQHNkSwhVUUZBKlcYlAGXQRnbG99LUozaBMsMIyjGN40wRN0GTcKdUM+IotM-VgNpUCrNXSDeMQLD-k0JxDHtNx1GsaQXW0BQqoGTknUmORcKJJZXyjCh0DAREsXDTjrO464ivqKYZPuAxwVccVVGYbpzB+awnJPWR0ksKUT3atMEWI9ANm0zFdLHPCdX2jYzJzXLWCGgrbL4uQnNmvl7T+E9aqWhAFMGe4m3WtwmwGTQdq7ZALtiGK33iz9ku-DrFQhsArpyyyCyZUa7IQRsFFcO0sJ9cF6IML4vqeRQfSwp5uR9Sx3NB+9p0HVVjpxPSmKWJmUYsvL0bXMaIUeaQ-TK5hXQqvQhVaK1dABloPHUbklAZ4leoHLT1iwO6bMx24SoazaDCMHdVBaKX92aW1PnSTpnCeFWlgSMhiFgQgjpHE74d2hQndIF3CG5xdbrAriMeLKQWhgrRIXWtRKaeOs9EeU39BrN7QpUs7giZqG4o-RKv1S7OAOynng-ynXw58mXNClSYJSmMrNCFGPmjE4Tq08zaoWhUguAgOBhCLsA+cKrG7iMR5dxBd5NtJ3pxAMd0jE6VxAQyb1rAdo4VkwUeHp+SFce0WQyoq1QyoJqSKuafRabpoEHO34MyT38CRuLF5-iw54qaBdpm5fXSLoOwEphgqE8meLwYUOaKkMvvXWFp6J2EsK0G0nxT6uiFOIK0rgV6tBBOTdIWhn4PifAOBBn9XRWi7qbIEGDtCqCFPoOwTxNrrTKp8ISshSEERjCRMilD1w6A8G3Nep8nQyCBLIOsYllAOSmA4ewe4eEwNUmldSmUhFjREeyR+PIbQSjpotXorlBKBWkPNP4EJvRNlIV1dA2isaQhgsLFoOg6azXct6F0wshijDYc4IS1ZJC8KRk4vim0AR2idNoaYYttBeS+p8dk7lXjuF5JY2apCmYRIkGeUq3p6KjCrFI82-wnjqECvoCEm1lZqKznENWEBeih35uPb0MhBKK1rjyXQEwpanwBAohWkwZB2lIb7f2eT6jeknnjbh+43hxxdMA3GptnDuFtlY7w3ggA */
     id: "cart_machine",
 
     initial: "ready",
@@ -21,7 +21,7 @@ export const cartMachine = createMachine(
           100: [
             {
               target: "load",
-              cond: (context) => context.save_index < context.chosen.length,
+              cond: "more pages",
             },
             {
               target: "finish",
@@ -40,7 +40,7 @@ export const cartMachine = createMachine(
 
       commit: {
         entry: assign({
-          message: () => `Saving video details...'`,
+          message: (context) => `Saving video details...'`,
         }),
 
         invoke: {
@@ -49,7 +49,7 @@ export const cartMachine = createMachine(
           onDone: [
             {
               target: "next",
-              cond: (context) => !context.track_info?.stars,
+              cond: "no model present",
               actions: "incrementSave",
             },
             {
@@ -127,7 +127,7 @@ export const cartMachine = createMachine(
 
       curate: {
         entry: assign({
-          message: () => `Looking up video details...'`,
+          message: (context) => `Looking up video details...'`,
         }),
         invoke: {
           src: "curateVideo",
@@ -155,6 +155,7 @@ export const cartMachine = createMachine(
       load: {
         invoke: {
           src: "loadByURL",
+
           onDone: [
             {
               target: "curate",
@@ -163,6 +164,11 @@ export const cartMachine = createMachine(
               }),
             },
           ],
+
+          onError: {
+            target: "error",
+            actions: "assignProblem",
+          },
         },
       },
 
@@ -181,6 +187,11 @@ export const cartMachine = createMachine(
           onDone: [
             {
               target: "ready",
+              actions: assign({
+                chosen: [],
+                progress: 0,
+                save_index: 0,
+              }),
             },
           ],
         },
@@ -220,6 +231,10 @@ export const cartMachine = createMachine(
           track_info: null,
         };
       }),
+    },
+    guards: {
+      "more pages": (context) => context.save_index < context.chosen.length,
+      "no model present": (context) => !context.track_info?.stars,
     },
   }
 );

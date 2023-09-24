@@ -26,7 +26,7 @@ import { IconTextField } from "../../../styled";
 import { Flex, Spacer } from "../../../styled";
 import { useCast } from "../../../machines";
 import { useDedupe } from "../../../machines/dedupeMachine";
-
+import DomainMenu from "../DomainMenu/DomainMenu";
 
 const U = styled("u")(() => ({
   cursor: "pointer",
@@ -64,12 +64,12 @@ export const useModelModal = () => {
         return await getModelMissingVideos(context.ID);
       },
       loadModel: async (context) => {
-        return await getModel(
-          context.ID,
-          context.page,
-          context.favorite,
-          context.filterText
-        );
+        return await getModel(context.ID, {
+          page: context.page,
+          favorite: context.favorite,
+          param: context.filterText,
+          domain: context.domain,
+        });
       },
       loadCostars: async (context) => {
         return await getModelCostars(context.ID);
@@ -124,6 +124,12 @@ export const useModelModal = () => {
   const setFavorite = () => send("FAVORITE");
 
   const refresh = () => send("REFRESH");
+  const setDomain = (domain) =>
+    send({
+      type: "REPROP",
+      name: "domain",
+      value: domain,
+    });
 
   return {
     state,
@@ -138,6 +144,7 @@ export const useModelModal = () => {
     handleRename,
     handleAlias,
     setFavorite,
+    setDomain,
     agent,
     ...state.context,
   };
@@ -147,6 +154,8 @@ const ModelModal = ({
   open,
   agent,
   state,
+  setDomain,
+  domain,
   tab: tabnum,
   memory,
   missing,
@@ -179,6 +188,7 @@ const ModelModal = ({
   // const pages = usePagination(costars, { pageCount: 10, page})
   const tab = Number(tabnum);
   const dedupe = useDedupe(refresh);
+  // const [domain, setDomain] = React.useState("");
 
   if (!model?.videos?.records) return <i />;
   const pageSize = Math.abs(tab) === 1 ? 18 : 16;
@@ -199,13 +209,33 @@ const ModelModal = ({
     },
   ];
 
-  const handleDedupe = (trackFk,modelFk) => {
+  const duplicates = model.videos.records
+    .filter(
+      (film) => film.models.filter((who) => who.ID === star.ID).length > 1
+    )
+    .map((rec) => ({
+      modelFk: star.ID,
+      trackFk: rec.ID,
+    }));
+
+  const handleDedupes = () => {
     dedupe.send({
-      type: 'DEDUPE',
-      modelFk,
-      trackFk
-    })
-  }
+      type: "DEDUPE",
+      items: duplicates,
+    });
+  };
+
+  const handleDedupe = (trackFk, modelFk) => {
+    dedupe.send({
+      type: "DEDUPE",
+      items: [
+        {
+          modelFk,
+          trackFk,
+        },
+      ],
+    });
+  };
 
   const handleModelMenu = async (value) => {
     if (value === 1) {
@@ -223,6 +253,20 @@ const ModelModal = ({
       return;
     }
     refresh();
+  };
+
+  const domains = model?.domains
+    ?.sort((a, b) => (a.amt < b.amt ? 1 : -1))
+    .reduce((out, res) => {
+      out[res.domain] = res;
+      return out;
+    }, {});
+
+  const domainProps = {
+    domains,
+    domain,
+    limit: 3,
+    navigate: (suffix) => setDomain(suffix),
   };
 
   return (
@@ -316,22 +360,21 @@ const ModelModal = ({
               }}
               className="fa-solid fa-cart-shopping"
             ></i>
-    
-    
-    
-          {!!model?.videos?.records?.length && <i 
-              onClick={() => {
-                bookClicked( {
-                  key: model.videos.records[0].Key,
-                  name: star.name, 
-                  modelfk: star.ID ,
-                  image: star.image
-                });
-                handleClose()
-              }}
-            className="fa-solid fa-book"
-          ></i>}
-          
+
+            {!!model?.videos?.records?.length && (
+              <i
+                onClick={() => {
+                  bookClicked({
+                    key: model.videos.records[0].Key,
+                    name: star.name,
+                    modelfk: star.ID,
+                    image: star.image,
+                  });
+                  handleClose();
+                }}
+                className="fa-solid fa-book"
+              ></i>
+            )}
 
             <i onClick={handleAlias} className="fa-solid fa-people-arrows"></i>
 
@@ -344,16 +387,8 @@ const ModelModal = ({
                 <I className="fa-solid fa-ellipsis-vertical"></I>
               </ModelMenu>
             )}
-            {/* [{memory?.length}] */}
           </Flex>
         </Stack>
-
-        {/* <Box sx={{ borderBottom: 1, borderColor: 'divider', width: '100%'}}>
-    <Tabs value={tab} onChange={(e,n) => setTab(n)} sx={{height: 24,p:0}} >
-    <Tab label=" videos"  sx={{textTransform: 'none',p:0 }} /> 
-    <Tab label=" costars"  sx={{textTransform: 'none',p:0 }} /> 
-   </Tabs>
-    </Box> */}
 
         {pageCount > 1 && tab < 2 && (
           <Stack
@@ -375,6 +410,14 @@ const ModelModal = ({
               size="small"
               onClick={() => setTab(1)}
             />
+            <Chip
+              variant={"outlined"}
+              color="primary"
+              label="Dedupe"
+              size="small"
+              disabled={!duplicates.length || !dedupe.state.can("DEDUPE")}
+              onClick={handleDedupes}
+            />
             <Pagination count={pageCount} page={page} onChange={setPage} />
             <Box sx={{ flexGrow: 1 }} />
             <Typography variant="caption">
@@ -382,7 +425,10 @@ const ModelModal = ({
             </Typography>
           </Stack>
         )}
-
+        {!!dedupe.progress && (
+          <LinearProgress variant="determinate" value={dedupe.progress} />
+        )}
+        {/* {JSON.stringify(dedupe.state.value)} */}
         {Math.abs(tab) === 1 && (
           <>
             <Grid wide>
@@ -395,8 +441,7 @@ const ModelModal = ({
       </pre> */}
           </>
         )}
-        {/* {JSON.stringify(state.value)}
-{JSON.stringify(selected)} */}
+
         {tab === 0 && (
           <Grid>
             {model.videos.records.map((record) => (
@@ -422,25 +467,24 @@ const ModelModal = ({
               )}
               {/* {progress} */}
             </Box>
-            <Stack spacing={1} direction="row"> 
+            <Stack spacing={1} direction="row">
               <Chip
                 size="small"
                 label={`select all`}
                 variant="outlined"
-                color="success" 
+                color="success"
                 onClick={() => handleSelect(missing.map((f) => f.ID))}
               />
-             {!!selected?.length && <Chip
-                size="small"
-                label={`Add model to  ${selected.length} videos`}
-                color="warning"
-                onClick={handleBatch}
-              />}
+              {!!selected?.length && (
+                <Chip
+                  size="small"
+                  label={`Add model to  ${selected.length} videos`}
+                  color="warning"
+                  onClick={handleBatch}
+                />
+              )}
               <Spacer />
-              <i
-                onClick={() => setTab(0)} 
-                className="fa-solid fa-xmark"
-              /> 
+              <i onClick={() => setTab(0)} className="fa-solid fa-xmark" />
             </Stack>
             <Grid>
               {missing.map((record) => (
@@ -453,6 +497,12 @@ const ModelModal = ({
               ))}
             </Grid>
           </>
+        )}
+
+        {!!model.domains && tab === 0 && (
+          <Flex sx={{ p: 1 }}>
+            <DomainMenu {...domainProps} />{" "}
+          </Flex>
         )}
 
         <FloatingMenu />

@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import { getPhoto } from "../../../connector";
 import { usePhoto } from "..";
+import { ERR_IMAGE } from "../../../const";
 
 export const usePhotoModal = (onChange) => {
   const [state, send] = useMachine(photoMachine, {
@@ -52,8 +53,6 @@ export const usePhotoModal = (onChange) => {
   };
 };
 
-const ERR_IMAGE =
-  "https://s3.amazonaws.com/sploosh.me.uk/assets/no-img-women.jpg";
 const PreviewCard = ({ src, size, onClick, caption }) => {
   const { image } = usePhoto(src, ERR_IMAGE);
   return (
@@ -93,7 +92,7 @@ const PhotoModal = ({ photo, choosePhoto, state, name, open }) => {
       maxWidth="md"
       open={open}
       onClose={() => choosePhoto()}
-      data-testid="test-for-PhotoModal"
+      anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
     >
       <Card>
         <Stack spacing={2} sx={{ p: 2, minWidth: 600, minHeight: 200 }}>

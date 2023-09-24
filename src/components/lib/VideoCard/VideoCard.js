@@ -12,13 +12,14 @@ import {
   Tooltip,
   styled,
 } from "@mui/material";
-import { Spacer} from "../../../styled";
+import { Spacer } from "../../../styled";
 import { RegionMenu, usePhoto, ConfirmPopover } from "..";
 // import { useWindowManager } from '../../../services';
 import Marquee from "react-fast-marquee";
 import { useMachine } from "@xstate/react";
 import { menuMachine } from "../../../machines";
 import { AppStateContext } from "../../../context";
+import { DEFAULT_IMAGE } from "../../../const";
 
 const Block = styled(Card)(({ cursor, opacity, width, selected }) => ({
   cursor,
@@ -101,8 +102,6 @@ const ModelName = ({ model, onClick }) => {
   );
 };
 
-const ERR_IMAGE = "https://s3.amazonaws.com/sploosh.me.uk/assets/XXX.jpg";
-
 const VideoCard = ({
   video,
   small,
@@ -118,14 +117,14 @@ const VideoCard = ({
   selectedID,
   modelClicked,
   studioClicked,
-  handleDedupe
+  handleDedupe,
 }) => {
   const [expanded, setExpanded] = React.useState(false);
   const [showRegion, setShowRegion] = React.useState(false);
   const [cursor, setCursor] = React.useState("pointer");
   const { WindowManager } = React.useContext(AppStateContext);
 
-  const source = usePhoto(video.image, ERR_IMAGE);
+  const source = usePhoto(video.image, DEFAULT_IMAGE);
 
   const { models: modelList = [] } = video;
 
@@ -229,7 +228,7 @@ const VideoCard = ({
         <CardContent sx={{ p: (t) => t.spacing(1) + " !important" }}>
           <Stack direction="row" sx={{ alignItems: "center" }} spacing={1}>
             <ModelMenu
-              handleDedupe={id => handleDedupe(video.ID, id)}
+              handleDedupe={(id) => handleDedupe(video.ID, id)}
               selectedID={selectedID}
               onChange={(e) => !!e && modelClicked(e)}
               models={models}
@@ -292,7 +291,11 @@ const VideoCard = ({
               </Typography>
             </Stack>
           </Stack>
-          <Stack spacing={1} direction="row" sx={{ justifyContent: "space-between" }}>
+          <Stack
+            spacing={1}
+            direction="row"
+            sx={{ justifyContent: "space-between" }}
+          >
             <Typography
               onClick={() => domainClicked && domainClicked(video.domain)}
               variant="caption"
@@ -307,17 +310,17 @@ const VideoCard = ({
               {video.studio}
             </Typography>
 
-          {!!bookClicked && <i 
-              onClick={() => {
-                bookClicked( {
-                  key: video.Key,
-                  studio: true
-                }); 
-              }}
-            className="fa-solid fa-book"
-          ></i>}
-          
-          
+            {!!bookClicked && (
+              <i
+                onClick={() => {
+                  bookClicked({
+                    key: video.Key,
+                    studio: true,
+                  });
+                }}
+                className="fa-solid fa-book"
+              ></i>
+            )}
           </Stack>
         </CardContent>
       )}
@@ -335,7 +338,7 @@ export const ModelMenu = ({
   value,
   models,
   modelList,
-  handleDedupe
+  handleDedupe,
 }) => {
   const [state, send] = useMachine(menuMachine, {
     services: {
@@ -363,13 +366,20 @@ export const ModelMenu = ({
 
       <Menu anchorEl={anchorEl} open={!!anchorEl} onClose={() => send("close")}>
         {models.map((model) => (
-          <ModelItem handleDedupe={handleDedupe}
-          modelList={modelList}
-          key={model.ID} model={model} selectedID={selectedID} onClick={handleClose(model.ID)}
-            /> 
+          <ModelItem
+            handleDedupe={handleDedupe}
+            modelList={modelList}
+            key={model.ID}
+            model={model}
+            selectedID={selectedID}
+            onClick={handleClose(model.ID)}
+          />
         ))}
         {!!clipboard && !!clipText && (
-          <MenuItem onClick={handleClose(clipboard)} handleDedupe={handleDedupe}>
+          <MenuItem
+            onClick={handleClose(clipboard)}
+            handleDedupe={handleDedupe}
+          >
             <Stack direction="row" sx={{ alignItems: "center" }} spacing={1}>
               <Avatar src={clipboard} />
               <Typography>{clipText}</Typography>
@@ -391,24 +401,26 @@ export const ModelMenu = ({
 //   )} xxx&source=lnms&tbm=isch`;
 // }
 
-const ModelItem  =  ({ model, onClick, selectedID, modelList, handleDedupe }) => {
-  const count = modelList?.filter(f => f.ID === model.ID);
-  return <>
-  <MenuItem onClick={onClick}>
-      <Stack direction="row" sx={{ alignItems: "center" }} spacing={1}>
-        <Avatar src={model.image} />
-        <Typography
-          sx={{ fontWeight: selectedID === model.ID ? 600 : 400 }}
-        >
-          {model.Name} 
-        </Typography>
-      </Stack>
-    </MenuItem>
-    {count?.length > 1 && <MenuItem onClick={() => handleDedupe(model.ID)}>
-      <Typography>Remove duplicate</Typography>
-    </MenuItem>}
+const ModelItem = ({ model, onClick, selectedID, modelList, handleDedupe }) => {
+  const count = modelList?.filter((f) => f.ID === model.ID);
+  return (
+    <>
+      <MenuItem onClick={onClick}>
+        <Stack direction="row" sx={{ alignItems: "center" }} spacing={1}>
+          <Avatar src={model.image} />
+          <Typography sx={{ fontWeight: selectedID === model.ID ? 600 : 400 }}>
+            {model.Name}
+          </Typography>
+        </Stack>
+      </MenuItem>
+      {count?.length > 1 && (
+        <MenuItem onClick={() => handleDedupe(model.ID)}>
+          <Typography>Remove duplicate</Typography>
+        </MenuItem>
+      )}
     </>
-}
+  );
+};
 
 /**
  *   {
