@@ -20,7 +20,11 @@ import {
   SettingsMenu,
   Librarian,
 } from "./components/lib";
-import { useWindowManager, VideoPersistService } from "./services";
+import {
+  useCartMachine,
+  useWindowManager,
+  VideoPersistService,
+} from "./services";
 import VideoForm from "./components/pages/Save/Save.js";
 
 import {
@@ -110,9 +114,11 @@ function Application() {
     send("REFRESH");
   });
   const store = dynamoStorage();
-  const shop = useShoppingDrawer(() => {
+  const curator = useCartMachine(() => {
     send("REFRESH");
   });
+
+  const shop = useShoppingDrawer(curator);
   const modal = useModelModal();
   const finder = useSearchDrawer(
     (val) => !!val && navigate(`/search/1/${val}`)
@@ -337,7 +343,7 @@ function Application() {
 
   return (
     <AppStateContext.Provider
-      value={{ WindowManager, active_machine, floatingProps }}
+      value={{ WindowManager, active_machine, floatingProps, curator }}
     >
       <Flex spacing={2} sx={{ p: 2, borderBottom: 1, borderColor: "divider" }}>
         <i

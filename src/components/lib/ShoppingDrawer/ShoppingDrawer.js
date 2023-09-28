@@ -25,12 +25,16 @@ import dynamoStorage from "../../../services/DynamoStorage";
 import { useCartMachine } from "../../../services";
 import { useFinderMachine } from "../../../services/useFinderMachine";
 import { CuratorCard, PhotoCard, PreviewCard } from "./Cards";
+import { usePreview } from "../../../services/usePreviewMachine";
+import PreviewBar from "./PreviewBar";
 
 const cookieName = "selected-parser-items";
 
-export const useShoppingDrawer = (onRefresh) => {
+export const useShoppingDrawer = (curator) => {
   const store = dynamoStorage();
-  const curator = useCartMachine(onRefresh);
+
+  // const curator = useCartMachine(onRefresh);
+
   const finder = useFinderMachine(() => send("searchdone"));
 
   const [state, send] = useMachine(shoppingMachine, {
@@ -204,6 +208,7 @@ const ShoppingDrawer = (props) => {
   console.log({ sortedResults });
 
   const pages = getPagination(curatedResults, { page, pageSize: 24 });
+  const viewer = usePreview();
 
   const handleCheckboxChange = (event) => {
     setExistingChecked(event.target.checked);
@@ -212,6 +217,7 @@ const ShoppingDrawer = (props) => {
     <>
       <CuratorCard {...props} />
       <PreviewCard {...props} />
+      <PreviewBar viewer={viewer} />
 
       <Drawer
         anchor="left"
@@ -241,6 +247,7 @@ const ShoppingDrawer = (props) => {
           <Box sx={{ width: 360, p: 2 }}>
             <TextField
               autoFocus
+              disabled={!state.can("SEARCH")}
               label="Search"
               placeholder="Type search param"
               fullwidth
@@ -249,7 +256,9 @@ const ShoppingDrawer = (props) => {
               value={param}
               onChange={handleChange}
             />
-            <Button onClick={handleSearch}>Search</Button>
+            <Button disabled={!state.can("SEARCH")} onClick={handleSearch}>
+              Search
+            </Button>
           </Box>
         )}
 
@@ -342,6 +351,7 @@ const ShoppingDrawer = (props) => {
                     active={chosen?.indexOf(result.URL) > -1}
                     onClick={(e) => handleChoose(result.URL)}
                     key={o}
+                    viewer={viewer}
                     {...result}
                   />
                 )}
@@ -350,7 +360,7 @@ const ShoppingDrawer = (props) => {
           </Grid>
         )}
 
-        {!!parsers && state.matches("opened.loaded") && (
+        {!!parsers && state.matches("opened") && (
           <Stack sx={{ width: 360, p: 2 }}>
             {parsers
               .filter((f) => !!f.pageParser)

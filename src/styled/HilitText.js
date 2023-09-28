@@ -1,4 +1,5 @@
 const HilitText = ({ value, values = [], children }) => {
+  if (!children) return <i />;
   const param = values.find(
     (str) => children.toLowerCase().indexOf(str.toLowerCase()) > -1
   );

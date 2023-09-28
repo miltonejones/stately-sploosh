@@ -118,6 +118,7 @@ const VideoCard = ({
   modelClicked,
   studioClicked,
   handleDedupe,
+  handleDrop,
 }) => {
   const [expanded, setExpanded] = React.useState(false);
   const [showRegion, setShowRegion] = React.useState(false);
@@ -185,6 +186,7 @@ const VideoCard = ({
             video.favorite ? "red fa-solid" : "fa-regular"
           } fa-heart`}
         ></i>
+
         <ConfirmPopover
           message={`Are you sure you want to delete "${video.title}"?`}
           caption="This action cannot be undone!"
@@ -192,10 +194,22 @@ const VideoCard = ({
         >
           <i className="fa-solid fa-trash-can"></i>
         </ConfirmPopover>
+
         <i
           onClick={() => window.open(video.URL)}
           className="fa-solid fa-up-right-from-square"
         ></i>
+
+        {!!handleDrop && (
+          <ConfirmPopover
+            message={`Are you sure you want to remove this model?`}
+            caption="This action cannot be undone!"
+            onChange={(val) => !!val && handleDrop && handleDrop(video.ID)}
+          >
+            <i className="fa fa-user-times" />
+          </ConfirmPopover>
+        )}
+
         {!!video.Key && (
           <i
             onClick={() =>
@@ -421,34 +435,3 @@ const ModelItem = ({ model, onClick, selectedID, modelList, handleDedupe }) => {
     </>
   );
 };
-
-/**
- *   {
-        "ID": 282710,
-        "title": "JavDoe | Watch JAV kawaii kawd-742 Fresh Face! Kawaii Exclusive: 18-Year-Old Fresh From Her Graduation - Her 1000% Innocent Dream Is To Become A Pop Star, But She's Ready For Porn Right Away Mio Shinozaki Online Free on JavDoe",
-        "src": "/player#684c774f4171303d",
-        "image": "https://cdndoe.xyz/files/movie/kawd-742-rookie-kawaii-exclusive-graduation-freshly-of-new-18-year-old-yearn-to-idle-pure-1000-kawaii-immediately-take-av-debut-mio-shinozaki_1491657662.png",
-        "URL": "https://javdoe.to/watch/kawaii-kawd-742-fresh-face-kawaii-exclusive-18-year-old-fresh-from-her-graduation-her-1000-innocent-dream-is-to-become-a-pop-star-but-shes-ready-for-porn-right-away-mio-shinozaki-1Ohj",
-        "domain": "javdoe.to",
-        "dateAdded": null,
-        "modelFk": 0,
-        "width": 600,
-        "height": 300,
-        "favorite": {
-          "type": "Buffer",
-          "data": [
-            1
-          ]
-        },
-        "models": [
-          {
-            "trackFk": 282710,
-            "ID": 127,
-            "Name": "Shinosaki Mio",
-            "image": "https://javtube.com/javpic/mio-shinozaki/1/mio-shinozaki-7.jpg"
-          }
-        ],
-        "studio": "kawd",
-        "Key": "kawd-742"
-      },
- */

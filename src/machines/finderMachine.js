@@ -2,7 +2,7 @@ import { createMachine, assign } from "xstate";
 
 export const finderMachine = createMachine(
   {
-    /** @xstate-layout N4IgpgJg5mDOIC5QDMCWA7CYBOB9AtgIYDGAFhmAMSEAONYmA2gAwC6ioNA9rKgC6ou6DiAAeiAEzMAbNIB0AZgUAOaQBYF0gOwS10gJwBWADQgAnogC0h6czkBGTWvuOtMo8oC+n02kw4CEnJ0KgBZAHkAEQBRFnYkEG5eASERcQR7LS0FOWZmRzVmTUNmNT1TCwRrWwdNBS0XXQlpCQVvXwwsPCIyCjkaQmxYMFwB7EJ8WEpRWD5CPjA5QmQF7AAKNQBKSj8uwN6Q-sHh0cGJ2DiRJP5BYQT0tUNlOWUJXXsNCSfMj4qrCQcDWUbjUWmUCkMagkWn07RAuwCPWCixCoj4p3G+Gms3mi2Wqw22wR3SCfVR6LGE0uCWuKTuoHS+m0ci0hi00gUmQhelBfyqAJ+yhs4Mc+iMzH0EjhxP2yLk5IxE2xcwWSxWOEJO06iNJhwVlPwjHs8U4PBuqXuiH07NyegMUO56i0fMs9lUuX09kMbMMX3sEmUai8Pnh2pJB0WGH4ytxaoJ9iJYdlfSjfGppuStzSiH9Rjk2gUen0zGUrgMfIkmXzduUktZ0NeUpDMqRZLAaJjqvxGoTWv84bl5PTiTNdOzCC0QdypchBhstiMfKBtq+MmynMLwY6-eTevbfE7ePV617Ld1KP3RpNI8zFoZiEnANU9vsLX0CjeJnMiA0zzc9X0cEmV9ZhDGlJNWz3DsZhVI940THdIIvNFGAka9aSzS0J1KBwDGYbIXFZTRlAraFFGkUtoXyZp9DUcDEPPI4YEoCAhEjdAADcuAAa0WM8IyYsAEAwLjiHmW44mHDC7zEK1mS9J4imUCUjA0PlaP0OQNDcVRwTtN56L2JC5BwbAuGwShsDAYguA4nApNHTD7wyWwckA99PSZf02QUPkXE9OQSmtV4PBKR5DJ1ATdhYti5BEni+IgxjdmEziuDEulJLYK5HJk9JcwBUovihdxHD8wjATKX13yeNktAigc+mi0zzP6AAbeZkHM-A5H4uUUvijKJLYBzb3pWSMiyNQ5FaCEXB8oMOT5ZxDDka0dAhWtpBAsDmySgSbPwGg2rABYYsOeLeN6-a5UO47TqEwbxKELL0Ny8b0hKValFoj4pCUbbZBdTkAU8sVVEMexrU9Oi9oYgTUAgE7KBxbA02yml3vHN15FeIVgUMJllHBVQXVfLRAs9b160hgMg28EN0C4LB4ASPqKBysbsccfNgSZSVgVZIN7BdKFVpKvI3glZS3V27cjMYsYTgNVmM3ND6c2kexeZhAwAyySESO-DJNNA0FQNkVQ8jUWE4YVgT9TOfBOfV8dJwp1kSjyZhKzqtQ-NNyE3HnK3Slt+XIrlVMXbHLDc21gpCmyN5QTU42odyIOLYo2ww4a3dkL4GOnImkUWVmpSSyZBpytBXDXkJ9QJElFp8+MgYYGLvKcx93GiJLNwWih6QlxcNbJSJwmVE5WGI8aw4WuwLuNYyZSPaUHHMkDWjyoCoKGhtnlpDb5LOmX7m8z+lOW7KbRlq+LTgSUQNtBKLdQ3h26uCOk6FnPrCmSgwojYSUjpeTG0sEoCmkpvZS0AvkIUJ8EZIzAP-ZymRNLeT0PYfIWRib6GBh8LSUg8gtF0LrQsDNPBAA */
+    /** @xstate-layout N4IgpgJg5mDOIC5QDMCWA7CYBOB9AtgIYDGAFhmAMSEAONYmA2gAwC6ioNA9rKgC6ou6DiAAeiAEzMAbNIB0AZgUAOaQBYF0gOwS10gJwBWADQgAnogC0h6czkBGTWvuOtMo8oC+n02kw4CEnJ0MDkaQmxYMFxw7EJ8WEpRWD5CPlDCZHTsAAo1AEpKPyw8IjIKMIiomIj42BZ2JBBuXgEhEXEENUNlOWUJXXsNCR77LSHTCwRLCQdx5Tc1LWUFQzUJLX1vXwwSwPKQuRDRPhq4-CSUtIysnDzC4oCy4NDj09j4hpEW-kFhJs6+m0ci0hi00gUY1WeiWkysszG9mUNhWjn0RmY+gk2xAj1KQQqbzO8UuqXScky2XuRV2TwJhyJH3wjHsjU4PF+7QBiH04LkzD0BnW0PUWjh0yR8kx9kMYMMI3sEmUai8PlxtPxB1CGH4pOuFNuuXsDw1+xech1fC+TR+bX+oE6iqMcm0Cj0+mYylcBnFEjGLsFyixoI2-WxarxZsJYBOevJlLuxpp-k15re1vZrT+HUQWhV-K9awMNlsRnF83560MMi0SkcKpxkee0djyTJNypSab9NeMatrO+HLtOYQedmqiF9mkEn0CgGJnMiA0vTcCk2KyB8uYhkbpubDL7cY7iZNKajB5OjAkbOaQ+z3NHAocBmYtZcoM0yl9G0U0i9G2YRUhV3M991CcIYEoCAhG1dAADcuAAa1CbstUqGAEAwBDiDSP4GgzW8sy5B0eWBGUemYFRMSMDRxX0NR9DkDQ3FUFZBQGEC9jAuQcGwLhsEobAwGILg4JwAjbXvEiECnSi5H0IMFH0ewgUVMEFHFFxlLkateX6Dxq26Ti6TQ4ooJgi14KQlC9x7ORikwqycLtfC2EHIj7TERAnVmAURnWdxHE0985jUboZ1WZEtC0YzUwqMzeP4sIABs0mQfj8Hs2zTN2RzsNwoRXJvSTiK8mTorUOQJCUQwXHUlUIXFZxDHk6Lqp6TcpB3CNsvNET8BoZKwHSczDiw6ystAuz+sG4awDyrhnLwtgJLvUrOmrFqlHooYpCUaQS3FSxIVmZT0QUg6VM2IZYvPbUICGygrmwK03JtNbPMdFQXRLZU-XBNc1COqdGNqsZmAFVRIRU27uNQB6qGe-tio+kdLCGRinFBdFDAUvNa2BsEHDWVYkV08FHFhuyYD4AACOD4bAHhaeQPj8FpwgIAgITYESaCxqs5DJq46nhvpxnmdZrh2c57m4FgBalsKla3szTlPtIxi9DcT083o-oxUXaY-0qkZlELZVDDdGxvDVdAuCweAmlQl53PVtGpF6BTeQOkZxitucjuihQmO0TFpChTYBSptDYmqJknbV4cHynewXQWIEsQWUEVU0xjtyWbdZFUCGGJjtM+2JfA3eT6T8ZBWUIYhv0wTzPP+TWNxftsAUth6qa0MtGupLKp00-rNRXznXQ8w0o2VI7wvu9LvudgHiuTmH9bEFREFqoUSjlE9IFxmCpZn36XH1BnCRp3LioILALeNZk5hb76D9dZkP0gXLFx5KxECZEs5URqHvocRK2Bn4jiRK+EEdZVBjGVPRYK2lyYYxhNIcBNlMDQJTipFqu0BgMVvmFbQTURhMQWEoZU2hqyqjXiLNCM0hrpDwdJIEp0-w2CxCKWERtjprnklIZuUgFKAWRNgi0CN2Gj02A4fyEdALRXNvoI6kJKoBQhtOGeQI3RSJpuLLAks2Ycy5jzROhF3YPnRrYeSQZwTyjBDKJQEgjrcPktoewAoVSaGquGbwQA */
     id: "finder_machine",
 
     initial: "idle",
@@ -23,11 +23,19 @@ export const finderMachine = createMachine(
         after: {
           4: {
             target: "next_param",
-            actions: assign((context) => ({
-              param_list: context.param.split("|"),
-              param_index: 0,
-              results: !!context.resume ? context.results : [],
-            })),
+            actions: assign((context) => {
+              const param_list = context.param.split("|");
+              if (!!context.resume) {
+                return {
+                  param_list: context.param_list.concat(param_list),
+                };
+              }
+              return {
+                param_list,
+                param_index: 0,
+                results: [],
+              };
+            }),
           },
         },
       },
@@ -150,13 +158,34 @@ export const finderMachine = createMachine(
 
       idle: {
         on: {
-          start: {
-            target: "parse_params",
-            actions: assign((_, event) => ({
-              param: event.param,
-              selected: event.selected,
-              resume: event.resume,
-            })),
+          start: [
+            {
+              target: "parse_params",
+
+              actions: assign((_, event) => ({
+                param: event.param,
+                selected: event.selected,
+                resume: event.resume,
+              })),
+
+              cond: "Param is not URL",
+            },
+            {
+              target: "get videos from address",
+              actions: assign((_, event) => ({
+                URL: event.param,
+              })),
+            },
+          ],
+        },
+      },
+
+      "get videos from address": {
+        invoke: {
+          src: "searchByURL",
+          onDone: {
+            target: "complete",
+            actions: "assignParseResults",
           },
         },
       },
@@ -197,7 +226,9 @@ export const finderMachine = createMachine(
           search_index: context.search_index + 1,
         };
       }),
-
+      assignParseResults: assign((_, event) => ({
+        results: event.data,
+      })),
       assignPage: assign((context, event) => {
         const results = combine(event.data, context.results);
         const latest = event.data.filter(timeFilter).find((f) => !!f.Photo);
@@ -220,6 +251,7 @@ export const finderMachine = createMachine(
 
       "More parsers": (context) =>
         context.search_index < context.selected.length,
+      "Param is not URL": (_, event) => event.param?.indexOf("://") < 0,
     },
   }
 );

@@ -31,6 +31,7 @@ export const menuMachine = createMachine({
         onError: [
           {
             target: "opened",
+            actions: () => alert("Error loading clipboard"),
           },
         ],
       },
@@ -72,15 +73,25 @@ export const useMenu = (onChange) => {
       menuClicked: async (context, event) => {
         onChange && onChange(event.value);
       },
-      readClipboard: async () => false,
+      readClipboard: async () => await navigator.clipboard.readText(),
     },
   });
   const { anchorEl } = state.context;
+
   const handleClose = (value) => () =>
     send({
       type: "close",
       value,
     });
+
+  const handleChange = (event) => {
+    send({
+      type: "change",
+      name: event.target.name,
+      value: event.target.value,
+    });
+  };
+
   const handleClick = (event, value) => {
     send({
       type: "open",
@@ -99,9 +110,11 @@ export const useMenu = (onChange) => {
   return {
     state,
     send,
+    ...state.context,
     anchorEl,
     handleClick,
     handleClose,
+    handleChange,
     diagnosticProps,
   };
 };

@@ -8,6 +8,10 @@ export const useFinderMachine = (onComplete) => {
       sendCompeteSignal: async () => {
         onComplete && onComplete();
       },
+      searchByURL: async (context) => {
+        const res = await getVideosByURL(context.URL);
+        return res.videos;
+      },
       searchByPage: async (context) => {
         const currentPage = context.addresses[context.page_index];
         const [address] = currentPage;

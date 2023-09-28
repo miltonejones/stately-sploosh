@@ -6,7 +6,7 @@ import { addModelToVideo, removeModelFromVideo } from "../connector";
 // add machine code
 const dedupeMachine = createMachine(
   {
-    /** @xstate-layout N4IgpgJg5mDOIC5QUgVwA5gHQCcwEMIBPAYgBEBRMgVQAUKBtABgF1FR0B7WASwBcenAHbsQAD0QBaABwBOLACZpARgAsshU03SAbAGYFAGhBFEe2dMVNly6Ux0B2ZZod6Avm+MoIGbAGNOAFt0ABswPkgSCGFsHiEAN04Aa2xvXywA4LCIiAQ4xL98AWFmFlLRLl5ikSRxKScFLCZVNWUdHRtm1T1jUwQHFqw9AFZR1QVZJmHpVSZZDy80TCx0HE4-OF4hKFwwQM54sAB9fZQQqJisfOTUpexV9c24nbx9w5POM7yE9aLBIVK5VqlX4-1EEgQOmGqiGkwUOlkamsemUsl6iGUTGsQx09mmAyYeh0qlUCxAaWWDw2sC2Lz2B2OpzA5zAODWOBWISKADNODhAlgKfc1tTabs3ozPszvgU-iVWECONxQcJwYgNMosMN7EwHNJhrZJrIHOiEAoHA5FLp2pMHLJVDMFGShSsRU9tlhCBAPmcLkJYj8UoK7q7HjTnp6IN6mSEZb9qoDWBVldU1WbpJa9CTVMM9QZHMMdKbc0wsMos7IERpNAj3J5ySGqe6dl6fcySKz2ZyeXyBS6m+GPa2Y3HCgmFUngSmwbUIQ4mJZnKpcToJiNcT0TGZZPJ5zZdAuLQplLnnY23YOdj5MEdO3ySAAlCgAYQA8gA1CgPxUgEGp2f1NMigWMe5bKA4HQqKa5rDFgertBahYKMMiJqGe17YP6Yh8AABPwewkD+f4zqAEKSE4TQLnMdoKAo4yyFmpqYhMigtN0UyGu0pL1i6WG4fhgSEcobBTlUJF1Agkh6LoWAWC00y2FoKJQkxWjyHRajTCi0jaA4Hj1kIUrwLUQrJmJqoAZJdg6MBOk2CiEG2MoqmNEoCE5t0qgOMMRLoekeCEH0SrmTUpGATCswLuB0gqHIDqmuYliOBa7E6QoBijH5yyZKE4SQGZKqhRJ5HIVq6jwnozROOMm59MxNnHnYszDOlajGllwphrSBX-mFkL2LCWgIkiYFoluCCGnB1oWkp0h6BaHWhqKEavAybYhD14kQjFmoWJVegVuoOgzKasiFkM+oIuVLULk6PHnl1EbDlKG2iYVaa1rJJIMaMx2zLoxaOFgugnh0eranmi0DmKGG3myfKbRZfUOEowPdNJJ6IhBB3QRYWrlultEZsS3GLBhWB8XhESBIjRVkeoijanRyHfVm0LFoiOInj5xqVrien6UAA */
+    /** @xstate-layout N4IgpgJg5mDOIC5QUgVwA5gHQCcwEMIBPAYgBEBRMgVQAUKBtABgF1FR0B7WASwBcenAHbsQAD0QBaAIzSATFmlMAzKukA2OXIAsADmXbtAGhBFEc6QFYsm9Zbn3t6gJzTd6gOwBfLyZQQMbDxCUjIAJQB5WmY2JBAuXgFhUQkEGR1nLA9nHUsNdU9lXV0TMwQddUVtC0tdJiY5Z2V1Jm9fEH9ArABjTgBbdAAbMD5IEghhbB4hADdOAGtsTswe-qGRyARpue78JKEYmNEE-kERONTJDwMsd2UHTXkCp1LES1qsuuKPPSt7ZR8fjQK3QOE43TgvCEUFwYD6nBmYAA+vCUINxpMsNsFktgdhQeDIdMYXh4YiUZw0VtZuC9mdDqxjtxTskLoh1MppFhLOpdNVnJYinkNK8ELo3J8WipOS0PLVAR08VgCRDYFCSXCEcjUWB0WAcGCcMrBnsAGacHB9LDLfFg1Xq2Fk7WU3XUnZ04QM2IcZn7FKIXTOXQ2PlyIquDxyQOWUXObRZeRMaTNd7SAUchU25V2onQrCECAUtEYoRTGmLa1KlW5mEFouu7G7fZepmJM7+8rqeP2OTqNxhpTvVSiooebktTmGZweDx1NpAgIgnNq4n5iCFnV6g0W41mi1WrPVld5uubt205usI5xE5+tkIXnWZQNDwFFxp7RJ0UWMdPQVMAoDHuZx1EzKtlwdRdkX1Q0SDCCgAGEIgANQoMJrx9NtWVAS5smDB56hcPInAcUVdDHd5LGnOVLH5ciwKgrBSzEPgAAJ+DhEgMPiX123vSQmluRpil5QNqiYdwyMaW5BUDOpXEsVptAYrpmLYji+i46RvR4rDzhwqRtHkLAcg0XsrD7QVSNMANpN0WSgyYBSlJUlYIDBdB0FXdzOHQVjNxLMs5grLMfM87yPP8l1BnPJt6SvRkb147DxCkaRtGuEzDBcJzXGcJNlFFSMmCwORWgMcqMneVylg8ry8zCqLixgnchj3S1K0YsL6phRqz0bD0DgSnTbz4gy0mkSMuT5WcnEHJhamMGyEH5GxlEjQMOUePkautOqIt81iWpwODEJQtDuNGlLLnShasHuApilaQNX2-NMsAaDQ4xaO5qksXbGrUrjEswll9NSiaB25NwgwUjwJMjKTMns5RTPcNw7AByKgYYbTWzBjsZHqaxtEU+oGmaVxdDkJGZNHbR7lkbQQJ8dohBdeA4htfG73GmR7MqHRPz7fK7AnUVJDqUryOnVHrgF2RduCYgebGiGrhnUqtDsH59DyGNlosSolGfcidbjVH-vaLNegGYZRggVXrqkXX7o8WRicpiMpMqfQmFJxMQMm3RdqPdUnfB1JamUcdQwFIVZHUIrSsTZM5IklQtFDiDV1JLV60GCOO3szINFkJpA1UX4isy8UTYFeo8tA63wMJY9a3XAui-vTwuXkZ8BRAzxiiWsohWlnKtueofs7byDAiRY7u-G+HKk+2i03y9LOVFWRrAryxXzuZQhxDlvGLU9jRj6Zf1cjD7iup9K7FouVRU-YNZ15INKPWiwsd8j1W+N0vilUMABNMAEeQqF3pybkRsv59hTL2AB4UGqRU3MAtKr4SpCwgaLaBhVlo-EqLUTwOgigSVNqgnqe1DpLySnpQmk0lDciDNcfsU10pvUyJ9HK5F3gzmqufLogMwAsSwZDVhn4QL+1kDOXsRUjJYAZuGf2woBTSFZl4IAA */
     id: "dedupe",
     initial: "ready",
     states: {
@@ -14,6 +14,11 @@ const dedupeMachine = createMachine(
         on: {
           DEDUPE: {
             target: "processing",
+            actions: "assignTrackModelInfo",
+          },
+
+          DROP: {
+            target: "dropping",
             actions: "assignTrackModelInfo",
           },
         },
@@ -81,6 +86,50 @@ const dedupeMachine = createMachine(
         always: [
           {
             target: "processing",
+            cond: "more items",
+            actions: "incrementItems",
+          },
+          {
+            target: "completed",
+            actions: assign({
+              item_index: 0,
+              items: [],
+              progress: 0,
+            }),
+          },
+        ],
+      },
+
+      dropping: {
+        states: {
+          "drop model": {
+            invoke: {
+              src: "removeModel",
+              onDone: {
+                target: "#dedupe.drop next",
+                actions: "incrementIndex",
+              },
+              onError: {
+                target: "drop error",
+                actions: "assignProblem",
+              },
+            },
+          },
+
+          "drop error": {
+            on: {
+              RECOVER: "#dedupe.ready",
+            },
+          },
+        },
+
+        initial: "drop model",
+      },
+
+      "drop next": {
+        always: [
+          {
+            target: "dropping",
             cond: "more items",
             actions: "incrementItems",
           },

@@ -14,6 +14,7 @@ import {
   Typography,
   TextField,
   styled,
+  Box,
 } from "@mui/material";
 import { ScrollingText, Photo, ModelCard } from "..";
 import { Flex, HilitText, Nowrap } from "../../../styled";
@@ -45,24 +46,28 @@ export const PhotoCard = ({
   Text,
   Photo,
   Time,
+  URL,
   domain,
   size = 200,
   onClick,
   existing,
+  viewer,
 }) => {
   const { image } = usePhoto(Photo, DEFAULT_IMAGE);
 
+  const preview = (event, url) => viewer.handleOpen(event, url);
   return (
     <Card
-      onClick={onClick}
       sx={{
         outline: active ? "solid 2px green" : "",
         cursor: "pointer",
         width: size,
         opacity: existing ? 0.5 : 1,
+        position: "relative",
       }}
     >
       <CardMedia
+        onClick={onClick}
         component="img"
         sx={{ borderRadius: 2, width: size - 16, aspectRatio: "16 / 9" }}
         width="100%"
@@ -70,7 +75,11 @@ export const PhotoCard = ({
         image={image}
         alt={Text}
       />
-      <CardContent sx={{ p: (t) => t.spacing(1) + " !important" }}>
+      <CardContent
+        sx={{
+          p: (t) => t.spacing(1) + " !important",
+        }}
+      >
         <Stack>
           <ScrollingText
             variant="body2"
@@ -87,9 +96,17 @@ export const PhotoCard = ({
               {Text}
             </HilitText>
           </ScrollingText>
-          <Stack sx={{ justifyContent: "space-between" }} direction="row">
+          <Stack direction="row">
             <Typography variant="caption">{Time}</Typography>
+            <Box sx={{ flexGrow: 1 }} />
             <Typography variant="caption">{domain}</Typography>
+            <IconButton
+              disabled={!viewer?.state.can("open")}
+              sx={{ width: 18, height: 18 }}
+              onClick={(event) => preview(event, URL)}
+            >
+              &crarr;
+            </IconButton>
           </Stack>
         </Stack>
       </CardContent>
@@ -101,103 +118,102 @@ export const CuratorCard = ({ curator, minimal, handleMode }) => {
   const saving = !["ready"].some(curator.state.matches);
   const { track_to_save, stars_to_add } = curator.state.context;
 
-  if (!(!!saving && !!track_to_save)) {
-    return <i />;
-  }
+  // if (!(!!saving && !!track_to_save)) {
+  //   return <i />;
+  // }
   return (
-    <Snackbar anchorOrigin={{ vertical: "bottom", horizontal: "right" }} open>
+    <Snackbar
+      anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+      open={!!saving}
+    >
       <Card onClick={handleMode}>
-        <Flex>
-          <Stack sx={{ p: 2, minWidth: 360 }} spacing={1}>
-            {!minimal && (
-              <Photo
-                backup={DEFAULT_IMAGE}
-                src={track_to_save.image}
-                alt={track_to_save.title}
-                style={{
-                  width: 360,
-                  aspectRatio: "16 / 9",
-                  borderRadius: 4,
-                }}
-              />
-            )}
-
-            <Stack direction="row" sx={{ alignItems: "center" }} spacing={1}>
-              {!!minimal && (
-                <Avatar
-                  sx={{ aspectRatio: "16/9" }}
-                  variant="square"
+        {!!track_to_save && (
+          <Flex>
+            <Stack sx={{ p: 2, minWidth: 360 }} spacing={1}>
+              <Typography variant="caption">
+                {JSON.stringify(curator.state.value)}
+              </Typography>
+              {!minimal && (
+                <Photo
+                  backup={DEFAULT_IMAGE}
                   src={track_to_save.image}
+                  alt={track_to_save.title}
+                  style={{
+                    width: 360,
+                    aspectRatio: "16 / 9",
+                    borderRadius: 4,
+                  }}
                 />
               )}
-              <Typography sx={{ maxWidth: 360 }} variant="body2">
-                {curator.message}
+
+              <Stack direction="row" sx={{ alignItems: "center" }} spacing={1}>
+                {!!minimal && (
+                  <Avatar
+                    sx={{ aspectRatio: "16/9" }}
+                    variant="square"
+                    src={track_to_save.image}
+                  />
+                )}
+                <Typography sx={{ maxWidth: 360 }} variant="body2">
+                  {curator.message}
+                </Typography>
+              </Stack>
+
+              <Typography sx={{ maxWidth: 360 }} variant="caption">
+                {track_to_save.title}
               </Typography>
+
+              {curator.state.matches("error") && (
+                <Stack>
+                  <Nowrap variant="caption" muted>
+                    There was an error processing this request
+                  </Nowrap>
+
+                  <Nowrap width={360}>
+                    <b>{curator.source}</b>: {curator.error}{" "}
+                  </Nowrap>
+
+                  <Flex spacing={2}>
+                    <Button
+                      variant="contained"
+                      onClick={() => curator.send("recover")}
+                    >
+                      Next
+                    </Button>
+                  </Flex>
+                </Stack>
+              )}
+
+              <LinearProgress
+                variant={!curator.progress ? "indeterminate" : "determinate"}
+                value={curator.progress}
+              />
             </Stack>
 
-            <Typography sx={{ maxWidth: 360 }} variant="caption">
-              {track_to_save.title}
-            </Typography>
-
-            {curator.state.matches("error") && (
-              <Stack>
-                <Nowrap muted>
-                  There was an error processing this request
-                </Nowrap>
-                <Nowrap width={360}>{curator.message} </Nowrap>
-                <Nowrap width={360}>
-                  {JSON.stringify(curator.state.value)}{" "}
-                </Nowrap>
-                <Flex spacing={2}>
-                  <Button
-                    variant="contained"
-                    onClick={() => curator.send("recover")}
-                  >
-                    Next
-                  </Button>
+            <Collapse
+              orientation="horizontal"
+              in={!!stars_to_add?.length && curator.state.matches("cast.pause")}
+            >
+              {!!stars_to_add?.length && (
+                <Flex spacing={2} sx={{ p: 2 }}>
+                  {stars_to_add.map((star) => (
+                    <ModelCard
+                      small={stars_to_add.length > 3}
+                      key={star.ID}
+                      model={star}
+                    />
+                  ))}
                 </Flex>
-              </Stack>
-            )}
-
-            <LinearProgress
-              variant={!curator.progress ? "indeterminate" : "determinate"}
-              value={curator.progress}
-            />
-          </Stack>
-
-          <Collapse
-            orientation="horizontal"
-            in={!!stars_to_add?.length && curator.state.matches("cast.pause")}
-          >
-            {!!stars_to_add?.length && (
-              <Flex spacing={2} sx={{ p: 2 }}>
-                {stars_to_add.map((star) => (
-                  <ModelCard
-                    small={stars_to_add.length > 3}
-                    key={star.ID}
-                    model={star}
-                  />
-                ))}
-              </Flex>
-            )}
-          </Collapse>
-        </Flex>
+              )}
+            </Collapse>
+          </Flex>
+        )}
       </Card>
     </Snackbar>
   );
 };
 
-export const PreviewCard = ({
-  // busy,
-  handleMode,
-  // message,
-  // progress,
-  // results,
-  minimal,
-
-  // send,
-  finder,
-}) => {
+export const PreviewCard = ({ handleMode, minimal, finder }) => {
   const {
     param_list,
     latest: result,

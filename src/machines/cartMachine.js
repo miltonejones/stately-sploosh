@@ -2,7 +2,7 @@ import { createMachine, assign } from "xstate";
 
 export const cartMachine = createMachine(
   {
-    /** @xstate-layout N4IgpgJg5mDOIC5QGMCGAnALgfQLauQAsBLAOzAGJUAHasUiAbQAYBdRUage1mM2K6kOIAB6IAtAEYArAA5mAOgDszACzTmATklLZSzdIBMAGhABPCQGZJshbNX3ml+dIBsrvQF9PptFjwEJOQK5CKYFCKwmKiYYAqoAGax6AAUkszMAJQUfjj4RGRxoZgs7Egg3Lz8gsJiCOJukgqGlg7WNq7OSqYWCDZK0gqqkpZyDh7S0kqu3r4YeYGFIWBhEVExcYnJaRnZuQEFwcWMkmWcPHwCQuV1UpZqyqpKkp1KziOukj2INqquCppVH9LNNnJpZIZVLMQPt8kE4sguLhcHwKBBBHEyAA3LgAawR8wO8IUiORfAQ2K4aGqpFKpWElUuNRuiEhlmUhje0kshkMHmmf2+fWGg3Shk0vNcww8hmhsMWwVJKPC6OClPxJMJcKWSvJlOpVzppwZFxptR+WiUzUhDmYsjc4OYriFkhFCjFBjekkMGk0ljlWoVCKRyooYHQ6C46AU1AANjEElHcJr-NrFSG9aQcQbBHS2CaqldzQgQU0XvI-jZDN63kL5Fbq8wptNQVppAHU0HNVEFLGuKgIGiMQp1QTO4cCT2+wOKVmqTFDWx6eVGWaWcKVO6nU9np9XPoXTy7JzOdJJDZ5KMZj4YYGJ93ML3+4Pw5Ho3GE0mUwt72gp8-Z2zBdcyXfMV1NIt13cTQhmGF4+Sldxz0PQxjyUU9z1kS83A7H9iT-R9qFQABXWBKEiaJYniJJwzSTR6L2O98NQHsiNIsBl3OQtmVAOodDPBRmEMJsHEkAw+W5F09EGYZRnsWQJima85nHZiexoOMzCHNU5w1eVfxYx8NNjMxAPnGk8zOCoIJ40QfiUYYFFacFXXkTQHNkSwhVUUZBKlcYlAGXQRnbG99LUozaBMsMIyjGN40wRN0GTcKdUM+IotM-VgNpUCrNXSDeMQLD-k0JxDHtNx1GsaQXW0BQqoGTknUmORcKJJZXyjCh0DAREsXDTjrO464ivqKYZPuAxwVccVVGYbpzB+awnJPWR0ksKUT3atMEWI9ANm0zFdLHPCdX2jYzJzXLWCGgrbL4uQnNmvl7T+E9aqWhAFMGe4m3WtwmwGTQdq7ZALtiGK33iz9ku-DrFQhsArpyyyCyZUa7IQRsFFcO0sJ9cF6IML4vqeRQfSwp5uR9Sx3NB+9p0HVVjpxPSmKWJmUYsvL0bXMaIUeaQ-TK5hXQqvQhVaK1dABloPHUbklAZ4leoHLT1iwO6bMx24SoazaDCMHdVBaKX92aW1PnSTpnCeFWlgSMhiFgQgjpHE74d2hQndIF3CG5xdbrAriMeLKQWhgrRIXWtRKaeOs9EeU39BrN7QpUs7giZqG4o-RKv1S7OAOynng-ynXw58mXNClSYJSmMrNCFGPmjE4Tq08zaoWhUguAgOBhCLsA+cKrG7iMR5dxBd5NtJ3pxAMd0jE6VxAQyb1rAdo4VkwUeHp+SFce0WQyoq1QyoJqSKuafRabpoEHO34MyT38CRuLF5-iw54qaBdpm5fXSLoOwEphgqE8meLwYUOaKkMvvXWFp6J2EsK0G0nxT6uiFOIK0rgV6tBBOTdIWhn4PifAOBBn9XRWi7qbIEGDtCqCFPoOwTxNrrTKp8ISshSEERjCRMilD1w6A8G3Nep8nQyCBLIOsYllAOSmA4ewe4eEwNUmldSmUhFjREeyR+PIbQSjpotXorlBKBWkPNP4EJvRNlIV1dA2isaQhgsLFoOg6azXct6F0wshijDYc4IS1ZJC8KRk4vim0AR2idNoaYYttBeS+p8dk7lXjuF5JY2apCmYRIkGeUq3p6KjCrFI82-wnjqECvoCEm1lZqKznENWEBeih35uPb0MhBKK1rjyXQEwpanwBAohWkwZB2lIb7f2eT6jeknnjbh+43hxxdMA3GptnDuFtlY7w3ggA */
+    /** @xstate-layout N4IgpgJg5mDOIC5QGMCGAnALgfQLauQAsBLAOzAGJUAHasUiAbQAYBdRUage1mM2K6kOIAB6IAtAEYArAE4ALADoAbAGYAHOoDszdZNnN5k9QBoQATwmrmWxQCZVy+aulatdyXdluAvj7NoWHgEJOSK5CKYFCKwmKiYYIqoAGYJ6AAUkszMAJQUgTj4RGSJEZgs7Egg3Lz8gsJiCOLSmor6slnyWs7MqnZmlgjGysqKstp28rIaHszKfgEYhSEl4WCR0bHxiSlpmdl5BcHFYWWMkpWcPHwCQlWNUtZK3VqSaloako6SA4jG8qMFADVFo1OpxpMFiAjkVQolkFxcLg+BQIIJEmQAG5cADW8KWxzhigRSL4CCxXDQdVIFQqwhqN3q90Qk1UincH2kfTsym0TmUvyGRmkbWYXjsPKMvLsUJhKzCJORUTRYQpeOJBNhq0VZIpVNutIu9Ou1Iaf2Y3nsk3k6l00mU4zmgskwtFXlcqk80gtqllmvl8MRSooYHQ6C46EU1AANvFkhHcBqglqFUHdaRsfrBLS2MbarczQhHHZ7Fl1M5ecoPNJ+hZEFp1KMq9prMxJFoDGo-cmAxrYopo1xUBBUejFGr8T2Tvj+4Ph+SM5T4ga2HSqgzTcyhTpRU43G83h3nX1FOo7BzpJJjLaXPN-ND-dO+5gB0OR6Hw5GY3GE0nlk+0FnN8F0zZds1XXN1xNAst2UDtFEMYw3C6ZhXD0Z0vhUOwWnkaRvQdB1nG7f8iUAl9qFQABXWBKBiOIEiSVJQ0yWRWMOR9SNQfsKOosA1yufMmVARpr2YFReW0Dl5DmLpnW0JRWI+RsDDmeTiMJbUuJfGgY3MUdVUXdU5QArSkloaNzBApdqRzS5qmgoTRD+XklDwux1G9XoXnbQVnFsDxPB6dRrC+eR1JTGdtPMvSVQxQzJxIzT+x0iyrKzGlVyNKDBLuYS-lcSQxlYsVwTbcsWmdDslGsPRxg7dyAS0cLezIszdJDMMIyjWNMHjdBE2MzjkuitKwIy1h+PsnLC3BdRFHkSYXVUZa3j6SrRjsXplAtNsdE0aRmqfD8IwodAwARTFQ0mjcYLypoWhFaQFvta0RjPaRj0KvoOQ0PQ3FYmV70G1ZjvQU7zq4S70HOOybsch5Qsex0HD6AEfjrIUxNcGSVotDpZEO0jKPQbZ9Li7EjI47Vie2UabIg2GHNypyEAlObHG6K8HC6ZxBVkc82m26w5GybJeUJ6mSYSDrP26n9+r-DSFRphI6ZXCbIIExlmcaCVZAQ1R+cbbnumsVRfI+cTjAlLnPHKiWwjnEdYvHeLFYi195z1MbbLzbXC3EZw5oBYLNq0LlJWCwU1FGG1DbUKYdGcAmgapx23xlrrv1639gfTr3F3S33sv9rcrzZXQ1E8hbUK8LRBRcR6PHkOOAs9JrU6nIkzuHPStiwa6mYDzRRi5B03K6boHAbuD7BtOYrzmZbyw7xYu9WZIyGIWBCDJ12KYSpXEk30ht8INXwI1xnpq3KR9DE9pw7kcEa1YwVwRLa1xhbpxvQ+Px7ykC4BAOAwg85gD9puO6jxpiKGfmKZakxlDo0GOIWQIoZA8i8MFfmNYQQO1KOsTAkDbos0CioDopUGoGE0LWQY1s5rnlwctIE3QCHEjTMQkuUCyEjFPNoa8LdnBXlkM6Gwc0P5GD2i4JC7CyIkPhuaVip5loLR-sYDo8hBTiFsMoGsYIXQ0MvAtORpknYKJ1n8F0thgqqDUWjcELpBTwRXo4WqC8SqmO4lRGiFjCztl5KWB0pVkFPRtO-fQ7JuiuBtOWZB4tO6JQVKZFKgwtY8JEqCNkLcPgShbvzQ29cMYujmjYcO0kQ4eE2gdRJR9FCgz8WXbo7IeR8l-nY+Ozo5DzRcF0ZeYoApyJVhA7hpDdYulPHIOQuF+ZwTgtHXQYw1CTG6C3Q2bx2HmNGYo+6bwxieFYjIs8MgtEY0cLHaJbgOxng5uwnuEA0lTVLtAq8fDMGaAtC-LwoizngjGNE7Q3gbBVjYbUj2J8z6NJedhEs20SpwQ+IYOhVibAqAWhoEYag7GGAAT4IAA */
     id: "cart_machine",
 
     initial: "ready",
@@ -13,6 +13,7 @@ export const cartMachine = createMachine(
       track_info: null,
       track_to_save: null,
       counter: 0,
+      stars_to_add: [],
     },
 
     states: {
@@ -66,7 +67,7 @@ export const cartMachine = createMachine(
           onError: [
             {
               target: "error",
-              actions: "assignProblem",
+              actions: ["assignProblem", assign({ source: "commit" })],
             },
           ],
         },
@@ -91,7 +92,7 @@ export const cartMachine = createMachine(
               },
               onError: {
                 target: "#cart_machine.error",
-                actions: "assignProblem",
+                actions: ["assignProblem", assign({ source: "load" })],
               },
             },
           },
@@ -101,17 +102,26 @@ export const cartMachine = createMachine(
                 target: "#cart_machine.next",
               },
             },
+
+            description: `Pause a few seconds to allow the UI to update.`,
           },
           apply: {
             invoke: {
               src: "castModels",
-              onDone: {
-                target: "pause",
-                actions: "incrementSave",
-              },
+              onDone: [
+                {
+                  target: "pause",
+                  actions: "incrementSave",
+                  cond: "found models",
+                },
+                {
+                  target: "#cart_machine.next",
+                  actions: "incrementSave",
+                },
+              ],
               onError: {
                 target: "#cart_machine.error",
-                actions: "assignProblem",
+                actions: ["assignProblem", assign({ source: "apply" })],
               },
             },
           },
@@ -121,7 +131,14 @@ export const cartMachine = createMachine(
       error: {
         description: `An error has occured somewhere in the process.`,
         on: {
-          recover: { target: "load", actions: "incrementSave" },
+          recover: [
+            {
+              target: "load",
+              actions: "incrementSave",
+              cond: "more pages",
+            },
+            "finish",
+          ],
         },
       },
 
@@ -146,7 +163,7 @@ export const cartMachine = createMachine(
           onError: [
             {
               target: "error",
-              actions: "assignProblem",
+              actions: ["assignProblem", assign({ source: "curate" })],
             },
           ],
         },
@@ -167,7 +184,7 @@ export const cartMachine = createMachine(
 
           onError: {
             target: "error",
-            actions: "assignProblem",
+            actions: ["assignProblem", assign({ source: "load" })],
           },
         },
       },
@@ -235,6 +252,7 @@ export const cartMachine = createMachine(
     guards: {
       "more pages": (context) => context.save_index < context.chosen.length,
       "no model present": (context) => !context.track_info?.stars,
+      "found models": (context) => !!context.stars_to_add?.length,
     },
   }
 );

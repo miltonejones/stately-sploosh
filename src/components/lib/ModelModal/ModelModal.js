@@ -20,7 +20,13 @@ import {
   addModelToVideo,
   getModelMissingVideos,
 } from "../../../connector";
-import { VideoCard, ModelSelect, FloatingMenu, ModelCard } from "..";
+import {
+  VideoCard,
+  ModelSelect,
+  FloatingMenu,
+  ModelCard,
+  ConfirmPopover,
+} from "..";
 import { ModelMenu } from "..";
 import { IconTextField } from "../../../styled";
 import { Flex, Spacer } from "../../../styled";
@@ -218,6 +224,32 @@ const ModelModal = ({
       trackFk: rec.ID,
     }));
 
+  const imposters = model.videos.records
+    // .filter((film) => !film.models.some((who) => who.name === star.name))
+    .map((rec) => ({
+      modelFk: star.ID,
+      trackFk: rec.ID,
+    }));
+
+  const handleDrops = () => {
+    dedupe.send({
+      type: "DROP",
+      items: imposters,
+    });
+  };
+
+  const handleDrop = (trackFk) => {
+    dedupe.send({
+      type: "DROP",
+      items: [
+        {
+          modelFk: star.ID,
+          trackFk,
+        },
+      ],
+    });
+  };
+
   const handleDedupes = () => {
     dedupe.send({
       type: "DEDUPE",
@@ -410,6 +442,21 @@ const ModelModal = ({
               size="small"
               onClick={() => setTab(1)}
             />
+
+            <ConfirmPopover
+              message={`Are you sure you want to drop this model?`}
+              caption="This action cannot be undone!"
+              onChange={(val) => !!val && handleDrops && handleDrops()}
+            >
+              <Chip
+                variant={"outlined"}
+                color="primary"
+                label="Drop"
+                size="small"
+                disabled={!dedupe.state.can("DROP")}
+              />
+            </ConfirmPopover>
+
             <Chip
               variant={"outlined"}
               color="primary"
@@ -451,8 +498,10 @@ const ModelModal = ({
                 selectedID={star.ID}
                 modelClicked={openModel}
                 handleDedupe={handleDedupe}
+                handleDrop={handleDrop}
                 bookClicked={bookClicked}
                 small
+                allowDrop
                 video={record}
               />
             ))}
