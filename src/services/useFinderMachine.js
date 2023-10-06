@@ -22,10 +22,6 @@ export const useFinderMachine = (onComplete) => {
         const currentDomain = context.selected[context.search_index];
         const address = `https://${currentDomain}`;
         const answer = await getVideosByText(address + "/", context.param);
-        console.log({
-          address,
-          answer,
-        });
         return answer;
       },
     },
@@ -37,6 +33,11 @@ export const useFinderMachine = (onComplete) => {
     });
 
   return {
+    diagnosticProps: {
+      id: finderMachine.id,
+      states: finderMachine.states,
+      state,
+    },
     state,
     send,
     ...state.context,

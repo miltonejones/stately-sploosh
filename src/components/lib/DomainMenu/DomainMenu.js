@@ -157,15 +157,16 @@ export default function DomainMenu({
       ))}
 
       {!dropdownSelection?.length && !!dropdownDomains.length && (
-        <Nowrap
-          hover
-          variant="caption"
-          onClick={handleMenuOpen}
-          disabled={busy}
-          sx={{ cursor: "pointer" }}
-        >
-          More Domains
-        </Nowrap>
+        <i onClick={handleMenuOpen} className="fa-regular fa-address-book"></i>
+        // <Nowrap
+        //   hover
+        //   variant="caption"
+        //   onClick={handleMenuOpen}
+        //   disabled={busy}
+        //   sx={{ cursor: "pointer" }}
+        // >
+        //   More Domains
+        // </Nowrap>
       )}
 
       {dropdownDomains.length > 0 && (

@@ -3,10 +3,12 @@ import { AppStateContext } from "./context";
 import {
   VideoCard,
   Dash,
-  useModelModal,
   ModelGrid,
   SearchDrawer,
+  useShoppingDrawer,
+  useVideoDrawer,
   useSearchDrawer,
+  useModelModal,
   usePhotoModal,
   PhotoModal,
   ModelModal,
@@ -15,8 +17,6 @@ import {
   FloatingMenu,
   Diagnostics,
   getPagination,
-  useShoppingDrawer,
-  useVideoDrawer,
   SettingsMenu,
   Librarian,
 } from "./components/lib";
@@ -69,9 +69,12 @@ import {
 } from "react-router-dom";
 import "./App.css";
 import { SearchPersistService } from "./services";
-import { Flex, PhotoGrid, IconTextField } from "./styled";
+import { Flex, PhotoGrid, IconTextField, Spacer } from "./styled";
 import DomainMenu from "./components/lib/DomainMenu/DomainMenu";
 import ExPagination from "./components/lib/ExPagination/ExPagination";
+import ModelMemory from "./components/lib/ModelMemory/ModelMemory";
+import Editor from "./components/pages/Editor/editor";
+import Janitor from "./components/pages/Janitor/Janitor";
 
 const Btn = styled(Button)(({ theme }) => ({
   textTransform: "capitalize",
@@ -96,6 +99,8 @@ function App() {
       <Routes>
         <Route path="/" element={<Application />} />
         <Route path="/save" element={<VideoForm />} />
+        <Route path="/editor" element={<Editor />} />
+        <Route path="/janitor" element={<Janitor />} />
         <Route path="/:type" element={<Application />} />
         <Route path="/:type/:page" element={<Application />} />
         <Route path="/:type/:page/:param" element={<Application />} />
@@ -107,13 +112,14 @@ function App() {
 
 function Application() {
   const WindowManager = useWindowManager();
+  const store = dynamoStorage();
+
   const librarian = useLibrarian(() => {
     send("REFRESH");
   });
   const editor = useVideoDrawer(() => {
     send("REFRESH");
   });
-  const store = dynamoStorage();
   const curator = useCartMachine(() => {
     send("REFRESH");
   });
@@ -123,6 +129,16 @@ function Application() {
   const finder = useSearchDrawer(
     (val) => !!val && navigate(`/search/1/${val}`)
   );
+
+  const photo = usePhotoModal((src, ID) => {
+    if (!src) return;
+    send({
+      type: "PHOTO",
+      src,
+      ID,
+    });
+  });
+
   const saving = [
     "save.next",
     "save.load",
@@ -194,6 +210,27 @@ function Application() {
     },
   });
 
+  const sploosh = {
+    diagnosticProps: {
+      ...splooshMachine,
+      state,
+    },
+  };
+
+  const allItems = [
+    shop.finder,
+    librarian,
+    editor,
+    curator,
+    shop,
+    modal,
+    photo,
+    sploosh,
+  ];
+  const machineItems = allItems.filter((item) => !!item.diagnosticProps);
+
+  // console.log({ allItems, machineItems });
+
   const appendTab = async (param, type) => {
     const raw = param.replace("*", "");
     if (!tabs) return;
@@ -207,15 +244,6 @@ function Application() {
   };
 
   const location = useLocation();
-  const photo = usePhotoModal((src, ID) => {
-    if (!src) return;
-    send({
-      type: "PHOTO",
-      src,
-      ID,
-    });
-  });
-
   React.useEffect(() => {
     if (!type) return;
     send({
@@ -341,9 +369,26 @@ function Application() {
     navigate: (suffix) => navigate(`/search/1/${search_param}/${suffix}`),
   };
 
+  // const debugPhotos = state.context.videos?.records?.map(
+  //   (record) => record.image
+  // );
+
+  const debugPhotos = state.context.videos?.records?.map((podcast) => ({
+    src: podcast.image,
+    title: podcast.title,
+    caption: "",
+    onClick: () => {
+      // send({
+      //   type: 'DETAIL',
+      //   podcast,
+      //   source: 'home',
+      // });
+    },
+  }));
+
   return (
     <AppStateContext.Provider
-      value={{ WindowManager, active_machine, floatingProps, curator }}
+      value={{ WindowManager, active_machine, floatingProps, curator, tabs }}
     >
       <Flex spacing={2} sx={{ p: 2, borderBottom: 1, borderColor: "divider" }}>
         <i
@@ -409,10 +454,16 @@ function Application() {
         <IconTextField
           endIcon={
             !search_param ? null : (
-              <i
-                onClick={() => navigate("/video/1")}
-                className="fa-solid fa-xmark"
-              />
+              <Flex spacing={1}>
+                <i
+                  onClick={() => navigate("/video/1")}
+                  className="fa-solid fa-xmark"
+                />
+                <i
+                  onClick={() => shop.handleClick(search_param)}
+                  className="fa fa-cart-arrow-down"
+                />
+              </Flex>
             )
           }
           placeholder="Type a title or model name"
@@ -432,8 +483,6 @@ function Application() {
           value={search_param}
         />
 
-        {/* <i onClick={() =>  WindowManager.focus()} className="fa-solid fa-users-viewfinder"></i>
-<i onClick={() =>  WindowManager.exit()}  className="fa-solid fa-xmark"></i>  */}
         <i
           onClick={() => shop.handleClick()}
           className={
@@ -448,11 +497,12 @@ function Application() {
           className="fa-solid fa-book"
         ></i>
 
-        {/* <i onClick={() =>  send('REFRESH')} className="fa-solid fa-rotate"></i>
-{!editor.videos?.length && <i onClick={() =>  editor.selectMode()} className={editor.multiple?"fa-solid fa-check red":"fa-solid fa-check"}></i>}
-{!!editor.videos?.length && <i onClick={() =>  editor.editMultiple()} className="fa-solid fa-pen"></i>} */}
         <SettingsMenu
           value={active_machine}
+          items={machineItems}
+          tabs={tabList}
+          store={store}
+          navigate={navigate}
           onChange={(value) =>
             send({
               type: "SET",
@@ -461,17 +511,8 @@ function Application() {
             })
           }
         />
-
-        {/* [{JSON.stringify(editor.multiple)}]
-[{editor.videos?.length}] */}
       </Flex>
 
-      {/* onChange={(e,n) => { 
-    if (n === 0) return navigate('/video/1')
-    navigate(`/search/1/${tabList[n - 1].param}`)
-  }} */}
-
-      {/* {JSON.stringify(librarian.state.value)} */}
       {!!tabList && !state.matches("dash") && view !== "model" && (
         <Flex
           sx={{ borderBottom: 1, borderColor: busy ? "primary" : "divider" }}
@@ -588,7 +629,7 @@ function Application() {
         {!state.matches("dash") &&
           !!state.context.videos &&
           view !== "model" && (
-            <Stack spacing={1}>
+            <Stack sx={{ pb: 4 }} spacing={1}>
               {pageCount > 1 && (
                 <Flex sx={{ mt: 1 }}>
                   <ExPagination
@@ -611,12 +652,7 @@ function Application() {
                       editClicked={editor.handleClick}
                       deleteClicked={removeVideo}
                       favoriteClicked={addFavorite}
-                      bookClicked={(options) => {
-                        librarian.send({
-                          type: "AUTO",
-                          ...options,
-                        });
-                      }}
+                      bookClicked={shop.handleClick}
                       studioClicked={(val) => navigate(`/search/1/${val}-`)}
                       domainClicked={(val) => navigate(`/domain/1/${val}`)}
                       photoClicked={photo.openPhoto}
@@ -632,102 +668,57 @@ function Application() {
 
               {!!domains && state.context.view === "search" && (
                 <DomainMenu {...domainProps} />
-                // <Stack
-                //   spacing={1}
-                //   direction="row"
-                //   sx={{
-                //     p: 2,
-                //     alignItems: "center",
-                //     maxWidth: "90vw",
-                //     overflow: "hidden",
-                //   }}
-                // >
-                //   <Typography variant="caption">Domains</Typography>
-                //   {Object.keys(domains).map((key) => (
-                //     <Chip
-                //       disabled={busy}
-                //       onClick={() => {
-                //         const prefix = !domain
-                //           ? [key]
-                //           : domain.split(",").concat(key);
-                //         navigate(
-                //           `/search/1/${search_param}/${prefix.join(",")}`
-                //         );
-                //       }}
-                //       onDelete={
-                //         domain?.indexOf(key) < 0
-                //           ? null
-                //           : () => {
-                //               if (!domain || domain.indexOf(key) < 0) {
-                //                 return navigate(`/search/1/${search_param}`);
-                //               }
-                //               const prefix = domain
-                //                 .split(",")
-                //                 .filter((name) => name !== key)
-                //                 .join(",");
-                //               return navigate(
-                //                 `/search/1/${search_param}/${prefix}`
-                //               );
-                //             }
-                //       }
-                //       key={key}
-                //       size="small"
-                //       variant="filled"
-                //       color={
-                //         !domain || domain.indexOf(key) < 0
-                //           ? "default"
-                //           : "success"
-                //       }
-                //       label={key}
-                //     />
-                //   ))}
-                // </Stack>
               )}
-
-              {pageCount > 1 && (
-                <Box sx={{ ml: 1 }}>
-                  <ExPagination
-                    count={Number(pageCount)}
-                    page={Number(page)}
-                    setPage={setPage}
-                  />
-                </Box>
-              )}
+              <Flex>
+                {pageCount > 1 && (
+                  <Box sx={{ ml: 1 }}>
+                    <ExPagination
+                      count={Number(pageCount)}
+                      page={Number(page)}
+                      setPage={setPage}
+                    />
+                  </Box>
+                )}
+                <ModelMemory {...modal} />
+              </Flex>
+              {/* <Spacer /> */}
             </Stack>
           )}
       </div>
       <Librarian librarian={librarian} />
       <FloatingMenu fixed />
-      <VideoDrawer {...editor} />
+      <VideoDrawer {...editor} shop={shop} />
       <SearchDrawer {...finder} />
       <ModelModal
         photoClicked={photo.openPhoto}
         searchClicked={shop.handleClick}
         deleteClicked={removeVideo}
         favoriteClicked={addFavorite}
-        bookClicked={(options) => {
-          librarian.send({
-            type: "AUTO",
-            ...options,
-          });
-        }}
         {...modal}
       />
-
+      {/* {JSON.stringify(modal.state.value)} */}
+      {/* {!!debugPhotos && <CardCarousel images={debugPhotos} />} */}
       <PhotoModal {...photo} />
-      <ShoppingDrawer {...shop} />
-
-      <Diagnostics {...photo.diagnosticProps} />
+      <ShoppingDrawer {...shop} handleModel={modal.openModel} />
+      {machineItems
+        .filter((item) => !!item.diagnosticProps)
+        .map((item) => (
+          <Diagnostics
+            key={item.diagnosticProps.id}
+            {...item.diagnosticProps}
+          />
+        ))}
+      {/* <Diagnostics {...photo.diagnosticProps} />
       <Diagnostics {...editor.diagnosticProps} />
-      <Diagnostics {...shop.diagnosticProps} />
+      <Diagnostics {...shop.diagnosticProps} /> */}
 
-      <Diagnostics
+      {/* <Diagnostics
         open={state.context.debug || state.matches("video_error")}
         id={splooshMachine.id}
         state={state}
         send={send}
         states={splooshMachine.states}
-      />
+      /> */}
     </AppStateContext.Provider>
   );
 }

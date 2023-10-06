@@ -1,5 +1,12 @@
 import React from "react";
-import { styled, Autocomplete, Avatar, TextField, Stack, Box } from "@mui/material";
+import {
+  styled,
+  Autocomplete,
+  Avatar,
+  TextField,
+  Stack,
+  Box,
+} from "@mui/material";
 import throttle from "lodash/throttle";
 import { Nowrap } from "../../../styled";
 import { findVideos, getModelsByName } from "../../../connector";
@@ -25,20 +32,40 @@ const ModelSelect = (props) => {
 
   const onValueChanged = async ({ value }) => {
     if (!value?.length) return;
+    let message = `Create new star named "${value}"`;
+    if (value.indexOf(",") > 0) {
+      const stars = value.split(",");
+      message = `Add "${stars.length}" models to the video`;
+      console.log({ message });
+
+      setOptions([
+        {
+          name: message,
+          value,
+          create: 1,
+        },
+      ]);
+      return;
+    }
+
     const opts = await getModelsByName(value);
     const vids = await findVideos(value);
+    let caption = vids?.records?.length
+      ? `Found in ${vids.records.length} videos`
+      : "";
+
+    console.log({ message });
+
     setOptions(
       [
         {
-          name: `Create new model named "${value}"`,
-          caption: vids?.records?.length ? `Found in ${vids.records.length} videos` : "",
+          name: message,
+          caption,
           value,
           create: 1,
         },
       ].concat(opts)
     );
-    // setOptions(opts);
-    // console.log(opts)
   };
   const [value] = React.useState("");
   const [inputValue, setInputValue] = React.useState("");
@@ -52,13 +79,16 @@ const ModelSelect = (props) => {
           {option.name}
         </Box>
       );
-    return <>
-    <Stack {...props}>
-      <Nowrap>{option.name}</Nowrap>
-    {!!option.caption && <Nowrap variant="caption">{option.caption}</Nowrap>}
-    </Stack>
-
-    </>;
+    return (
+      <>
+        <Stack {...props}>
+          <Nowrap>{option.name}</Nowrap>
+          {!!option.caption && (
+            <Nowrap variant="caption">{option.caption}</Nowrap>
+          )}
+        </Stack>
+      </>
+    );
   };
 
   const fetch = React.useMemo(
@@ -73,7 +103,7 @@ const ModelSelect = (props) => {
     let active = true;
 
     if (inputValue === "") {
-      setOptions(value ? [value] : []);
+      // setOptions(value ? [value] : []);
       return undefined;
     }
 
@@ -89,14 +119,14 @@ const ModelSelect = (props) => {
           newOptions = [...newOptions, ...results];
         }
 
-        setOptions(
-          [
-            {
-              name: `Create new model named ${inputValue}`,
-              create: 1,
-            },
-          ].concat(newOptions)
-        );
+        // setOptions(
+        //   [
+        //     {
+        //       name: `Create new model named ${inputValue}!`,
+        //       create: 1,
+        //     },
+        //   ].concat(newOptions)
+        // );
       }
     });
 

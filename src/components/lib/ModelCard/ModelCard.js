@@ -24,7 +24,7 @@ const ModelCard = ({ model, small, modelClicked }) => {
   return (
     <Badge color="secondary" badgeContent={model.VideoCount}>
       <Card
-        onClick={() => modelClicked(model.ID)}
+        onClick={() => modelClicked && modelClicked(model.ID)}
         sx={{ cursor: "pointer", width: size }}
       >
         <CardMedia
@@ -48,7 +48,7 @@ const ModelCard = ({ model, small, modelClicked }) => {
             }}
             color="text.primary"
           >
-            {model.name}
+            {model.name || model.Name}
           </Typography>
         </CardContent>
       </Card>

@@ -90,10 +90,9 @@ const FloatingMenu = ({ fixed }) => {
       </Dialog>
       <Layout fixed={fixed}>
         <SpeedDial
-          onClick={menu.handleClick}
           ariaLabel="SpeedDial basic example"
           sx={{ position: "absolute", bottom: 16, right: 16 }}
-          icon={<SpeedDialIcon />}
+          icon={<SpeedDialIcon onClick={menu.handleClick} />}
         >
           {actions.map((action) => (
             <SpeedDialAction

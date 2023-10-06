@@ -2,11 +2,13 @@ import { createMachine, assign } from "xstate";
 
 export const shoppingMachine = createMachine(
   {
-    /** @xstate-layout N4IgpgJg5mDOIC5SwBYHsAOB9AtgQwGMUBLAOzAGJYw8AnIiNcgbQAYBdRUDNWYgF2JMuIAB6IAHAE4ALADoArAGYATEpkBGKQHYNWjSoA0IAJ6INrGQrmsJG7bJVSJM7awBsAX0-HUmXIQk5BQAwgASAIIAcgDiAKJsnEggPHyCwsniCAC0UgoqNlKsDmoyShruMu7GZggq+dqFDhJKUq0Kxd6+6Nj4RGRgcsQQADaUAPIACnFRiSKpAkKkIlkSKgVt9TJSBhIdGko1iGVKEjYKMk4KspenXSB+vYEDcrRwAK4j-LAUkxHxc2SC3Sy0yiAUdjkzlkrFYRXK2gk1VM5ks1ls9kczlccPujwC-XIrw+Xx+IQAMnEIgAlQHcXiLDKgLI7AraCFSdzldTwjRHOoKLRyMraJwVNwqGQSbR4noEoKDN6wT7fCgAZQiADUEhx5gyQStUds5Oz3O4PCotJKpPyNIKzu5tEpinblJoLrL-H0FcTlaTQmFxuM1TqkvS0ktDQgDKxrB18i0LNpNKwjCjo0p2XIDjs7WbNPDPU9CYqSaqIpNplEACJ0lL6yNg6MqYo2FplBTufIWG3pixWNuYy7YtxeHwPOXel5KlU-EM08J14GN5nmHRyFRd4dqaWig62rRKbOVYoyVPsu0qIvyl6YMDkCByEZoPAQAAE1DGBH4kDfGDo1C0D8jBEmQABuaAANaDPiU5EneD5Pi+76fmA36-v+QFgEBCDgWgBB4CCiRLg2TJiIg2SVGcnailKHR7O4dr8komZHoxsjOtKViSjI15wYMCGQEhr4fmAX4-u+mGAcBTCDHh0FyLBzzwRg95Cc+ImoehkkAdhsC4aQEEEURHDMBoYb1hGZFZNkCiInIqiZlKqYHDIMi2nYjRFDsVisrGZR8cpAmqYhWmCKQUAUCBcmGVBMGTkFciCY+YVkFABlGYRSzEbqQKkaCq45CoZzFdIHgXOoxXlMxEjStmLiIme2iOvkgUlklIXqchkDqnElIhAAKiRVkFeRCDbA60jrGeLFImUzGMdYWi1WaTpKBcVhtT6yXCRAPUUsGoZ6iNUaVFI5zrBoiapm5va1Jc9gORtlydqxvHjkp7U7Rpe0QL1C5hMNjKjVkw5yHY0oHMmqixho7npvUrAaHIlRWJcbhFOaMofQl7XUKQKF4GBYAfsQUCkHgIxRbJQyxQpn0+vjhPE6T5OUxl+FZUwOUWcu1moqm2awkoZrOM6FQSMxmbI7C2yOBc7hIltLxM6JdBEKzFNU9FtMQfTuOM-eKE0PQKCa+zeHGdlpm5eGwNRts1hVCLljsi0az7gj62NHoisi24blSu93ReolqvUOrZt8Gz2s0-J8Wh3jRtq6b5sjBzVvc6Z5nHfbTYQu4igOM41wtGa0q2l250eA49gXIKUhXjjic+j9f66bQb4jMQsD8NToF0wnxat8h7dYZ33e9xnXOkDzucGk2VdQm0nZrJmrDqHy6ZVNIKPOnkjFI4KSjeOOpBoHt8DJAzAzzyuY3ZMm8g0ZKey2J2THpnkjQQnX5pI0UJuIdh4vGGGMO+-MEAKGUNmJM7pG7OjsvyNyXJwZdjFD2ZQUhlZEhnKSCBINECilYMKKoZRKgixLocPsh4UZnhPO4Tk5CcHBTUhAAhUZKKckUI6V+9EP4KGYioLM6gITaD3MmOGCgWEdTYbtUS4kMIdyvnbBehVbJVCLu4NQVUnK1RqrocGeh6j2DNFdAKzcQEqTkalCKHCmyaELldBBlgyhML2DVbRKNGIuG2JKeokoZHfW6uwvKJ0HHGmLn7CovtthSy8S4a46hYwnksDI8ORMSbRy1vYwqnIvItGEcVHcy1K6yAcs4E8axEQbxPpYm8RJw4mw1tkymuSxpqGRpKSo+R356E0B5PQ2ZVBIgMGI2wMi25SWwl3Hu-B2lZEqIXOi7Iih2VsOyZBbR5BODWBCZ2FVT6eCAA */
+    /** @xstate-layout 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 */
     id: "shop_machine",
 
     initial: "load parser list",
-
+    context: {
+      memory: {},
+    },
     states: {
       idle: {
         on: {
@@ -27,13 +29,16 @@ export const shoppingMachine = createMachine(
             }),
           },
 
-          CLEAR: {
-            target: "opened",
-            actions: assign({
-              results: [],
-              auto_search: false,
-            }),
-          },
+          CLEAR: [
+            {
+              target: "confirm close",
+              cond: "has chosen items",
+            },
+            {
+              target: "opened",
+              actions: "assignClose",
+            },
+          ],
 
           SAVE: {
             target: "send save signal",
@@ -136,11 +141,12 @@ export const shoppingMachine = createMachine(
 
               SEARCH: {
                 target: "#shop_machine.send search signal",
-                actions: assign((_, event) => ({
+                actions: assign((context, event) => ({
                   param_list: [],
                   param_index: 0,
                   open: false,
                   source: "opened",
+                  param: context.param || event.param,
                 })),
               },
             },
@@ -195,6 +201,21 @@ export const shoppingMachine = createMachine(
           ],
         },
       },
+
+      "confirm close": {
+        on: {
+          CLOSE: {
+            target: "opened.loaded",
+            actions: "assignClose",
+          },
+
+          CANCEL: {
+            target: "results",
+          },
+        },
+
+        description: `Confirm before clearing if any items are selected.`,
+      },
     },
 
     on: {
@@ -206,7 +227,6 @@ export const shoppingMachine = createMachine(
           open: true,
           chosen: [],
           page: 1,
-          // param: (context) => context.param_list.join(" OR "),
         }),
       },
 
@@ -219,6 +239,18 @@ export const shoppingMachine = createMachine(
   },
   {
     actions: {
+      assignClose: assign((context) => {
+        return {
+          memory: {
+            ...context.memory,
+            [context.param]: context.results,
+          },
+          open: false,
+          param: "",
+          results: [],
+          auto_search: false,
+        };
+      }),
       assignOpen: assign({
         auto_search: (_, event) => event.value,
         page: 1,
@@ -228,6 +260,8 @@ export const shoppingMachine = createMachine(
     },
     guards: {
       "source is opened": (context) => context.source === "opened",
+      "has chosen items": (context) => context.chosen.length > 0,
+      // "remembers param": (context) => !!context.memory[context.param],
       // "parsers not loaded": (context) => !context.selected?.length,
     },
   }

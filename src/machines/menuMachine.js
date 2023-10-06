@@ -24,7 +24,7 @@ export const menuMachine = createMachine({
           {
             target: "opened",
             actions: assign({
-              clipboard: (context, event) => event.data,
+              clipboard: (_, event) => event.data,
             }),
           },
         ],
@@ -73,7 +73,11 @@ export const useMenu = (onChange) => {
       menuClicked: async (context, event) => {
         onChange && onChange(event.value);
       },
-      readClipboard: async () => await navigator.clipboard.readText(),
+      readClipboard: async () => {
+        const content = await navigator.clipboard.readText();
+        // alert(content);
+        return content;
+      },
     },
   });
   const { anchorEl } = state.context;
@@ -107,10 +111,17 @@ export const useMenu = (onChange) => {
     send,
   };
 
+  const menuProps = {
+    open: !!anchorEl,
+    onClose: handleClose(),
+    anchorEl,
+  };
+
   return {
     state,
     send,
     ...state.context,
+    menuProps,
     anchorEl,
     handleClick,
     handleClose,

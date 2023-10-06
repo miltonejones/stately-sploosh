@@ -2,7 +2,7 @@ import { createMachine, assign } from "xstate";
 
 export const finderMachine = createMachine(
   {
-    /** @xstate-layout N4IgpgJg5mDOIC5QDMCWA7CYBOB9AtgIYDGAFhmAMSEAONYmA2gAwC6ioNA9rKgC6ou6DiAAeiAEzMAbNIB0AZgUAOaQBYF0gOwS10gJwBWADQgAnogC0h6czkBGTWvuOtMo8oC+n02kw4CEnJ0MDkaQmxYMFxw7EJ8WEpRWD5CPlDCZHTsAAo1AEpKPyw8IjIKMIiomIj42BZ2JBBuXgEhEXEENUNlOWUJXXsNCR77LSHTCwRLCQdx5Tc1LWUFQzUJLX1vXwwSwPKQuRDRPhq4-CSUtIysnDzC4oCy4NDj09j4hpEW-kFhJs6+m0ci0hi00gUY1WeiWkysszG9mUNhWjn0RmY+gk2xAj1KQQqbzO8UuqXScky2XuRV2TwJhyJH3wjHsjU4PF+7QBiH04LkzD0BnW0PUWjh0yR8kx9kMYMMI3sEmUai8PlxtPxB1CGH4pOuFNuuXsDw1+xech1fC+TR+bX+oE6iqMcm0Cj0+mYylcBnFEjGLsFyixoI2-WxarxZsJYBOevJlLuxpp-k15re1vZrT+HUQWhV-K9awMNlsRnF83560MMi0SkcKpxkee0djyTJNypSab9NeMatrO+HLtOYQedmqiF9mkEn0CgGJnMiA0vTcCk2KyB8uYhkbpubDL7cY7iZNKajB5OjAkbOaQ+z3NHAocBmYtZcoM0yl9G0U0i9G2YRUhV3M991CcIYEoCAhG1dAADcuAAa1CbstUqGAEAwBDiDSP4GgzW8sy5B0eWBGUemYFRMSMDRxX0NR9DkDQ3FUFZBQGEC9jAuQcGwLhsEobAwGILg4JwAjbXvEiECnSi5H0IMFH0ewgUVMEFHFFxlLkateX6Dxq26Ti6TQ4ooJgi14KQlC9x7ORikwqycLtfC2EHIj7TERAnVmAURnWdxHE0985jUboZ1WZEtC0YzUwqMzeP4sIABs0mQfj8Hs2zTN2RzsNwoRXJvSTiK8mTorUOQJCUQwXHUlUIXFZxDHk6Lqp6TcpB3CNsvNET8BoZKwHSczDiw6ystAuz+sG4awDyrhnLwtgJLvUrOmrFqlHooYpCUaQS3FSxIVmZT0QUg6VM2IZYvPbUICGygrmwK03JtNbPMdFQXRLZU-XBNc1COqdGNqsZmAFVRIRU27uNQB6qGe-tio+kdLCGRinFBdFDAUvNa2BsEHDWVYkV08FHFhuyYD4AACOD4bAHhaeQPj8FpwgIAgITYESaCxqs5DJq46nhvpxnmdZrh2c57m4FgBalsKla3szTlPtIxi9DcT083o-oxUXaY-0qkZlELZVDDdGxvDVdAuCweAmlQl53PVtGpF6BTeQOkZxitucjuihQmO0TFpChTYBSptDYmqJknbV4cHynewXQWIEsQWUEVU0xjtyWbdZFUCGGJjtM+2JfA3eT6T8ZBWUIYhv0wTzPP+TWNxftsAUth6qa0MtGupLKp00-rNRXznXQ8w0o2VI7wvu9LvudgHiuTmH9bEFREFqoUSjlE9IFxmCpZn36XH1BnCRp3LioILALeNZk5hb76D9dZkP0gXLFx5KxECZEs5URqHvocRK2Bn4jiRK+EEdZVBjGVPRYK2lyYYxhNIcBNlMDQJTipFqu0BgMVvmFbQTURhMQWEoZU2hqyqjXiLNCM0hrpDwdJIEp0-w2CxCKWERtjprnklIZuUgFKAWRNgi0CN2Gj02A4fyEdALRXNvoI6kJKoBQhtOGeQI3RSJpuLLAks2Ycy5jzROhF3YPnRrYeSQZwTyjBDKJQEgjrcPktoewAoVSaGquGbwQA */
+    /** @xstate-layout N4IgpgJg5mDOIC5QDMCWA7CYBOB9AtgIYDGAFhmAMSEAONYmA2gAwC6ioNA9rKgC6ou6DiAAeiAEzMAbNIB0AZgUAOaQBYF0gOwS10gJwBWADQgAnogC0h6czkBGTWvuOtMo8oC+n02kw4CEnJ0MDkaQmxYMFxw7EJ8WEpRWD5CPlDCZHTsAAo1AEpKPyw8IjIKMIiomIj42BZ2JBBuXgEhEXEENUNlOWUJXXsNCR77LSHTCwRLCQdx5Tc1LWUFQzUJLX1vXwwSwPKQuRDRPhq4-CSUtIysnDzC4oCy4NDj09j4hpEW-kFhJs69hkhjk+kcA1Uhg2mwUk0koIU+mUhhs+gUQOUKx62xAj1KQQqbzO8UuqXScky2XuRV2TwJhyJH3wjHsjU4PF+7QBiCBmjk0hcLi0CmYyOUcOmEhccjUGlUQ30bjWYxxeP2LzkGH4pOuFNuuXsD1p+IOoS1fC+TR+bX+oEBCjUvXU0nR9hGaNkWgl9n0+n56mUzE2hh0AdVxvVhLAJx15Mpd0NNP8Jo1b0t7Nafw6iGFvUV41sqxkUuk3r0vR0OmYEhFwokXh8uIjzyjMeSZJuVMTapbDOjFtZ3w5NuzCAFCjkwIGDsV6NUEr0ftkaLU+lkEkVG2k4eTkb7baucf1OW7zfpr37jAkbOaw6z3LH40Ustl1bFmJM5kkNbkVf03R6AwUQUHc9l7UJwhgSgICEM10AANy4ABrUIe3PSoYAQDBEOINI-gadNb0zLk7UQTReg2TEN3-ZhFRXb1lCMUFbEMBQtC0PRgK0UC6VNOQcGwLhsEobAwGILh4JwQjrXvUiEHsQx9FmJFxgU5hX0xWEv3kpT5DnOj9FFTQNh4lMKmKORBIAV3SAACPguFsqIIjIJyO0oaS7xIsQeSULQHHRNFmBkAsFAkCVNn86QpTC1RFUdNdTL3VDdksrgbLAezHOc7BXMPKgWRvGTvM6X01H5NY1GYTRDHsQMwoi5R7H5Kr1DqgxAx0JLwLkCz0hOJywBc0hoNgzUEOQlLdx6vr+0G4asIm3CbQItgh2I20fPkjZytlFZV2FF86oY9ZmJWTRbDUpZuvQ2aBpyshKAEoSwgAGzSZAhPwXqzz4u6+Hm3LSEWnC8KEVaiq8zbAXY2Z7FsYK11lMFpE-KYjHKkM5SalTopuvjxPwGhXrAdJRsObDJp+6b0MJ4nSbAEGuGW-C2E8jbR1qicNCMAVfVFBZxW0yw2OawwZFXJEN0U1R8Y1VAIBJygrmwC01qtKHRwU+QDCBICFkM5hFIlSxHTsDRRSAtcemrOWKgVpWVYHSGOYfSwfWalQ3AxmtWKqtGrFXOH1Jq5gxn-JZt0bNC+IdqgnavF3OWhqw6r9NdESU-oRlq+dhekZRyp2pHDZfQw7cOGAAfghWwB4WzkEE-BbMICAIFE2BEhgimJpQ6mwPQqvbJrrB68brhm9b9u4FgJmWfBtn1YzZPRyRP1VGC+tMSDN17BNxjehUFENmnEYBQrqaIDkKzsFewHHu7uDEL7mONQsm+74e4HKfn9AIfWleD4wSzFRo6WUKJ1JSC0lMes-lkRIiqoZDciDvCNnQFwLA8AmivwoAAkcbsRjNXhisN0MhopKXCsLJEIIPxQlFECdYjgL6VEiNEJkWDl74Lku7EYcgubClFGiHQhcJQbjkIQqUIYHSSPrMwxktR8B4NkltHQfojZxR6OWcW+hvSgnhusAuzgtDaELhoZh5olElV8rKBwQYJC63FqoaK3o1FrAMBxB0YxFIhjkf2SxKcED9DsEoRSfNnCYjGAxDik5bC6ConQtEzDIJgH8aOVYmMehuAUmFKQyIyxuAqusQyxlZCOmYc9bAqSHx1SNn0VYSggzVnAULKYPp7GKDTpsQyKxorl2jr9N+uwqlySUn6PQQIJbRWFPDBcT42KKTXiiFYjE+k7Bpn9VK1k7IOXvqQNy1xhlbXBLMSqBgpDGPFnvbS64YnaF6WuIY59+nrMGZgOQ-UAZf0OYCDc-lhTOgMEoX0DoJRGAnOLSqa4XSaNWU2F55lUof12d8xA+YZQCmCs6DY6JSzXOqooLQCzgyEs0NxZ5A8CYT3pukFFCAkQTiNkMDimxRRBlxVMU2yxxHsSNpkpStU9DmMVikjWrs5JSiXCsEY6x2JpxWCbGqMoFRLGqm6AFzCh4jzrrABuTcW5tw7hwoigDuFQIcAXdEUh1wUP3oZdFuhgLqTDqsVBnggA */
     id: "finder_machine",
 
     initial: "idle",
@@ -16,6 +16,7 @@ export const finderMachine = createMachine(
       param_index: 0,
       busy: false,
       results: [],
+      memory: {},
     },
 
     states: {
@@ -63,6 +64,8 @@ export const finderMachine = createMachine(
             },
           ],
         },
+
+        description: `Search for the next param or exit if done.`,
       },
 
       init: {
@@ -92,9 +95,7 @@ export const finderMachine = createMachine(
             },
             {
               target: "#finder_machine.next_param",
-              actions: assign({
-                param_index: (context) => context.param_index + 1,
-              }),
+              actions: "incrementParam",
             },
           ],
         },
@@ -123,26 +124,66 @@ export const finderMachine = createMachine(
       },
 
       find: {
-        invoke: {
-          src: "searchByText",
-          onDone: [
-            {
-              target: "next",
-              actions: "assignResults",
-            },
-          ],
-          onError: [
-            {
-              target: "error",
-              actions: assign((_, event) => ({
-                error: event.data.message,
-                stack: event.data.stack,
-              })),
-            },
-          ],
-        },
+        // invoke: {
+        //   src: "searchByText",
+        //   onDone: [
+        //     {
+        //       target: "next",
+        //       actions: "assignTextResults",
+        //     },
+        //   ],
+        //   onError: [
+        //     {
+        //       target: "error",
+        //       actions: assign((_, event) => ({
+        //         error: event.data.message,
+        //         stack: event.data.stack,
+        //       })),
+        //     },
+        //   ],
+        // },
 
         description: `Call the search API using the current param.`,
+
+        states: {
+          "route to search state": {
+            always: [
+              {
+                target: "text search",
+                cond: "current param is not a URL",
+              },
+              {
+                target: "url search",
+                actions: assign((context) => ({
+                  URL: context.param,
+                })),
+              },
+            ],
+          },
+
+          "text search": {
+            invoke: {
+              src: "searchByText",
+              onDone: {
+                target: "#finder_machine.next",
+                actions: "assignTextResults",
+              },
+              onError: "#finder_machine.error",
+            },
+          },
+
+          "url search": {
+            invoke: {
+              src: "searchByURL",
+              onDone: {
+                target: "#finder_machine.next_param",
+                actions: ["assignURLResults", "incrementParam"],
+              },
+            },
+          },
+        },
+
+        initial: "route to search state",
       },
 
       complete: {
@@ -154,20 +195,26 @@ export const finderMachine = createMachine(
             },
           ],
         },
+
+        entry: ["collateResults", "isolateResults", "assignMemory"],
+        description: `Send complete signal to calling machine.`,
       },
 
       idle: {
         on: {
           start: [
             {
+              cond: "param in memory",
+              target: "complete",
+              actions: ["assignMemoryResults"],
+            },
+            {
               target: "parse_params",
-
               actions: assign((_, event) => ({
                 param: event.param,
                 selected: event.selected,
                 resume: event.resume,
               })),
-
               cond: "Param is not URL",
             },
             {
@@ -193,16 +240,66 @@ export const finderMachine = createMachine(
 
     on: {
       append: {
-        actions: assign({
-          param_list: (context, event) =>
-            context.param_list.concat(event.param),
+        actions: assign((context, event) => {
+          const exists = context.param_list.some((f) =>
+            event.param.some((e) => e === f)
+          );
+          if (exists) return;
+          // alert(
+          //   JSON.stringify(
+          //     {
+          //       list: context.param_list,
+          //       param: event.param,
+          //       exists,
+          //     },
+          //     0,
+          //     2
+          //   )
+          // );
+          // alert(context.param_list.indexOf(event.param));
+          return {
+            param_list: context.param_list.concat(event.param),
+          };
         }),
       },
     },
   },
   {
     actions: {
-      assignResults: assign((context, event) => {
+      incrementParam: assign({
+        param_index: (context) => context.param_index + 1,
+      }),
+      assignURLResults: assign((context, event) => {
+        const currentDomain = context.selected[context.search_index];
+        const videos = event.data;
+
+        const results = combine(videos, context.results);
+        const latest = videos.filter(timeFilter).find((f) => !!f.Photo);
+        return {
+          // set proview item as the first video with an image
+          latest: latest || context.latest,
+
+          results,
+
+          // set progress message
+          message: `Searching ${currentDomain} page ${
+            context.page_index + 1
+          }. ${context.results.length} found on "${context.param}"...`,
+
+          // reset page to 0
+          page_index: 0,
+
+          // set current search domain
+          currentDomain,
+
+          // set progress
+          progress:
+            100 * ((context.search_index + 1) / context.selected.length),
+          // increment search_index
+          search_index: context.search_index + 1,
+        };
+      }),
+      assignTextResults: assign((context, event) => {
         const currentDomain = context.selected[context.search_index];
         const { videos = [], pages } = event.data;
         const addresses = !pages
@@ -212,22 +309,82 @@ export const finderMachine = createMachine(
         const results = combine(videos, context.results);
         const latest = videos.filter(timeFilter).find((f) => !!f.Photo);
         return {
+          // set proview item as the first video with an image
           latest: latest || context.latest,
+
           results,
 
+          // set progress message
           message: `Searching ${currentDomain} page ${
             context.page_index + 1
           }. ${context.results.length} matches for "${context.param}"...`,
+
+          // add addition pages, if page numbers are present
           addresses,
+
+          // reset page to 0
           page_index: 0,
+
+          // set current search domain
           currentDomain,
+
+          // set progress
           progress:
             100 * ((context.search_index + 1) / context.selected.length),
+          // increment search_index
           search_index: context.search_index + 1,
+        };
+      }),
+
+      isolateResults: assign((context) => {
+        const results = context.results.map((f) => {
+          const dupes = !f.Key
+            ? []
+            : context.results.filter(
+                (d) => d.Key === f.Key && d.index > f.index
+              );
+          return {
+            ...f,
+            dupes,
+          };
+        });
+
+        return {
+          results,
+        };
+      }),
+      collateResults: assign((context) => {
+        const results = context.results.map((f, index) => {
+          const key = /([a-z|A-Z]+[-\s]\d+)/.exec(f.Text);
+          return {
+            ...f,
+            Key: !key ? null : key[0],
+            index,
+          };
+        });
+
+        return {
+          results,
+        };
+      }),
+      assignMemory: assign((context) => {
+        if (!context.param_list.length) {
+          return {};
+        }
+        const key = context.param_list.join("|");
+        return {
+          memory: {
+            ...context.memory,
+            [key]: context.results,
+          },
         };
       }),
       assignParseResults: assign((_, event) => ({
         results: event.data,
+      })),
+      assignMemoryResults: assign((context, event) => ({
+        results: context.memory[event.param],
+        param_list: event.param.split("|"),
       })),
       assignPage: assign((context, event) => {
         const results = combine(event.data, context.results);
@@ -252,6 +409,9 @@ export const finderMachine = createMachine(
       "More parsers": (context) =>
         context.search_index < context.selected.length,
       "Param is not URL": (_, event) => event.param?.indexOf("://") < 0,
+      "param in memory": (context, event) => !!context.memory[event.param],
+      "current param is not a URL": (context) =>
+        context.param.indexOf("://") < 0,
     },
   }
 );
@@ -265,22 +425,13 @@ const combine = (source, destination) => {
   const combined = destination.concat(trimmed);
   const timed = combined.filter(timeFilter);
 
-  console.log({ source, destination, timed });
+  // console.log({ source, destination, timed });
   return timed;
 };
 
-function mergeArrays(arr1, arr2) {
-  const merged = [...arr1, ...arr2];
-  const uniqueUrls = new Set(merged.map((obj) => obj.URL));
-  const result = Array.from(uniqueUrls).map((url) => {
-    return merged.find((obj) => obj.URL === url);
-  });
-  return result;
-}
-
 const timeFilter = (file) => !file.CalculatedTime || file.CalculatedTime > 899;
 
-const dressAddress = (domain) => (p) => {
+export const dressAddress = (domain) => (p) => {
   const address = p[0].indexOf("://") > 0 ? p[0] : `https://${domain}${p[0]}`;
   return [address, p[1], domain];
 };

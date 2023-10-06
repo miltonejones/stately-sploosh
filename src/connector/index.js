@@ -5,6 +5,16 @@ const API_ENDPOINT = "https://3bax4cg6w7.execute-api.us-east-1.amazonaws.com";
 const PHOTO_ENDPOINT = "https://58uf2seho0.execute-api.us-east-1.amazonaws.com";
 const JAV_ENDPOINT = "https://jhdcmv7zhi.execute-api.us-east-1.amazonaws.com";
 
+export const saveParser = async (parser) => {
+  const requestOptions = {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ...parser }),
+  };
+  const response = await fetch(API_ENDPOINT + "/parsers", requestOptions);
+  return await response.json();
+};
+
 export const getVideoInfo = async (key) => {
   const response = await fetch(JAV_ENDPOINT + `/${key}`);
   return await response.json();
@@ -177,7 +187,8 @@ export const addModelToVideo = async (trackFk, modelFk) => {
     body: JSON.stringify({ trackFk, modelFk }),
   };
   const response = await fetch(API_ENDPOINT + "/model/cast", requestOptions);
-  return await response.json();
+  console.log({ response });
+  return true; // await response.json();
 };
 
 export const addModelAlias = async (modelFk, aliasFk) => {
@@ -250,6 +261,7 @@ export const saveVideo = async (video) => {
     const response = await fetch(API_ENDPOINT + "/video", requestOptions);
     return await response.json();
   } catch (error) {
-    return { error };
+    console.log({ error });
+    return 0;
   }
 };

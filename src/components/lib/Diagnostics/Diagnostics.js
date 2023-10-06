@@ -18,7 +18,7 @@ const IceCream = styled(Box)(({ open }) => ({
   right: 20,
   bottom: !open ? -400 : 80,
   transition: "top 0.4s linear",
-  zIndex: 400,
+  zIndex: 44400,
 }));
 
 const ChipBody = ({ children }) => {
@@ -82,13 +82,18 @@ const StatusChip = ({
   transitions,
 }) => {
   if (!Object.keys(events).length) return <i />;
+  const [first] = name.split(".");
   return (
     <Chip
       color={name === previous ? "error" : "primary"}
       label={
         <Stack>
-          <Typography sx={{ lineHeight: 0.9 }} variant="subtitle2">
-            {name}
+          <Typography
+            onClick={() => alert(name)}
+            sx={{ lineHeight: 0.9 }}
+            variant="subtitle2"
+          >
+            {first}
           </Typography>
           <EventNode
             id={id}
@@ -121,22 +126,28 @@ const StateName = ({ state }) => {
     return state;
   }
   if (!Object.keys(state)) return <>huh</>;
-  if (typeof Object.keys(state)[0] === "string" && 
-        typeof Object.values(state)[0] === "string") {
+  if (
+    typeof Object.keys(state)[0] === "string" &&
+    typeof Object.values(state)[0] === "string"
+  ) {
     return (
       <>
         {Object.keys(state)[0]}.{Object.values(state)[0]}
       </>
     );
   }
-  return (
-    <>
-       {JSON.stringify(state)}
-    </>
-  );
+  return <>{JSON.stringify(state)}</>;
 };
 
-const Diagnostics = ({ id, send, state, states, error: problem, onClose, layer }) => {
+const Diagnostics = ({
+  id,
+  send,
+  state,
+  states,
+  error: problem,
+  onClose,
+  layer,
+}) => {
   const error = problem || state.context.error;
   const [showContext, setShowContext] = React.useState(false);
   const { previous } = state.context;
@@ -151,20 +162,27 @@ const Diagnostics = ({ id, send, state, states, error: problem, onClose, layer }
     typeof state.value === "string" ? state.value : Object.keys(state.value)[0];
   const is = context.active_machine === id;
   return (
-    <IceCream key={id} open={is  ? 1 : 0}>
+    <IceCream key={id} open={is ? 1 : 0}>
       <Card sx={{ mt: 2, width: "fit-content", minWidth: 400 }}>
         <Layout data-testid="test-for-Diagnostics">
           <Stack direction="row" sx={{ alignItems: "center" }}>
-            <Typography color={error?"error":"text.secondary"} variant="body2">
+            <Typography
+              color={error ? "error" : "text.secondary"}
+              variant="body2"
+            >
               Machine ID: <em>"{id}"</em>{" "}
               {/* <u onClick={() => setShowContext(!showContext)}>
                 {showContext ? "hide" : "show"} context
               </u> */}
             </Typography>
             <Box sx={{ flexGrow: 1 }} />
-            
-           {!!Object.keys(state.context).length && <i onClick={() => setShowContext(!showContext)} className="fa-solid fa-circle-info"></i>}
 
+            {!!Object.keys(state.context).length && (
+              <i
+                onClick={() => setShowContext(!showContext)}
+                className="fa-solid fa-circle-info"
+              ></i>
+            )}
 
             {!!onClose && (
               <IconButton onClick={onClose}>
@@ -174,29 +192,31 @@ const Diagnostics = ({ id, send, state, states, error: problem, onClose, layer }
             )}
           </Stack>
 
-          {!!error && <Typography>
-              {error}
-              </Typography>}
-          {!!state.context.stack && <Typography variant="caption">
-              {state.context.stack}
-              </Typography>}
+          {!!error && <Typography>{error}</Typography>}
+          {!!state.context.stack && (
+            <Typography variant="caption">{state.context.stack}</Typography>
+          )}
           <Divider sx={{ m: (t) => t.spacing(0.5, 0) }} />
 
-          {!!showContext && (<Box>
-
-            {Object.keys(state.context).map((key) => (
-              <Flex key={key} between>
-                <Nowrap variant="body2" bold>
-                  {key}
-                </Nowrap>
-                <Nowrap variant="caption" onClick={() => alert(JSON.stringify(state.context[key]))} width={300}>
-                  {JSON.stringify(state.context[key])}
-                </Nowrap>
-              </Flex>
-            ))}
-            <Divider sx={{ m: (t) => t.spacing(0.5, 0) }} />
-          </Box>)
-            }
+          {!!showContext && (
+            <Box>
+              {Object.keys(state.context).map((key) => (
+                <Flex key={key} between>
+                  <Nowrap variant="body2" bold>
+                    {key}
+                  </Nowrap>
+                  <Nowrap
+                    variant="caption"
+                    onClick={() => alert(JSON.stringify(state.context[key]))}
+                    width={300}
+                  >
+                    {JSON.stringify(state.context[key])}
+                  </Nowrap>
+                </Flex>
+              ))}
+              <Divider sx={{ m: (t) => t.spacing(0.5, 0) }} />
+            </Box>
+          )}
 
           <Typography variant="body2">
             Current state:{" "}

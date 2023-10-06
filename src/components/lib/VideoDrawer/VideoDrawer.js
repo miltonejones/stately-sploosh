@@ -1,167 +1,242 @@
-import React from 'react';
-import { Drawer, Stack, Avatar, Typography, Snackbar, Button, Box } from '@mui/material';
-import { useMachine } from '@xstate/react'; 
-import { ModelSelect,  Diagnostics, ConfirmPopover } from '..'
-import { videoMachine } from '../../../machines';
-import { getVideo, deleteVideo, addModelToVideo, addModel, removeModelFromVideo } from '../../../connector';
-import { Flex } from '../../../styled';
-
-
+import React from "react";
+import {
+  Drawer,
+  Stack,
+  Avatar,
+  Typography,
+  Snackbar,
+  Button,
+  Box,
+  Alert,
+} from "@mui/material";
+import { useMachine } from "@xstate/react";
+import { ModelSelect, Diagnostics, ConfirmPopover } from "..";
+import { videoMachine } from "../../../machines";
+import {
+  getVideo,
+  deleteVideo,
+  addModelToVideo,
+  addModel,
+  removeModelFromVideo,
+  getModelsByName,
+} from "../../../connector";
+import { Flex, Spacer } from "../../../styled";
 
 export const useVideoDrawer = (onRefresh) => {
   const [state, send] = useMachine(videoMachine, {
     services: {
-      refreshList: async() => {
-        onRefresh && onRefresh()
+      refreshList: async () => {
+        onRefresh && onRefresh();
       },
       dropModel: async (context) => {
-        return await removeModelFromVideo(context.video.ID, context.ID)
+        return await removeModelFromVideo(context.video.ID, context.ID);
       },
       dropVideo: async (context) => {
-        return await deleteVideo(context.video.ID)
+        return await deleteVideo(context.video.ID);
       },
-      loadVideo:  async (context) => {
+      loadVideo: async (context) => {
         const { video, videos } = context;
-        const { ID } = !!videos && Array.isArray(videos) && videos[0] ? videos[0] : video; 
+        const { ID } =
+          !!videos && Array.isArray(videos) && videos[0] ? videos[0] : video;
         const vid = await getVideo(ID);
         if (vid.records?.length) {
-          return vid.records[0]
+          return vid.records[0];
         }
       },
-      createModel: async(context, event) => {  
-      
-        return await addModel(context.model.value)
-      } ,
-     applyModel: async(context, event) => {  
-      // alert (JSON.stringify(context.model))
-      if  (!context.model) return;
-       await addModelToVideo(context.video.ID, context.model.ID)
-     }
+      checkModel: async (context) => {
+        return await getModelsByName(context.value);
+      },
+      createModel: async (context) => {
+        return await addModel(context.value);
+      },
+      applyModel: async (context) => {
+        // if (!context.model) return;
+        await addModelToVideo(context.video.ID, context.ID);
+      },
     },
   });
- 
-  const handleClose = () => send('CLOSE')
-  const handleClick = video => {
+
+  const handleClose = () => send("CLOSE");
+  const handleClick = (video) => {
     send({
-      type: 'OPEN',
-      video
-    })
-  }
-  const castModel = model => { 
+      type: "OPEN",
+      video,
+    });
+  };
+  const castModel = (model) => {
     send({
-      type: 'ADD',
-      model
-    })
-  }
-  const loseModel = ID => { 
+      type: "ADD",
+      model,
+    });
+  };
+  const loseModel = (ID) => {
     send({
-      type: 'DROP',
-      ID
-    })
-  }
+      type: "DROP",
+      ID,
+    });
+  };
 
   const selectMode = () => {
-    send('MULTIPLE')
-  }
+    send("MULTIPLE");
+  };
   const editMultiple = () => {
-    send('EDIT')
-  }
+    send("EDIT");
+  };
   return {
     diagnosticProps: {
       ...videoMachine,
-      state 
+      state,
     },
-    state, 
-    multiple: state.matches('multiple'),
+    state,
+    multiple: state.matches("multiple"),
     editMultiple,
     selectMode,
     handleClose,
-    handleError: () => send('RECOVER'),
-    handleDrop: () => send('REMOVE'),
+    handleError: () => send("RECOVER"),
+    handleDrop: () => send("REMOVE"),
     handleClick,
     castModel,
     loseModel,
-    ...state.context
-  }
-}
- 
-const VideoDrawer = ({  diagnosticProps, state, handleDrop, 
-    handleClose, handleError, message, loseModel, castModel, msg, open, video, videos = []}) => {
-  if (!video) return <Diagnostics {...diagnosticProps} />
-  
+    ...state.context,
+  };
+};
+
+const VideoDrawer = ({
+  diagnosticProps,
+  state,
+  handleDrop,
+  handleClose,
+  handleError,
+  message,
+  loseModel,
+  castModel,
+  msg,
+  open,
+  video,
+  videos = [],
+  shop,
+  notify,
+}) => {
+  if (!video) return <Diagnostics {...diagnosticProps} />;
+
   // const titleTrack = videos.find(f => !!f.models.length);
 
-
-  if (state.matches('opened.error')) {
-    return <Snackbar open>
-      <Box>
-
-      Error: {message} <Button onClick={handleError}>
-        okay
-      </Button>
-      </Box>
-    </Snackbar>
+  if (state.matches("opened.error")) {
+    return (
+      <Snackbar open>
+        <Box>
+          Error: {message} <Button onClick={handleError}>okay</Button>
+        </Box>
+      </Snackbar>
+    );
   }
 
- return (
-  <>
-   <Drawer anchor="left" onClose={handleClose} open={open} data-testid="test-for-VideoDrawer">
-    <Box sx={{ borderBottom: 1, borderColor: 'divider'}}>
-      <Flex sx={{ p: 1 }} between>
-        <Typography>Edit Video</Typography>
-        {/* {JSON.stringify(state.value)} */}
-        <i className="fa-solid fa-pen"></i>
-      </Flex>
-    </Box>
-     <Box sx={{maxWidth:  400,overflow: 'hidden',p:2}}>
-      <img src={video.image} alt={video.title} style={{
-        width: 400,
-        aspectRatio: '16 / 9',
-        borderRadius: 4
-      }} />
-      <Typography sx={{mb: 2}}>{video.title}</Typography>
+  return (
+    <>
+      <Snackbar open={notify}>
+        <Alert sx={{ minWidth: 400 }}>{message}</Alert>
+      </Snackbar>
+      <Drawer
+        anchor="left"
+        onClose={handleClose}
+        open={open}
+        data-testid="test-for-VideoDrawer"
+      >
+        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+          <Flex spacing={1} sx={{ p: 1 }}>
+            <Typography>Edit Video</Typography>
+            <Spacer />
+            <Typography variant="caption">
+              {" "}
+              {JSON.stringify(state.value)}
+            </Typography>
 
-      {!!videos.length && <Stack direction="row" spacing={1}>
-          {videos.map(vid =>  <Avatar key={vid.ID} src={vid.image} />)}
-        </Stack>}
-
-      {!!video.models?.length && (
-        <Box>
-         <Typography sx={{mt: 2, mb: 1}}> Models:</Typography>
-          {video.models.map(model => <Stack sx={{alignItems: 'center'}} spacing={2} direction="row">
-        <Avatar src={model.image} />
-        <Typography>{model.Name}</Typography>
-        <Box sx={{flexGrow: 1}} />
-        <ConfirmPopover 
-        onChange={ok => !!ok && loseModel(model.ID)}
-          message={`Remove ${model.Name}?`}
-          ><i className="fa-solid fa-trash-can"></i></ConfirmPopover>
-      </Stack>)}
+            <i
+              onClick={() => {
+                shop.handleClick(video.URL);
+                handleClose();
+              }}
+              className="fa fa-cart-arrow-down"
+            />
+            <i className="fa-solid fa-pen"></i>
+          </Flex>
         </Box>
+        <Box sx={{ maxWidth: 400, overflow: "hidden", p: 2 }}>
+          <img
+            src={video.image}
+            alt={video.title}
+            style={{
+              width: 400,
+              aspectRatio: "16 / 9",
+              borderRadius: 4,
+            }}
+          />
+          <Typography sx={{ mb: 2 }}>{video.title}</Typography>
 
-      )}
+          {!!videos.length && (
+            <Stack direction="row" spacing={1}>
+              {videos.map((vid) => (
+                <Avatar key={vid.ID} src={vid.image} />
+              ))}
+            </Stack>
+          )}
 
-<Typography>Add model</Typography>
-      <ModelSelect onValueSelected={castModel}/>
+          {!!video.models?.length && (
+            <Box>
+              <Typography sx={{ mt: 2, mb: 1 }}> Models:</Typography>
+              {video.models.map((model) => (
+                <Stack
+                  sx={{ alignItems: "center" }}
+                  spacing={2}
+                  direction="row"
+                >
+                  <Avatar src={model.image} />
+                  <Typography>{model.Name}</Typography>
+                  <Box sx={{ flexGrow: 1 }} />
+                  <i
+                    onClick={() => {
+                      shop.handleClick(model.Name);
+                      handleClose();
+                    }}
+                    className="fa fa-cart-arrow-down"
+                  />
+                  <ConfirmPopover
+                    onChange={(ok) => !!ok && loseModel(model.ID)}
+                    message={`Remove ${model.Name}?`}
+                  >
+                    <i className="fa-solid fa-trash-can"></i>
+                  </ConfirmPopover>
+                </Stack>
+              ))}
+            </Box>
+          )}
 
-      <Box sx={{mt:  2}}>
-       {!!videos?.length && (
-          <ConfirmPopover 
-          onChange={ok => !!ok && handleDrop()}
-            message={`Remove ${videos.length} videos?`}
-            > <Button variant="contained" color="error">delete {videos.length} videos</Button></ConfirmPopover>
-      )}
-      </Box>
-     
-{msg}
+          <Typography>Add model</Typography>
+          <ModelSelect onValueSelected={castModel} />
 
-      {/* <pre>
+          <Box sx={{ mt: 2 }}>
+            {!!videos?.length && (
+              <ConfirmPopover
+                onChange={(ok) => !!ok && handleDrop()}
+                message={`Remove ${videos.length} videos?`}
+              >
+                {" "}
+                <Button variant="contained" color="error">
+                  delete {videos.length} videos
+                </Button>
+              </ConfirmPopover>
+            )}
+          </Box>
+
+          {msg}
+
+          {/* <pre>
         {JSON.stringify(video,0,2)}
       </pre> */}
-     </Box>
-   </Drawer>
-  </>
- );
-}
+        </Box>
+      </Drawer>
+    </>
+  );
+};
 VideoDrawer.defaultProps = {};
 export default VideoDrawer;

@@ -1,11 +1,15 @@
 const HilitText = ({ value, values = [], children }) => {
   if (!children) return <i />;
+  const content = children.toString();
   const param = values.find(
-    (str) => children.toLowerCase().indexOf(str.toLowerCase()) > -1
+    (str) => content?.toLowerCase().indexOf(str.toLowerCase()) > -1
   );
   const str = param || value;
 
-  const parts = children.split(new RegExp(str, "ig"));
+  const parts = content?.split(new RegExp(str, "ig"));
+  if (!parts?.length) {
+    return <i />;
+  }
   return (
     <>
       {/* [{JSON.stringify(values)}] */}

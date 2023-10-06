@@ -11,6 +11,7 @@ import {
   TextField,
   Checkbox,
   FormControlLabel,
+  Dialog,
 } from "@mui/material";
 import { useMachine } from "@xstate/react";
 import { shoppingMachine } from "../../../machines";
@@ -27,6 +28,8 @@ import { useFinderMachine } from "../../../services/useFinderMachine";
 import { CuratorCard, PhotoCard, PreviewCard } from "./Cards";
 import { usePreview } from "../../../services/usePreviewMachine";
 import PreviewBar from "./PreviewBar";
+import { Flex, Nowrap, Spacer } from "../../../styled";
+import MemoryMenu from "../MemoryMenu/MemoryMenu";
 
 const cookieName = "selected-parser-items";
 
@@ -70,7 +73,7 @@ export const useShoppingDrawer = (curator) => {
     },
   });
 
-  const handleClose = () => send("CLOSE");
+  const handleClose = () => send(state.can("CLEAR") ? "CLEAR" : "CLOSE");
   const handleClick = (value) => {
     if (!finder.state.can("start")) {
       return finder.send({
@@ -79,6 +82,7 @@ export const useShoppingDrawer = (curator) => {
       });
     }
     if (state.can("SEARCH")) {
+      // alert("search-->" + value);
       return send({
         type: "SEARCH",
         param: value,
@@ -191,10 +195,12 @@ const ShoppingDrawer = (props) => {
     handleAppend,
     param,
     handleChange,
+    handleModel,
     selected,
     parsers,
     open,
     finder,
+    send,
   } = props;
 
   const { results, message } = finder;
@@ -205,7 +211,7 @@ const ShoppingDrawer = (props) => {
     ? sortedResults
     : sortedResults?.filter((f) => !f.existing);
 
-  console.log({ sortedResults });
+  // console.log({ sortedResults });
 
   const pages = getPagination(curatedResults, { page, pageSize: 24 });
   const viewer = usePreview();
@@ -215,9 +221,24 @@ const ShoppingDrawer = (props) => {
   };
   return (
     <>
-      <CuratorCard {...props} />
+      <CuratorCard {...props} handleModel={handleModel} />
       <PreviewCard {...props} />
       <PreviewBar viewer={viewer} />
+      <Dialog open={state.can("CANCEL")} onClose={() => send("CANCEL")}>
+        <Stack sx={{ p: 2 }}>
+          <Typography>Really close?</Typography>
+          <Typography variant="subtitle2" color="error">
+            This will erase your search results
+          </Typography>
+          <Flex spacing={1}>
+            <Spacer />
+            <Button onClick={() => send("CANCEL")}>Cancel</Button>
+            <Button variant="contained" onClick={() => send("CLOSE")}>
+              Close
+            </Button>
+          </Flex>
+        </Stack>
+      </Dialog>
 
       <Drawer
         anchor="left"
@@ -225,9 +246,11 @@ const ShoppingDrawer = (props) => {
         open={open && !finder.busy}
       >
         <Box sx={{ borderBottom: 1, minWidth: 360, borderColor: "divider" }}>
-          <Stack direction="row" sx={{ p: 1, justifyContent: "space-between" }}>
+          <Stack direction="row" sx={{ p: 1 }} spacing={1}>
             <Typography>Shop</Typography>
+            <Spacer />
             <i className="fa-solid fa-cart-shopping"></i>
+            <MemoryMenu finder={finder} handleClick={handleClick} />
           </Stack>
         </Box>
 
@@ -244,7 +267,7 @@ const ShoppingDrawer = (props) => {
           )}
         </Box>
         {!state.matches("results") && (
-          <Box sx={{ width: 360, p: 2 }}>
+          <Box sx={{ width: "100%", p: 2 }}>
             <TextField
               autoFocus
               disabled={!state.can("SEARCH")}
@@ -259,6 +282,7 @@ const ShoppingDrawer = (props) => {
             <Button disabled={!state.can("SEARCH")} onClick={handleSearch}>
               Search
             </Button>
+            {/* <i class="fa-solid fa-floppy-disk"></i> */}
           </Box>
         )}
 
@@ -310,11 +334,12 @@ const ShoppingDrawer = (props) => {
                 sx={{ alignItems: "center", p: 2 }}
                 spacing={2}
               >
-                <Typography variant="body2" color="text.secondary">
+                <Nowrap width={240} variant="body2" color="text.secondary">
                   Results for "{finder.param_list.join(" or ")}"
-                </Typography>
+                </Nowrap>
 
                 <Badge
+                  max={999}
                   onClick={handleSave}
                   sx={{ cursor: "pointer" }}
                   badgeContent={chosen?.length}
@@ -326,7 +351,7 @@ const ShoppingDrawer = (props) => {
                 <i
                   onClick={() => {
                     const ids = pages.visible
-                      .filter((f) => !f.existing)
+                      .filter((f) => !(f.existing || f.dupes?.length > 0))
                       .map((f) => f.URL);
                     handleAppend(ids);
                     // alert (JSON.stringify(ids));
@@ -359,7 +384,7 @@ const ShoppingDrawer = (props) => {
             ))}
           </Grid>
         )}
-
+        {/* <pre>{JSON.stringify(finder.memory)}</pre> */}
         {!!parsers && state.matches("opened") && (
           <Stack sx={{ width: 360, p: 2 }}>
             {parsers

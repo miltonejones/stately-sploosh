@@ -20,6 +20,8 @@ import { useMachine } from "@xstate/react";
 import { menuMachine } from "../../../machines";
 import { AppStateContext } from "../../../context";
 import { DEFAULT_IMAGE } from "../../../const";
+import ModelList from "./ModelList";
+import VideoMedia from "./VideoMedia";
 
 const Block = styled(Card)(({ cursor, opacity, width, selected }) => ({
   cursor,
@@ -87,14 +89,24 @@ const ModelName = ({ model, onClick }) => {
     <Tooltip
       onClick={onClick}
       title={
-        <img
-          src={model.image}
-          alt={model.Name}
-          style={{
-            width: 160,
-            aspectRatio: "2.1 / 3",
+        <Stack
+          sx={{
+            backgroundColor: "white",
+            textAlign: "center",
           }}
-        />
+        >
+          <img
+            src={model.image}
+            alt={model.Name}
+            style={{
+              width: 160,
+              aspectRatio: "2.1 / 3",
+            }}
+          />{" "}
+          <Typography variant="caption" sx={{ color: "black" }}>
+            {model.Name}
+          </Typography>
+        </Stack>
       }
     >
       <u onClick={onClick}>{model.Name}</u>
@@ -163,7 +175,14 @@ const VideoCard = ({
     );
 
   const size = small ? 200 : medium ? "230" : 230;
-  const opacity = WindowManager.visited(video) ? 0.5 : 1;
+  const opacity = WindowManager?.visited(video) ? 0.5 : 1;
+
+  const modelListProps = {
+    setExpanded,
+    expanded,
+    modelClicked,
+    models,
+  };
   return (
     <Block cursor={cursor} opacity={opacity} width={size} selected={selected}>
       <RegionMenu
@@ -222,7 +241,7 @@ const VideoCard = ({
         )}
       </BlockMenu>
       <Tooltip title={video.title}>
-        <CardMedia
+        <VideoMedia
           onClick={() => setShowRegion(!showRegion)}
           onError={() => source.handleError()}
           component="img"
@@ -233,6 +252,7 @@ const VideoCard = ({
           }}
           width="100%"
           height="auto"
+          size={size}
           image={source.image}
           alt={video.title}
         />
@@ -294,15 +314,15 @@ const VideoCard = ({
               >
                 {video.title}
               </ScrollingText>
-              <Typography variant="caption" color="text.secondary">
+              <ModelList {...modelListProps} model={modelProps} />
+              {/* <Typography variant="caption" color="text.secondary">
                 {costars}
                 <ModelName
                   onClick={() => modelClicked(modelProps.ID)}
                   model={modelProps}
                 />
-                {moreText}
-                {/* <u onClick={() => modelClicked(modelProps.ID)}>{modelProps.Name}</u>{" "}*/}
-              </Typography>
+                {moreText} 
+              </Typography> */}
             </Stack>
           </Stack>
           <Stack
@@ -324,15 +344,12 @@ const VideoCard = ({
               {video.studio}
             </Typography>
 
-            {!!bookClicked && (
+            {!!bookClicked && !!video.studio && (
               <i
                 onClick={() => {
-                  bookClicked({
-                    key: video.Key,
-                    studio: true,
-                  });
+                  bookClicked(video.studio);
                 }}
-                className="fa-solid fa-book"
+                className="fa fa-cart-arrow-down"
               ></i>
             )}
           </Stack>
@@ -349,7 +366,6 @@ export const ModelMenu = ({
   children,
   clipText,
   selectedID,
-  value,
   models,
   modelList,
   handleDedupe,

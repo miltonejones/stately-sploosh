@@ -59,9 +59,11 @@ export default function PreviewBar({ viewer }) {
                 />
               </Box>
             </Stack>
-            <Link href={URL} target="_blank" rel="noreferrer">
-              Open on {video?.domain}
-            </Link>
+            {!!video?.domain && (
+              <Link href={URL} target="_blank" rel="noreferrer">
+                Open on {video.domain}
+              </Link>
+            )}
           </>
         )}
       </Box>

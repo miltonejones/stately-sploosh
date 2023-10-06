@@ -15,11 +15,13 @@ import {
   TextField,
   styled,
   Box,
+  Dialog,
 } from "@mui/material";
 import { ScrollingText, Photo, ModelCard } from "..";
-import { Flex, HilitText, Nowrap } from "../../../styled";
+import { Flex, HilitText, Nowrap, Spacer } from "../../../styled";
 import { DEFAULT_IMAGE } from "../../../const";
 import { usePhoto } from "..";
+import VideoMedia from "../VideoCard/VideoMedia";
 
 export const StyledTextField = styled(TextField)(() => ({
   "& .MuiInputBase-root": {
@@ -40,14 +42,17 @@ export const StyledTextField = styled(TextField)(() => ({
 }));
 
 export const PhotoCard = ({
-  active,
-  param,
-  params,
   Text,
   Photo,
   Time,
   URL,
+  Key,
+  dupes,
   domain,
+
+  active,
+  param,
+  params,
   size = 200,
   onClick,
   existing,
@@ -55,20 +60,23 @@ export const PhotoCard = ({
 }) => {
   const { image } = usePhoto(Photo, DEFAULT_IMAGE);
 
-  const preview = (event, url) => viewer.handleOpen(event, url);
+  const preview = (event, url) =>
+    !viewer ? false : viewer.handleOpen(event, url);
   return (
     <Card
       sx={{
         outline: active ? "solid 2px green" : "",
+        border: dupes?.length > 0 ? "dotted 1px red" : "",
         cursor: "pointer",
         width: size,
-        opacity: existing ? 0.5 : 1,
+        opacity: existing || dupes?.length > 0 ? 0.5 : 1,
         position: "relative",
       }}
     >
-      <CardMedia
+      <VideoMedia
         onClick={onClick}
         component="img"
+        size={size}
         sx={{ borderRadius: 2, width: size - 16, aspectRatio: "16 / 9" }}
         width="100%"
         height="auto"
@@ -81,6 +89,7 @@ export const PhotoCard = ({
         }}
       >
         <Stack>
+          {/* [{Key}][{dupes?.length}] */}
           <ScrollingText
             variant="body2"
             sx={{
@@ -114,55 +123,84 @@ export const PhotoCard = ({
   );
 };
 
-export const CuratorCard = ({ curator, minimal, handleMode }) => {
+export const CuratorCard = ({ curator, minimal, handleMode, handleModel }) => {
+  const [right, setRight] = React.useState(true);
   const saving = !["ready"].some(curator.state.matches);
-  const { track_to_save, stars_to_add } = curator.state.context;
+  const { track_to_save, stars_to_add, pausing } = curator.state.context;
 
-  // if (!(!!saving && !!track_to_save)) {
-  //   return <i />;
-  // }
   return (
-    <Snackbar
-      anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-      open={!!saving}
-    >
-      <Card onClick={handleMode}>
-        {!!track_to_save && (
-          <Flex>
-            <Stack sx={{ p: 2, minWidth: 360 }} spacing={1}>
-              <Typography variant="caption">
-                {JSON.stringify(curator.state.value)}
-              </Typography>
-              {!minimal && (
-                <Photo
-                  backup={DEFAULT_IMAGE}
-                  src={track_to_save.image}
-                  alt={track_to_save.title}
-                  style={{
-                    width: 360,
-                    aspectRatio: "16 / 9",
-                    borderRadius: 4,
-                  }}
-                />
-              )}
+    <>
+      <Dialog open={curator.state.matches("error")}>
+        <Box sx={{ p: 2 }}>
+          <Stack>
+            <Nowrap variant="caption" muted>
+              There was an error processing this request
+            </Nowrap>
 
-              <Stack direction="row" sx={{ alignItems: "center" }} spacing={1}>
-                {!!minimal && (
-                  <Avatar
-                    sx={{ aspectRatio: "16/9" }}
-                    variant="square"
+            <Typography width={360}>
+              <b>{curator.source}</b>: {curator.error}{" "}
+            </Typography>
+
+            <Flex spacing={2}>
+              <Spacer />
+              <Button
+                variant="contained"
+                onClick={() => curator.send("recover")}
+              >
+                Next
+              </Button>
+            </Flex>
+          </Stack>
+        </Box>
+      </Dialog>
+      <Snackbar
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: right ? "right" : "center",
+        }}
+        open={!!saving}
+      >
+        <Card onClick={handleMode}>
+          {!!track_to_save && (
+            <Flex>
+              <Stack sx={{ p: 2, minWidth: 360 }} spacing={1}>
+                <Typography variant="caption" onClick={() => setRight(!right)}>
+                  {JSON.stringify(curator.state.value)}
+                </Typography>
+                {!minimal && (
+                  <Photo
+                    backup={DEFAULT_IMAGE}
                     src={track_to_save.image}
+                    alt={track_to_save.title}
+                    style={{
+                      width: 360,
+                      aspectRatio: "16 / 9",
+                      borderRadius: 4,
+                    }}
                   />
                 )}
-                <Typography sx={{ maxWidth: 360 }} variant="body2">
-                  {curator.message}
+
+                <Stack
+                  direction="row"
+                  sx={{ alignItems: "center" }}
+                  spacing={1}
+                >
+                  {!!minimal && (
+                    <Avatar
+                      sx={{ aspectRatio: "16/9" }}
+                      variant="square"
+                      src={track_to_save.image}
+                    />
+                  )}
+                  <Typography sx={{ maxWidth: 360 }} variant="body2">
+                    {curator.message}
+                  </Typography>
+                </Stack>
+
+                <Typography sx={{ maxWidth: 360 }} variant="caption">
+                  {track_to_save.title}
                 </Typography>
-              </Stack>
-
-              <Typography sx={{ maxWidth: 360 }} variant="caption">
-                {track_to_save.title}
-              </Typography>
-
+                {/* 
               {curator.state.matches("error") && (
                 <Stack>
                   <Nowrap variant="caption" muted>
@@ -182,34 +220,49 @@ export const CuratorCard = ({ curator, minimal, handleMode }) => {
                     </Button>
                   </Flex>
                 </Stack>
-              )}
+              )} */}
 
-              <LinearProgress
-                variant={!curator.progress ? "indeterminate" : "determinate"}
-                value={curator.progress}
-              />
-            </Stack>
-
-            <Collapse
-              orientation="horizontal"
-              in={!!stars_to_add?.length && curator.state.matches("cast.pause")}
-            >
-              {!!stars_to_add?.length && (
-                <Flex spacing={2} sx={{ p: 2 }}>
-                  {stars_to_add.map((star) => (
-                    <ModelCard
-                      small={stars_to_add.length > 3}
-                      key={star.ID}
-                      model={star}
+                <Stack>
+                  {!!curator.chosen?.length && (
+                    <Flex spacing={1}>
+                      <Typography variant="caption">
+                        {curator.save_index} of {curator.chosen.length}
+                      </Typography>
+                      <Typography color="error" variant="caption">
+                        {curator.skipped} skipped
+                      </Typography>{" "}
+                    </Flex>
+                  )}
+                  <Box>
+                    <LinearProgress
+                      variant={
+                        !curator.progress ? "indeterminate" : "determinate"
+                      }
+                      value={curator.progress}
                     />
-                  ))}
-                </Flex>
-              )}
-            </Collapse>
-          </Flex>
-        )}
-      </Card>
-    </Snackbar>
+                  </Box>
+                </Stack>
+              </Stack>
+
+              <Collapse orientation="horizontal" in={pausing}>
+                {!!stars_to_add?.length && (
+                  <Flex spacing={2} sx={{ p: 2 }}>
+                    {stars_to_add.map((star) => (
+                      <ModelCard
+                        modelClicked={handleModel}
+                        small={stars_to_add.length > 3}
+                        key={star.ID}
+                        model={star}
+                      />
+                    ))}
+                  </Flex>
+                )}
+              </Collapse>
+            </Flex>
+          )}
+        </Card>
+      </Snackbar>
+    </>
   );
 };
 
@@ -220,8 +273,10 @@ export const PreviewCard = ({ handleMode, minimal, finder }) => {
     results,
     progress,
     message,
+    param,
     busy,
   } = finder;
+
   const [searchOn, setSearchOn] = React.useState(false);
   const [temp, setTemp] = React.useState("");
   const handleClick = () => {
@@ -242,7 +297,8 @@ export const PreviewCard = ({ handleMode, minimal, finder }) => {
       <Card>
         <Stack spacing={2} sx={{ width: 360, p: 1 }}>
           <Typography variant="subtitle2">
-            Finding "{param_list.join(" or ")}"
+            Finding "
+            <HilitText values={[param]}>{param_list.join(" or ")}</HilitText>"
           </Typography>
           <PhotoCard
             onClick={handleMode}

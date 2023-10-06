@@ -33,6 +33,8 @@ import { Flex, Spacer } from "../../../styled";
 import { useCast } from "../../../machines";
 import { useDedupe } from "../../../machines/dedupeMachine";
 import DomainMenu from "../DomainMenu/DomainMenu";
+import ModelMemory from "../ModelMemory/ModelMemory";
+import { batchCastMachine } from "../../../machines/modelMachine";
 
 const U = styled("u")(() => ({
   cursor: "pointer",
@@ -53,10 +55,34 @@ const Grid = styled(Box)(({ wide, theme }) => ({
   gridTemplateColumns: wide ? "1fr 1fr 1fr 1fr 1fr 1fr" : "1fr 1fr 1fr 1fr",
 }));
 
+const useBatch = (onDone) => {
+  const [state, send] = useMachine(batchCastMachine, {
+    services: {
+      castModel: async (context) => {
+        return await addModelToVideo(context.items[context.index], context.ID);
+      },
+      sendCompeteSignal: async () => !!onDone && onDone(),
+    },
+  });
+  return {
+    ...state.context,
+    state,
+    send,
+  };
+};
+
 export const useModelModal = () => {
   const agent = useCast(() => send("REFRESH"));
+  const batch = useBatch(() => send("complete"));
   const [state, send] = useMachine(modelMachine, {
     services: {
+      sendBatch: async (context) => {
+        batch.send({
+          type: "cast",
+          items: context.selected,
+          ID: context.ID,
+        });
+      },
       assignAlias: async (context) => {
         return await addModelAlias(context.ID, context.alias.ID);
       },
@@ -70,12 +96,15 @@ export const useModelModal = () => {
         return await getModelMissingVideos(context.ID);
       },
       loadModel: async (context) => {
-        return await getModel(context.ID, {
+        const args = {
           page: context.page,
           favorite: context.favorite,
           param: context.filterText,
           domain: context.domain,
-        });
+        };
+        const models = await getModel(context.ID, args);
+        console.log({ ID: context.ID, args, models });
+        return models;
       },
       loadCostars: async (context) => {
         return await getModelCostars(context.ID);
@@ -84,13 +113,21 @@ export const useModelModal = () => {
   });
 
   const openModel = (ID) => {
-    send({
-      type: "OPEN",
-      ID,
-    });
+    !!ID &&
+      send({
+        type: "OPEN",
+        ID,
+      });
   };
 
   const handleClose = () => send("CLOSE");
+
+  const setState = (name, value) =>
+    send({
+      type: "SET",
+      name,
+      value,
+    });
 
   const setPage = (e, index) => {
     send({
@@ -101,8 +138,9 @@ export const useModelModal = () => {
 
   const setTab = (tab) => {
     send({
-      type: "TAB",
-      tab,
+      type: "REPROP",
+      value: tab,
+      name: "tab",
     });
   };
 
@@ -114,21 +152,25 @@ export const useModelModal = () => {
   };
 
   const handleBatch = () => send("BATCH");
-  const handleAlias = () => send("ALIAS");
+  const handleAlias = () =>
+    send({
+      type: "SET",
+      name: "aliasMode",
+      value: !state.context.aliasMode,
+    });
 
   const handleRename = (alias) =>
     send({
       type: "RENAME",
       alias,
     });
-  const handleChange = (value) =>
-    send({
-      type: "CHANGE",
-      value,
-    });
+  const handleChange = (value) => setState("filterText", value);
+  // send({
+  //   type: "CHANGE",
+  //   value,
+  // });
 
   const setFavorite = () => send("FAVORITE");
-
   const refresh = () => send("REFRESH");
   const setDomain = (domain) =>
     send({
@@ -138,6 +180,10 @@ export const useModelModal = () => {
     });
 
   return {
+    diagnosticProps: {
+      ...modelMachine,
+      state,
+    },
     state,
     refresh,
     openModel,
@@ -152,6 +198,7 @@ export const useModelModal = () => {
     setFavorite,
     setDomain,
     agent,
+    batch,
     ...state.context,
   };
 };
@@ -189,6 +236,7 @@ const ModelModal = ({
   setPage,
   page = 1,
   model,
+  batch,
 }) => {
   // const [tab, setTab] = React.useState(0)
   // const pages = usePagination(costars, { pageCount: 10, page})
@@ -299,6 +347,12 @@ const ModelModal = ({
     domain,
     limit: 3,
     navigate: (suffix) => setDomain(suffix),
+  };
+
+  const modalProps = {
+    memory,
+    openModel,
+    ID: star.ID,
   };
 
   return (
@@ -511,8 +565,8 @@ const ModelModal = ({
         {tab === 2 && !!missing && (
           <>
             <Box sx={{ p: 1, width: "100%" }}>
-              {!!progress && (
-                <LinearProgress variant="determinate" value={progress} />
+              {!!batch.progress && (
+                <LinearProgress variant="determinate" value={batch.progress} />
               )}
               {/* {progress} */}
             </Box>
@@ -549,8 +603,8 @@ const ModelModal = ({
         )}
 
         {!!model.domains && tab === 0 && (
-          <Flex sx={{ p: 1 }}>
-            <DomainMenu {...domainProps} />{" "}
+          <Flex spacing={2} sx={{ p: 1 }}>
+            <DomainMenu {...domainProps} /> <ModelMemory {...modalProps} />
           </Flex>
         )}
 

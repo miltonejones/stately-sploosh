@@ -5,14 +5,35 @@ import {
   getModelsByName,
   addModelToVideo,
   saveVideo,
+  getVideo,
 } from "../connector";
 import { getVideoByURL } from "../connector/parser";
+
+const validateVideo = async (url) => {
+  const ENDPOINT =
+    "https://sd03bu0vvl.execute-api.us-east-1.amazonaws.com/check";
+  const requestOptions = {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ url }),
+  };
+
+  console.log({ url });
+  const response = await fetch(ENDPOINT, requestOptions);
+  return await response.json();
+};
 
 export const useCartMachine = (onRefresh) => {
   const [state, send] = useMachine(cartMachine, {
     services: {
       refreshList: async () => {
         onRefresh && onRefresh();
+      },
+      checkVideoContent: async (context) => {
+        const address = context.chosen[context.save_index];
+        const ok = await validateVideo(address);
+        console.log({ ok: ok.result });
+        return ok;
       },
       loadByURL: async (context) => {
         const address = context.chosen[context.save_index];
@@ -60,9 +81,16 @@ export const useCartMachine = (onRefresh) => {
         }
         return false;
       },
+      verifyVideo: async (context) => {
+        const video = await getVideo(context.ID);
+        console.log({ video });
+        return video;
+      },
       curateVideo: async (context) => {
         const { track_to_save } = context;
         const { title, image, URL } = track_to_save;
+
+        if (!URL) return false;
 
         const key =
           URL.indexOf("xvideo") > 0
@@ -91,6 +119,11 @@ export const useCartMachine = (onRefresh) => {
 
   return {
     state,
+    diagnosticProps: {
+      id: cartMachine.id,
+      states: cartMachine.states,
+      state,
+    },
     send,
     ...state.context,
     beginImport,
