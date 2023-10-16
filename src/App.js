@@ -41,6 +41,7 @@ import {
   Typography,
   styled,
   Chip,
+  Dialog,
 } from "@mui/material";
 import {
   getVideos,
@@ -75,6 +76,7 @@ import ExPagination from "./components/lib/ExPagination/ExPagination";
 import ModelMemory from "./components/lib/ModelMemory/ModelMemory";
 import Editor from "./components/pages/Editor/editor";
 import Janitor from "./components/pages/Janitor/Janitor";
+import Javlib from "./components/pages/Javlib/Javlib";
 
 const Btn = styled(Button)(({ theme }) => ({
   textTransform: "capitalize",
@@ -101,6 +103,7 @@ function App() {
         <Route path="/save" element={<VideoForm />} />
         <Route path="/editor" element={<Editor />} />
         <Route path="/janitor" element={<Janitor />} />
+        <Route path="/jav" element={<Javlib />} />
         <Route path="/:type" element={<Application />} />
         <Route path="/:type/:page" element={<Application />} />
         <Route path="/:type/:page/:param" element={<Application />} />
@@ -390,6 +393,17 @@ function Application() {
     <AppStateContext.Provider
       value={{ WindowManager, active_machine, floatingProps, curator, tabs }}
     >
+      <Dialog open={state.matches("video_error")}>
+        <Stack sx={{ p: 2 }}>
+          <Typography>An error occurred:</Typography>
+          {state.context.errorMsg}
+          {JSON.stringify(state.context.stack)}
+          <Flex>
+            <Spacer />
+            <Button onClick={() => send("RECOVER")}>home</Button>
+          </Flex>
+        </Stack>
+      </Dialog>
       <Flex spacing={2} sx={{ p: 2, borderBottom: 1, borderColor: "divider" }}>
         <i
           onClick={() => finder.handleClick()}
@@ -441,13 +455,6 @@ function Application() {
           models
         </Btn>
         {/* <Typography variant="caption" color="grey[200]">[{view}] - {JSON.stringify(state.value)}</Typography> */}
-        {state.matches("video_error") && (
-          <>
-            {state.context.errorMsg}
-            {JSON.stringify(state.context.stack)}
-            <Button onClick={() => send("RECOVER")}>home</Button>
-          </>
-        )}
 
         <Box sx={{ flexGrow: 1 }} />
 
@@ -512,7 +519,6 @@ function Application() {
           }
         />
       </Flex>
-
       {!!tabList && !state.matches("dash") && view !== "model" && (
         <Flex
           sx={{ borderBottom: 1, borderColor: busy ? "primary" : "divider" }}
@@ -588,9 +594,7 @@ function Application() {
           </TabList>
         </Flex>
       )}
-
       {(busy || saving) && <LinearProgress />}
-
       <div className="App">
         {state.matches("dash") && <Dash />}
 
@@ -711,7 +715,6 @@ function Application() {
       {/* <Diagnostics {...photo.diagnosticProps} />
       <Diagnostics {...editor.diagnosticProps} />
       <Diagnostics {...shop.diagnosticProps} /> */}
-
       {/* <Diagnostics
         open={state.context.debug || state.matches("video_error")}
         id={splooshMachine.id}

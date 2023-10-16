@@ -187,7 +187,7 @@ export const addModelToVideo = async (trackFk, modelFk) => {
     body: JSON.stringify({ trackFk, modelFk }),
   };
   const response = await fetch(API_ENDPOINT + "/model/cast", requestOptions);
-  console.log({ response });
+  // console.log({ response });
   return true; // await response.json();
 };
 

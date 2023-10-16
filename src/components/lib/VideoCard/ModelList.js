@@ -1,4 +1,13 @@
-import { Menu, MenuItem, Stack, Tooltip, Typography } from "@mui/material";
+import React from "react";
+import {
+  Box,
+  Button,
+  Menu,
+  MenuItem,
+  Stack,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import { useMenu } from "../../../machines";
 import { StarAvatar } from "../ModelMemory/StarAvatar";
 
@@ -41,6 +50,16 @@ const CostarMenu = ({ models, menu }) => {
 };
 
 const ModelName = ({ model, onClick }) => {
+  const [loaded, setLoaded] = React.useState(false);
+
+  React.useEffect(() => {
+    const im = new Image();
+    im.onload = () => {
+      setLoaded(true);
+    };
+    im.src = model.image;
+  }, [model.image]);
+
   if (!model.image) {
     return <em onClick={onClick}>{model.Name}</em>;
   }
@@ -54,7 +73,12 @@ const ModelName = ({ model, onClick }) => {
             textAlign: "center",
           }}
         >
-          {!!model.image && (
+          {!loaded && (
+            <Box sx={{ p: 2 }}>
+              <Button onClick={onClick}>Open model details</Button>
+            </Box>
+          )}
+          {!!model.image && loaded && (
             <img
               src={model.image}
               alt={model.Name}

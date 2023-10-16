@@ -118,7 +118,7 @@ const PhotoModal = ({
     >
       <Card>
         <Stack spacing={2} sx={{ p: 2, minWidth: 600, minHeight: 200 }}>
-          {/* {JSON.stringify(state.value)} */}
+          {JSON.stringify(state.value)}
           {state.matches("opened.loading") && (
             <Stack>
               <LinearProgress />
@@ -159,7 +159,7 @@ const PhotoModal = ({
             </Stack>
           )}
 
-          {!!photo?.length && state.matches("opened.loaded") && (
+          {state.matches("opened.loaded") && (
             <Stack>
               Found {photo.length} photos for {name}
               <Stack direction="row">

@@ -19,13 +19,11 @@ export const getJavNames = async (key, name, studio) => {
   const response = await fetch(API_ENDPOINT + `/names/${key}`);
   const res = await response.json();
   if (studio) {
-    return res?.studio
+    return res?.studio;
   }
-  const obj = res.names?.find(f => f.title === name);
+  const obj = res.names?.find((f) => f.title === name);
   if (obj) {
-    return obj.href
+    return obj.href;
   }
-  return false
+  return false;
 };
-
-// https://jhdcmv7zhi.execute-api.us-east-1.amazonaws.com/find/names/nnpj-414

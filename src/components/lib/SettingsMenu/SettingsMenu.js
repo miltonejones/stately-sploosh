@@ -107,6 +107,12 @@ const SettingsMenu = ({ store, value, items, tabs, navigate, onChange }) => {
             <Link sx={{ m: 1 }} href="/editor">
               Open parser editor
             </Link>
+            <Link sx={{ m: 1 }} href="/janitor">
+              Open migration tool
+            </Link>
+            <Link sx={{ m: 1 }} href="/jav">
+              Open import tool
+            </Link>
             <Link sx={{ m: 1 }} onClick={tabMenu.handleClick}>
               Edit tabs
             </Link>
