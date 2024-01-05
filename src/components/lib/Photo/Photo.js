@@ -3,7 +3,13 @@ import React from "react";
 import { useMachine } from "@xstate/react";
 import { imageMachine } from "../../../machines";
 
-export const usePhoto = (src, backup) => {
+export const usePhoto = (source, backup) => {
+  console.log({ source });
+  let src = source;
+  if (source?.indexOf("img.javdoe.sh") > 0) {
+    src = source.replace("img.javdoe.sh", "javdoe.sh/media/videos");
+  }
+
   const [state, send] = useMachine(imageMachine, {
     services: {
       loadPhoto: () =>

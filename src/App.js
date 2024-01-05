@@ -104,6 +104,7 @@ function App() {
         <Route path="/editor" element={<Editor />} />
         <Route path="/janitor" element={<Janitor />} />
         <Route path="/jav" element={<Javlib />} />
+        <Route path="/jav/:routedpath" element={<Javlib />} />
         <Route path="/:type" element={<Application />} />
         <Route path="/:type/:page" element={<Application />} />
         <Route path="/:type/:page/:param" element={<Application />} />

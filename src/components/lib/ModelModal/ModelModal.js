@@ -450,13 +450,11 @@ const ModelModal = ({
             {!!model?.videos?.records?.length && (
               <i
                 onClick={() => {
-                  bookClicked({
-                    key: model.videos.records[0].Key,
-                    name: star.name,
-                    modelfk: star.ID,
-                    image: star.image,
-                  });
-                  handleClose();
+                  window.open(
+                    `/jav/${model.videos.records[0].Key}`,
+                    `${model.videos.records[0].Key}_window`,
+                    "width=500,height=800,toolbar=0,location=0"
+                  );
                 }}
                 className="fa-solid fa-book"
               ></i>

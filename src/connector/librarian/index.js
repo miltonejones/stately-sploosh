@@ -25,5 +25,5 @@ export const getJavNames = async (key, name, studio) => {
   if (obj) {
     return obj.href;
   }
-  return false;
+  return res;
 };
