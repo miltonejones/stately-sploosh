@@ -21,6 +21,7 @@ import {
   getModelsByName,
 } from "../../../connector";
 import { Flex, Spacer } from "../../../styled";
+import InBox from "../../../styled/InBox";
 
 export const useVideoDrawer = (onRefresh) => {
   const [state, send] = useMachine(videoMachine, {
@@ -88,6 +89,7 @@ export const useVideoDrawer = (onRefresh) => {
       state,
     },
     state,
+    send,
     multiple: state.matches("multiple"),
     editMultiple,
     selectMode,
@@ -112,12 +114,16 @@ const VideoDrawer = ({
   castModel,
   msg,
   open,
+  send,
   video,
   videos = [],
   shop,
   notify,
 }) => {
   if (!video) return <Diagnostics {...diagnosticProps} />;
+  const fixed = state.context.locked; //("unlock");
+
+  const Component = fixed ? InBox : Drawer;
 
   // const titleTrack = videos.find(f => !!f.models.length);
 
@@ -136,7 +142,7 @@ const VideoDrawer = ({
       <Snackbar open={notify}>
         <Alert sx={{ minWidth: 400 }}>{message}</Alert>
       </Snackbar>
-      <Drawer
+      <Component
         anchor="left"
         onClose={handleClose}
         open={open}
@@ -146,10 +152,10 @@ const VideoDrawer = ({
           <Flex spacing={1} sx={{ p: 1 }}>
             <Typography>Edit Video</Typography>
             <Spacer />
-            <Typography variant="caption">
+            {/* <Typography variant="caption">
               {" "}
               {JSON.stringify(state.value)}
-            </Typography>
+            </Typography> */}
 
             <i
               onClick={() => {
@@ -158,7 +164,11 @@ const VideoDrawer = ({
               }}
               className="fa fa-cart-arrow-down"
             />
-            <i className="fa-solid fa-pen"></i>
+            {/* <i className="fa-solid fa-pen"></i> */}
+            <i
+              className="fa-solid fa-angles-left"
+              onClick={() => send(fixed ? "unlock" : "lock")}
+            ></i>
           </Flex>
         </Box>
         <Box sx={{ maxWidth: 400, overflow: "hidden", p: 2 }}>
@@ -166,12 +176,14 @@ const VideoDrawer = ({
             src={video.image}
             alt={video.title}
             style={{
-              width: 400,
+              width: "100%",
               aspectRatio: "16 / 9",
               borderRadius: 4,
             }}
           />
-          <Typography sx={{ mb: 2 }}>{video.title}</Typography>
+          <Typography variant="body2" sx={{ mb: 2 }}>
+            {video.title}
+          </Typography>
 
           {!!videos.length && (
             <Stack direction="row" spacing={1}>
@@ -191,7 +203,7 @@ const VideoDrawer = ({
                   direction="row"
                 >
                   <Avatar src={model.image} />
-                  <Typography>{model.Name}</Typography>
+                  <Typography variant="body2">{model.Name}</Typography>
                   <Box sx={{ flexGrow: 1 }} />
                   <i
                     onClick={() => {
@@ -234,7 +246,7 @@ const VideoDrawer = ({
         {JSON.stringify(video,0,2)}
       </pre> */}
         </Box>
-      </Drawer>
+      </Component>
     </>
   );
 };

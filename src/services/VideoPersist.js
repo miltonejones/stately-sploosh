@@ -1,36 +1,43 @@
-import dynamoStorage from './DynamoStorage';
-import { SEED_DATA } from './Seed'
-const RECENT_WATCHED_SETTING_NAME = 'video-recent-watched-id-list';
+import dynamoStorage from "./DynamoStorage";
+import videoStore from "./HistoryIndex";
+import { SEED_DATA } from "./Seed";
+const RECENT_WATCHED_SETTING_NAME = "video-recent-watched-id-list";
 
 class VideoPersistService$ {
-
   limit = 1000000;
   seed = SEED_DATA;
-  store = dynamoStorage()
-  constructor() { 
-    this.init()
+  store = dynamoStorage();
+  constructor() {
+    this.init();
   }
 
   async init() {
-    const storage = await this.store.getItem(RECENT_WATCHED_SETTING_NAME)
+    const storage = await this.store.getItem(RECENT_WATCHED_SETTING_NAME);
     if (!storage) {
-      await this.store.setItem(RECENT_WATCHED_SETTING_NAME, JSON.stringify(SEED_DATA))
+      await this.store.setItem(
+        RECENT_WATCHED_SETTING_NAME,
+        JSON.stringify(SEED_DATA)
+      );
     }
   }
 
-  async add(track) { 
+  async add(track) {
     const existing = await this.get();
     const setting = existing.filter((old) => old !== track.ID);
     setting.unshift(track.ID);
     await this.set(setting);
-    console.log (`Added ${track.title} to cache:`);
+    videoStore.addItem(track);
+    console.log(`Added ${track.title} to cache:`);
     console.log(`${JSON.stringify(setting).length} bytes.`);
   }
 
   async list() {
     const setting = await this.get();
-    console.table(setting);
+    //    console.table(setting);
     console.log(`${JSON.stringify(setting).length} bytes.`);
+
+    const old = await videoStore.getItems();
+    // console.table(old);
   }
 
   trim(setting) {
@@ -43,33 +50,41 @@ class VideoPersistService$ {
   }
 
   async getSetting(name) {
-    return await this.store.getItem(name)
+    return await this.store.getItem(name);
   }
 
   async setSetting(name, value) {
-    await this.store.setItem(name, value)
+    await this.store.setItem(name, value);
   }
 
   async set(setting) {
-    await this.setSetting(RECENT_WATCHED_SETTING_NAME, JSON.stringify(this.trim(setting)));
+    await this.setSetting(
+      RECENT_WATCHED_SETTING_NAME,
+      JSON.stringify(this.trim(setting))
+    );
   }
 
   async clear() {
-    await this.setSetting(RECENT_WATCHED_SETTING_NAME, '[]');
+    await this.setSetting(RECENT_WATCHED_SETTING_NAME, "[]");
   }
 
   async get() {
-    const storage = await this.getSetting(RECENT_WATCHED_SETTING_NAME)
+    const storage = await this.getSetting(RECENT_WATCHED_SETTING_NAME);
+
+    // const old = await videoStore.getItems();
+    // console.table(old);
+
+    const history = JSON.parse(storage || []);
+    console.log(history);
+
     try {
-      return JSON.parse(storage || []);
-    } catch (e) { return []; }
+      return history;
+    } catch (e) {
+      return [];
+    }
   }
-
-
 }
 
 const VideoPersistService = new VideoPersistService$();
 
-export {
-  VideoPersistService
-}
+export { VideoPersistService };

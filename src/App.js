@@ -70,13 +70,16 @@ import {
 } from "react-router-dom";
 import "./App.css";
 import { SearchPersistService } from "./services";
-import { Flex, PhotoGrid, IconTextField, Spacer } from "./styled";
+import { Flex, PhotoGrid, IconTextField, Spacer, Columns } from "./styled";
 import DomainMenu from "./components/lib/DomainMenu/DomainMenu";
 import ExPagination from "./components/lib/ExPagination/ExPagination";
 import ModelMemory from "./components/lib/ModelMemory/ModelMemory";
 import Editor from "./components/pages/Editor/editor";
 import Janitor from "./components/pages/Janitor/Janitor";
 import Javlib from "./components/pages/Javlib/Javlib";
+import Historian from "./components/pages/Janitor/History";
+import videoStore from "./services/HistoryIndex";
+import SettingsPrompt from "./components/lib/SettingsMenu/SettingsPrompt";
 
 const Btn = styled(Button)(({ theme }) => ({
   textTransform: "capitalize",
@@ -103,6 +106,7 @@ function App() {
         <Route path="/save" element={<VideoForm />} />
         <Route path="/editor" element={<Editor />} />
         <Route path="/janitor" element={<Janitor />} />
+        <Route path="/past" element={<Historian />} />
         <Route path="/jav" element={<Javlib />} />
         <Route path="/jav/:routedpath" element={<Javlib />} />
         <Route path="/:type" element={<Application />} />
@@ -115,6 +119,8 @@ function App() {
 }
 
 function Application() {
+  // const [fixed, setFixed] = React.useState(false);
+
   const WindowManager = useWindowManager();
   const store = dynamoStorage();
 
@@ -134,6 +140,10 @@ function Application() {
     (val) => !!val && navigate(`/search/1/${val}`)
   );
 
+  const fixed = finder.state.can("unlock");
+  const fixed2 = editor.state.context.locked; //("unlock");
+  const setFixed = () => (fixed ? finder.send("unlock") : finder.send("lock"));
+
   const photo = usePhotoModal((src, ID) => {
     if (!src) return;
     send({
@@ -142,6 +152,8 @@ function Application() {
       ID,
     });
   });
+
+  const sortRecent = (a, b) => (a.timestamp > b.timestamp ? -1 : 1);
 
   const saving = [
     "save.next",
@@ -186,14 +198,38 @@ function Application() {
         return await getVideosByDomain(context.domain, page);
       },
       loadRecentVideos: async () => {
-        const videos = await VideoPersistService.get();
+        const oldies = await videoStore.getItems();
+        console.log({ oldies });
+        // const videos = await VideoPersistService.get();
         const first = (page - 1) * 30;
-        const Keys = videos.slice(first, first + 30);
-        if (!Keys.length) return alert(["NO KEYS IN", videos.length]);
-        const list = await getVideoKeys(Keys);
+        const list = oldies.sort(sortRecent).slice(first, first + 30);
+
+        const Keys = list.map((f) => f.ID);
+
+        if (!list.length) return alert(["NO KEYS IN", oldies.length]);
+
+        console.log({ list });
+        const existing = await getVideoKeys(Keys);
+        const updated = list.map((f) => {
+          const track = existing.records.find((b) => b.ID === f.ID);
+          if (track) {
+            return {
+              ...f,
+              ...track,
+            };
+          }
+          console.log({ f }, "deleted");
+          return {
+            ...f,
+            deleted: true,
+          };
+        });
+
+        console.log({ updated });
+
         const items = {
-          records: list.records,
-          count: videos.length,
+          records: updated,
+          count: oldies.length,
         };
         return items;
       },
@@ -205,7 +241,8 @@ function Application() {
         await updateModelPhoto(context.ID, context.src);
       },
       setFavorite: async (context) => {
-        return await toggleVideoFavorite(context.ID);
+        const answer = await toggleVideoFavorite(context.ID);
+        return answer;
       },
       searchVideos: async (context) => {
         await appendTab(param, "search");
@@ -405,6 +442,8 @@ function Application() {
           </Flex>
         </Stack>
       </Dialog>
+
+      {/* toolbar */}
       <Flex spacing={2} sx={{ p: 2, borderBottom: 1, borderColor: "divider" }}>
         <i
           onClick={() => finder.handleClick()}
@@ -522,7 +561,11 @@ function Application() {
       </Flex>
       {!!tabList && !state.matches("dash") && view !== "model" && (
         <Flex
-          sx={{ borderBottom: 1, borderColor: busy ? "primary" : "divider" }}
+          sx={{
+            borderBottom: 1,
+            borderColor: busy ? "primary" : "divider",
+            pr: 2,
+          }}
         >
           {!!param && (
             <Flex sx={{ ml: 2 }} spacing={2}>
@@ -593,6 +636,8 @@ function Application() {
               />
             ))}
           </TabList>
+          <SettingsPrompt tabs={tabList} store={store} navigate={navigate} />
+          {/* <i class="fa-solid fa-chevron-down"></i> */}
         </Flex>
       )}
       {(busy || saving) && <LinearProgress />}
@@ -648,8 +693,18 @@ function Application() {
                   </Typography>
                 </Flex>
               )}
-              <Box sx={{ ml: 2 }}>
-                <PhotoGrid sx={{ width: "97vw" }}>
+
+              <Columns
+                baseline
+                columns={fixed || fixed2 ? "300px 1fr" : "0px 99vw"}
+                sx={{ ml: 2 }}
+              >
+                <Box>
+                  <SearchDrawer {...finder} fixed={fixed} setFixed={setFixed} />
+
+                  <VideoDrawer {...editor} shop={shop} />
+                </Box>
+                <PhotoGrid sx={{ width: "97%" }}>
                   {state.context.videos.records.map((video) => (
                     <VideoCard
                       medium
@@ -669,7 +724,7 @@ function Application() {
                     />
                   ))}
                 </PhotoGrid>
-              </Box>
+              </Columns>
 
               {!!domains && state.context.view === "search" && (
                 <DomainMenu {...domainProps} />
@@ -690,10 +745,7 @@ function Application() {
             </Stack>
           )}
       </div>
-      <Librarian librarian={librarian} />
       <FloatingMenu fixed />
-      <VideoDrawer {...editor} shop={shop} />
-      <SearchDrawer {...finder} />
       <ModelModal
         photoClicked={photo.openPhoto}
         searchClicked={shop.handleClick}
@@ -701,10 +753,12 @@ function Application() {
         favoriteClicked={addFavorite}
         {...modal}
       />
-      {/* {JSON.stringify(modal.state.value)} */}
-      {/* {!!debugPhotos && <CardCarousel images={debugPhotos} />} */}
       <PhotoModal {...photo} />
+
+      <Librarian librarian={librarian} />
+
       <ShoppingDrawer {...shop} handleModel={modal.openModel} />
+
       {machineItems
         .filter((item) => !!item.diagnosticProps)
         .map((item) => (
@@ -713,16 +767,6 @@ function Application() {
             {...item.diagnosticProps}
           />
         ))}
-      {/* <Diagnostics {...photo.diagnosticProps} />
-      <Diagnostics {...editor.diagnosticProps} />
-      <Diagnostics {...shop.diagnosticProps} /> */}
-      {/* <Diagnostics
-        open={state.context.debug || state.matches("video_error")}
-        id={splooshMachine.id}
-        state={state}
-        send={send}
-        states={splooshMachine.states}
-      /> */}
     </AppStateContext.Provider>
   );
 }

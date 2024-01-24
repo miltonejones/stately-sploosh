@@ -58,12 +58,15 @@ const BlockMenu = styled(Box)(({ theme, width }) => ({
   },
 }));
 
-export const ScrollingText = ({ children, ...props }) => {
+export const ScrollingText = ({ children, deleted, ...props }) => {
   const [hover, setHover] = React.useState(false);
+  const sx = deleted
+    ? { ...props.sx, textDecoration: "line-through", color: "red" }
+    : props.sx;
   if (!hover) {
     return (
       <>
-        <Typography {...props} onClick={() => setHover(true)}>
+        <Typography {...props} sx={sx} onClick={() => setHover(true)}>
           {children}
         </Typography>
       </>
@@ -272,6 +275,7 @@ const VideoCard = ({
             </ModelMenu>
             <ScrollingText
               variant="caption"
+              deleted={video.deleted}
               sx={{
                 whiteSpace: "nowrap",
                 fontWeight: !!video.favorite ? 600 : 400,
@@ -303,6 +307,7 @@ const VideoCard = ({
             <Stack>
               <ScrollingText
                 variant="body2"
+                deleted={video.deleted}
                 sx={{
                   whiteSpace: "nowrap",
                   fontWeight: !!video.favorite ? 600 : 400,

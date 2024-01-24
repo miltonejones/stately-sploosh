@@ -6,11 +6,13 @@ import {
   Box,
   Stack,
   Typography,
+  Card,
 } from "@mui/material";
 import { useMachine } from "@xstate/react";
 import { searchMachine } from "../../../machines";
 import { SearchPersistService } from "../../../services";
 import { ConfirmPopover } from "..";
+import InBox from "../../../styled/InBox";
 
 const Text = styled(Typography)(({ theme }) => ({
   width: 300,
@@ -63,6 +65,7 @@ export const useSearchDrawer = (onSearch) => {
       state,
     },
     state,
+    send,
     handleClose,
     handleClick,
     handleDrop,
@@ -71,27 +74,42 @@ export const useSearchDrawer = (onSearch) => {
   };
 };
 
+// const InBox = styled(Card)(({ open }) => ({
+//   width: 300,
+//   opacity: open ? 1 : 0,
+//   height: `calc(100vh - 170px)`,
+//   overflow: "auto",
+//   backgroundColor: "#ebebeb",
+// }));
+
 const SearchDrawer = ({
   handleClose,
   handlePin,
   handleDrop,
   searches,
   state,
+  send,
   open,
+  fixed,
+  setFixed,
 }) => {
   const pinned = searches?.filter((text) => !!text && text.indexOf("^") > 0);
   const unpinned = searches?.filter((text) => !!text && text.indexOf("^") < 0);
+  const Component = fixed ? InBox : Drawer;
   return (
-    <Drawer
+    <Component
       anchor="left"
       onClose={(e) => handleClose()}
       open={open}
       data-testid="test-for-VideoDrawer"
     >
-      <Box sx={{ borderBottom: 1, minWidth: 440, borderColor: "divider" }}>
+      <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Stack direction="row" sx={{ p: 1, justifyContent: "space-between" }}>
           <Typography>Saved searches</Typography>
-          <i className="fa-solid fa-pen"></i>
+          <i
+            className="fa-solid fa-angles-left"
+            onClick={() => setFixed(!fixed)}
+          ></i>
         </Stack>
       </Box>
       {!state.matches("opened.loaded") && <LinearProgress />}
@@ -100,7 +118,10 @@ const SearchDrawer = ({
 
         {pinned?.map((item) => (
           <Line direction="row" sx={{ alignItems: "center", width: 400 }}>
-            <Text onClick={() => handleClose(item.replace("^", ""))}>
+            <Text
+              variant="body2"
+              onClick={() => handleClose(item.replace("^", ""))}
+            >
               {item.replace("^", "")}
             </Text>
             <Box sx={{ flexGrow: 1 }} />
@@ -121,7 +142,9 @@ const SearchDrawer = ({
             direction="row"
             sx={{ alignItems: "center", width: 400 }}
           >
-            <Text onClick={() => handleClose(item)}>{item}</Text>
+            <Text variant="body2" onClick={() => handleClose(item)}>
+              {item}
+            </Text>
             <Box sx={{ flexGrow: 1 }} />
             <i
               onClick={() => handlePin(item)}
@@ -138,8 +161,8 @@ const SearchDrawer = ({
           </Line>
         ))}
       </Box>
-      <pre>{JSON.stringify(state.value, 0, 2)}</pre>
-    </Drawer>
+      {/* <pre>{JSON.stringify(state.value, 0, 2)}</pre> */}
+    </Component>
   );
 };
 

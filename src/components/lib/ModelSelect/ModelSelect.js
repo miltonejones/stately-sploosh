@@ -138,7 +138,7 @@ const ModelSelect = (props) => {
   return (
     <Layout data-testid="test-for-ModelSelect">
       <Autocomplete
-        sx={{ minWidth: 300 }}
+        sx={{ minWidth: "100%" }}
         renderOption={renderOption}
         getOptionLabel={(option) => option.name || option}
         options={options}

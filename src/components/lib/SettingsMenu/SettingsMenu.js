@@ -21,7 +21,6 @@ const SettingsMenu = ({ store, value, items, tabs, navigate, onChange }) => {
     if (!ok) return;
     const values = checked.map((val) => tabs[val].param);
     const searches = tabs.filter((t) => !values.some((e) => e === t.param));
-    // alert(JSON.stringify(searches, 0, 2));
     await store.setItem("search-tabs", JSON.stringify(searches));
     navigate(`/video/1`);
   });
