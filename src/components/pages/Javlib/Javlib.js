@@ -22,6 +22,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { Helmet } from "react-helmet";
 import { javlibMachine } from "../../../machines/javlibMachine";
 import { useMachine } from "@xstate/react";
 import { Flex, Nowrap, Spacer } from "../../../styled";
@@ -72,8 +73,17 @@ export default function Javlib() {
     },
     [placeholders]
   );
+
+  const pageTitle = !metrics[selectedPath]
+    ? "Loading"
+    : metrics[selectedPath].title;
   return (
     <>
+      <Helmet>
+        <meta charSet="utf-8" />
+        <title>{pageTitle}</title>
+      </Helmet>
+
       <Dialog {...menu.menuProps}>
         <Stack spacing={1} sx={{ p: 2, width: DIALOG_WIDTH }}>
           <Typography>Enter path</Typography>
@@ -325,6 +335,7 @@ function JavlibBody({ startPath, size, remove, state, send, visible }) {
                         .replace(/:/g, ".")}
                     </Nowrap>
                   </Flex>
+                  {state.matches("idle.get key info") && <LinearProgress />}
                 </Stack>
                 {/* <Spacer /> */}
               </Flex>

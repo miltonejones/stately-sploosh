@@ -32,20 +32,34 @@ const SettingsPrompt = ({ store, tabs, navigate }) => {
         <Box sx={{ p: 2 }}>
           <Columns columns="1fr 1fr 1fr">
             {tabs.map((item, index) => (
-              <Flex onClick={handleToggle(index)}>
+              <Flex>
                 <Checkbox
+                  onClick={handleToggle(index)}
                   edge="start"
                   checked={checked.indexOf(index) !== -1}
                   tabIndex={-1}
                   disableRipple
                 />
-                <Nowrap variant="body2" width={200}>
+                <Nowrap
+                  hover
+                  variant="body2"
+                  width={200}
+                  onClick={() => {
+                    navigate(`/${item.type}/1/${item.param}`);
+                    tabMenu.handleClose();
+                  }}
+                >
                   {item.param}
                 </Nowrap>
               </Flex>
             ))}
           </Columns>
-          <Button onClick={tabMenu.handleClose(true)}>Save</Button>
+          <Button
+            disabled={!checked.length}
+            onClick={tabMenu.handleClose(true)}
+          >
+            Delete selected
+          </Button>
         </Box>
       </Popover>
     </>

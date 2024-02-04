@@ -8,8 +8,8 @@ export const excludedDomains = ["javdoe.com", "eporner.com", "javfinder.la"];
 export const approvedDomain = "javdoe.sh";
 
 export const GROSS_WORDS = [
-  "poss",
-  "piss",
+  " poss",
+  " piss",
   "golden shower",
   "device",
   "breast-feed",
@@ -19,7 +19,7 @@ export const GROSS_WORDS = [
   "drool",
   "scat",
   "saliva",
-  "spit",
+  " spit",
   "grand",
   "urination",
   "urine",
@@ -28,7 +28,7 @@ export const GROSS_WORDS = [
   "fifties",
   "sixty",
   "sixties",
-  "mature",
+  " mature",
   "vibrator",
   "dildo",
   "peeing",

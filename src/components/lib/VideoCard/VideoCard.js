@@ -180,6 +180,11 @@ const VideoCard = ({
   const size = small ? 200 : medium ? "230" : 230;
   const opacity = WindowManager?.visited(video) ? 0.5 : 1;
 
+  const shop = () => {
+    const { Key } = video;
+    window.open("/jav/" + Key, Key, "width=500,height=800,addressbar=no");
+  };
+
   const modelListProps = {
     setExpanded,
     expanded,
@@ -343,7 +348,7 @@ const VideoCard = ({
             </Typography>
             <Spacer />
             <Typography
-              onClick={() => studioClicked && studioClicked(video.studio)}
+              onClick={() => !!video.studio && shop(video.studio)}
               variant="caption"
             >
               {video.studio}
@@ -352,7 +357,7 @@ const VideoCard = ({
             {!!bookClicked && !!video.studio && (
               <i
                 onClick={() => {
-                  bookClicked(video.studio);
+                  shop();
                 }}
                 className="fa fa-cart-arrow-down"
               ></i>

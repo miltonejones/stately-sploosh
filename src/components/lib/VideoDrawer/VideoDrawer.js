@@ -8,6 +8,7 @@ import {
   Button,
   Box,
   Alert,
+  Checkbox,
 } from "@mui/material";
 import { useMachine } from "@xstate/react";
 import { ModelSelect, Diagnostics, ConfirmPopover } from "..";
@@ -120,8 +121,23 @@ const VideoDrawer = ({
   shop,
   notify,
 }) => {
-  if (!video) return <Diagnostics {...diagnosticProps} />;
   const fixed = state.context.locked; //("unlock");
+  const [checked, setChecked] = React.useState([]);
+  if (!video) return <Diagnostics {...diagnosticProps} />;
+  const handleToggle = (value) => () => {
+    setChecked((oldChecked) => {
+      const currentIndex = oldChecked.indexOf(value);
+      const newChecked = [...oldChecked];
+
+      if (currentIndex === -1) {
+        newChecked.push(value);
+      } else {
+        newChecked.splice(currentIndex, 1);
+      }
+      alert(JSON.stringify(newChecked));
+      return newChecked;
+    });
+  };
 
   const Component = fixed ? InBox : Drawer;
 
@@ -171,6 +187,7 @@ const VideoDrawer = ({
             ></i>
           </Flex>
         </Box>
+        {JSON.stringify(checked)}
         <Box sx={{ maxWidth: 400, overflow: "hidden", p: 2 }}>
           <img
             src={video.image}
@@ -202,7 +219,14 @@ const VideoDrawer = ({
                   spacing={2}
                   direction="row"
                 >
-                  <Avatar src={model.image} />
+                  <Checkbox
+                    checked={checked.indexOf(model.ID) !== -1}
+                    onClick={() => handleToggle(model.ID)}
+                  />
+                  <Avatar
+                    src={model.image}
+                    onClick={() => handleToggle(model.ID)}
+                  />
                   <Typography variant="body2">{model.Name}</Typography>
                   <Box sx={{ flexGrow: 1 }} />
                   <i
@@ -235,6 +259,14 @@ const VideoDrawer = ({
                 {" "}
                 <Button variant="contained" color="error">
                   delete {videos.length} videos
+                </Button>
+              </ConfirmPopover>
+            )}
+            {!!checked?.length && (
+              <ConfirmPopover message={`Remove ${checked.length} models?`}>
+                {" "}
+                <Button variant="contained" color="error">
+                  delete {checked.length} models
                 </Button>
               </ConfirmPopover>
             )}

@@ -355,6 +355,11 @@ const ModelModal = ({
     ID: star.ID,
   };
 
+  const shop = () => {
+    const { Key } = model.videos.records[0];
+    window.open("/jav/" + Key, Key, "width=500,height=800,addressbar=no");
+  };
+
   return (
     <Dialog maxWidth="md" open={open} onClose={handleClose}>
       <Stack spacing={1} sx={{ p: 2, minHeight: 500, position: "relative" }}>
@@ -441,8 +446,7 @@ const ModelModal = ({
 
             <i
               onClick={() => {
-                searchClicked(star.name);
-                handleClose();
+                shop();
               }}
               className="fa-solid fa-cart-shopping"
             ></i>
