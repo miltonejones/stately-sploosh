@@ -11,6 +11,11 @@ body {
   overflow-x: hidden;
 }
 
+.MuiCardHeader-title {
+  font-size: 1rem !important;
+  white-space: nowrap;
+}
+
 i,
 u {
   cursor: pointer;

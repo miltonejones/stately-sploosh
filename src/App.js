@@ -20,11 +20,7 @@ import {
   SettingsMenu,
   Librarian,
 } from "./components/lib";
-import {
-  useCartMachine,
-  useWindowManager,
-  VideoPersistService,
-} from "./services";
+import { useCartMachine, useWindowManager } from "./services";
 import VideoForm from "./components/pages/Save/Save.js";
 
 import {
@@ -36,11 +32,9 @@ import {
   Tab,
   LinearProgress,
   Button,
-  Pagination,
   // TextField,
   Typography,
   styled,
-  Chip,
   Dialog,
 } from "@mui/material";
 import {
@@ -80,6 +74,7 @@ import Javlib from "./components/pages/Javlib/Javlib";
 import Historian from "./components/pages/Janitor/History";
 import videoStore from "./services/HistoryIndex";
 import SettingsPrompt from "./components/lib/SettingsMenu/SettingsPrompt";
+import VirtualMedia from "./components/pages/VirtualMedia/VirtualMedia";
 
 const Btn = styled(Button)(({ theme }) => ({
   textTransform: "capitalize",
@@ -108,6 +103,7 @@ function App() {
         <Route path="/janitor" element={<Janitor />} />
         <Route path="/past" element={<Historian />} />
         <Route path="/jav" element={<Javlib />} />
+        <Route path="/vr" element={<VirtualMedia />} />
         <Route path="/jav/:routedpath" element={<Javlib />} />
         <Route path="/:type" element={<Application />} />
         <Route path="/:type/:page" element={<Application />} />
@@ -414,18 +410,18 @@ function Application() {
   //   (record) => record.image
   // );
 
-  const debugPhotos = state.context.videos?.records?.map((podcast) => ({
-    src: podcast.image,
-    title: podcast.title,
-    caption: "",
-    onClick: () => {
-      // send({
-      //   type: 'DETAIL',
-      //   podcast,
-      //   source: 'home',
-      // });
-    },
-  }));
+  // const debugPhotos = state.context.videos?.records?.map((podcast) => ({
+  //   src: podcast.image,
+  //   title: podcast.title,
+  //   caption: "",
+  //   onClick: () => {
+  //     // send({
+  //     //   type: 'DETAIL',
+  //     //   podcast,
+  //     //   source: 'home',
+  //     // });
+  //   },
+  // }));
 
   return (
     <AppStateContext.Provider
