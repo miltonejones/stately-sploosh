@@ -87,29 +87,28 @@ const machine = createMachine(
           : validData.filter((track) => {
               const unspaced = despaced(track.title.toLowerCase());
               const params = param.split("|");
+              const exact = param.split(",");
               let ok = params.some(
                 (f) => unspaced.indexOf(f.toLowerCase()) > -1
               );
-              ok =
-                ok ||
-                params.some(
-                  (f) => track.title.toLowerCase().indexOf(f.toLowerCase()) > -1
-                );
+              const matchParam = params.some(
+                (f) => track.title.toLowerCase().indexOf(f.toLowerCase()) > -1
+              );
+              ok = either(ok, matchParam);
               if (track.info?.title) {
                 const { title, stars } = track.info;
-                ok =
-                  ok ||
+                const matchTitle = params.some(
+                  (f) => title.toLowerCase().indexOf(f.toLowerCase()) > -1
+                );
+                const matchModel = stars.some((star) =>
                   params.some(
-                    (f) => title.toLowerCase().indexOf(f.toLowerCase()) > -1
-                  );
-                ok =
-                  ok ||
-                  stars.some((star) =>
-                    params.some(
-                      (f) => star.toLowerCase().indexOf(f.toLowerCase()) > -1
-                    )
-                  );
+                    (f) => star.toLowerCase().indexOf(f.toLowerCase()) > -1
+                  )
+                );
+                ok = either(ok, matchTitle);
+                ok = either(ok, matchModel);
               }
+
               return ok;
             });
 
@@ -134,6 +133,8 @@ const machine = createMachine(
     delays: {},
   }
 );
+
+const either = (a, b) => a || b;
 
 export const useVirtualMedia = () => {
   const [state, send] = useMachine(machine);

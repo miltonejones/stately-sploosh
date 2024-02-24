@@ -5,7 +5,7 @@ import CardMedia from "@mui/material/CardMedia";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import { CardActions, Collapse, IconButton, Tooltip } from "@mui/material";
-import { Flex } from "../../../styled";
+import { Flex, Nowrap } from "../../../styled";
 import TooltipLink from "./TooltipLink";
 
 const MediaCard = ({ data, fixed, getModel, setParam, stars }) => {
@@ -16,8 +16,21 @@ const MediaCard = ({ data, fixed, getModel, setParam, stars }) => {
   return (
     <Card>
       <CardHeader
-        title={data.title || "No title"}
-        subheader={`Studio: ${data.studio || "none"}`}
+        title={
+          <Tooltip title={data.title || "No title"}>
+            <Typography variant="body2">{data.title || "No title"}</Typography>
+          </Tooltip>
+        }
+        subheader={
+          <Nowrap
+            muted={!data.studio}
+            variant="caption"
+            hover={!!data.studio}
+            onClick={() => !!data.studio && setParam(data.studio)}
+          >
+            Studio: {data.studio || "none"}
+          </Nowrap>
+        }
       />
       <CardMedia
         component="img"
@@ -69,7 +82,20 @@ const MediaCard = ({ data, fixed, getModel, setParam, stars }) => {
           <ExpandMoreIcon />
         </ExpandMore> */}
           {!!data.info?.stars?.length && (
-            <i class="fa-solid fa-chevron-down" onClick={handleExpandClick}></i>
+            <>
+              <TooltipLink
+                stars={stars}
+                first={data.info.stars[0]}
+                getModel={getModel}
+                setParam={setParam}
+              />
+              {data.info.stars.length > 1 && (
+                <i
+                  class="fa-solid fa-chevron-down"
+                  onClick={handleExpandClick}
+                ></i>
+              )}
+            </>
           )}
         </Flex>
       </CardActions>
