@@ -187,7 +187,6 @@ const VideoDrawer = ({
             ></i>
           </Flex>
         </Box>
-
         <Box sx={{ maxWidth: 400, overflow: "hidden", p: 2 }}>
           <img
             src={video.image}
@@ -209,8 +208,6 @@ const VideoDrawer = ({
               ))}
             </Stack>
           )}
-
-          <pre>{JSON.stringify(video, 0, 2)}</pre>
 
           {!!video.models?.length && (
             <Box>
