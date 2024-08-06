@@ -74,8 +74,20 @@ const machine = createMachine(
         };
       }),
       assignVideos: assign((context, event) => {
+        const videoList = event.data;
+        const modelData = videoList.reduce((out, datum) => {
+          if (datum.info?.stars) {
+            datum.info.stars.map((star) => {
+              if (!out[star]) out[star] = [];
+              out[star].push(star);
+            });
+          }
+          return out;
+        }, {});
+
         return {
-          videoList: event.data,
+          videoList,
+          modelData,
         };
       }),
       assignPages: assign((context, event) => {

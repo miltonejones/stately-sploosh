@@ -210,6 +210,8 @@ const VideoDrawer = ({
             </Stack>
           )}
 
+          <pre>{JSON.stringify(video, 0, 2)}</pre>
+
           {!!video.models?.length && (
             <Box>
               <Typography sx={{ mt: 2, mb: 1 }}> Models:</Typography>

@@ -1,6 +1,6 @@
- import React from 'react';
-import Observer from "./Observer"; 
-import { VideoPersistService } from './VideoPersist'
+import React from "react";
+import Observer from "./Observer";
+import { VideoPersistService } from "./VideoPersist";
 
 // 0.56
 
@@ -70,13 +70,12 @@ export const WINDOW_REGIONS = [
   },
 ];
 
-
 class WindowManagerService$ {
   launched = [];
   sidebarOpened = !1;
   index = 0;
   constructor() {
-    window.addEventListener('unload', () => this.exit());
+    window.addEventListener("unload", () => this.exit());
   }
   quickSize(re, src) {
     const regex = /embed\/(\d+)\/(\d+)\/(\d+)\/(\d+)/.exec(src);
@@ -85,12 +84,12 @@ class WindowManagerService$ {
       const str = `embed/${regex[1]}/${regex[2]}/${re.width}/${re.height}`;
       out = out.replace(regex[0], str);
     }
- 
+
     return out;
   }
 
   javdoeCustom(video, w, h) {
-    return video.URL + `#${w}/${h}`
+    return video.URL + `#${w}/${h}`;
   }
 
   region(video, index = 0) {
@@ -98,10 +97,11 @@ class WindowManagerService$ {
     re.on = !0;
     re.src = video.image;
 
-    const address = video.URL?.indexOf('javdoe.to') > 0 
-      ? this.javdoeCustom(video, re.width, re.height)
-      : this.quickSize(re, video.src);
-      
+    const address =
+      video.src?.indexOf("javdoe.to") > 0
+        ? this.javdoeCustom(video, re.width, re.height)
+        : this.quickSize(re, video.src);
+    // alert([address, video.src, this.quickSize(re, video.src)].join("<--->"));
     return window.open(
       address,
       `region_${index}`,
@@ -117,7 +117,7 @@ class WindowManagerService$ {
     try {
       await VideoPersistService.add(video);
     } catch (e) {
-      console.log ({ e })
+      console.log({ e });
     }
     this.launched.push({
       video,
@@ -148,57 +148,56 @@ class WindowManagerService$ {
   googlePhotoLink(title) {
     return `https://www.google.com/search?q=${title.replace(
       /\s/g,
-      '+'
+      "+"
     )} xxx&source=lnms&tbm=isch`;
   }
   javLibrarySearchLink(key) {
     return `http://www.javlibrary.com/en/vl_searchbyid.php?keyword=${key}`;
   }
   javLibraryAutoLink(items) {
-    return `http://www.javlibrary.com/en/#find${items.join('/')}`;
+    return `http://www.javlibrary.com/en/#find${items.join("/")}`;
   }
   javdoeSearchLink(items, href) {
-    const address = [`https://javdoe.tv#${items.join('/')}`];
+    const address = [`https://javdoe.tv#${items.join("/")}`];
     if (href) address.push(href);
-    return address.join('^');
+    return address.join("^");
   }
 }
 const WindowManagerService = new WindowManagerService$();
 
 const windowChange = new Observer();
 
-function useWindowManager () { 
-  const [windowLength, setWindowLength] = React.useState(0)
-
+function useWindowManager() {
+  const [windowLength, setWindowLength] = React.useState(0);
 
   const launch = async (video, i) => {
-    await WindowManagerService.launch(video, i);   
-    setWindowLength(f => f + 1)
+    await WindowManagerService.launch(video, i);
+    setWindowLength((f) => f + 1);
     windowChange.next(true);
-  }
-  
+  };
+
   const exit = () => {
     WindowManagerService.exit();
-    setWindowLength(0)
-    windowChange.next(false); 
-  }
-  
+    setWindowLength(0);
+    windowChange.next(false);
+  };
+
   const focus = () => {
-    WindowManagerService.focus(); 
-  }
+    WindowManagerService.focus();
+  };
 
   const getLength = () => WindowManagerService.launched.length;
-  
+
   const visited = (video) => WindowManagerService.visited(video);
 
-  return { 
-    getLength, 
+  return {
+    getLength,
     launch,
     exit,
     focus,
     visited,
-    windowLength
-  }
+    windowLength,
+  };
 }
 
 export { WindowManagerService, useWindowManager, windowChange };

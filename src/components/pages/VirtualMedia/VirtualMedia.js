@@ -1,4 +1,6 @@
 import {
+  Badge,
+  Box,
   IconButton,
   Pagination,
   Stack,
@@ -10,6 +12,7 @@ import MediaCard from "./MediaCard";
 import Columns from "../../../styled/Columns";
 import { getModelsByName } from "./connector";
 import React from "react";
+import { Flex, Nowrap, Spacer } from "../../../styled";
 
 export default function VirtualMedia() {
   const media = useVirtualMedia();
@@ -29,9 +32,14 @@ export default function VirtualMedia() {
     setBusy(false);
   };
 
-  const { pages, param, page } = media.state.context;
+  const { pages, param, page, modelData } = media.state.context;
 
   if (!pages) return <>Loading</>;
+
+  const heightProps = {
+    overflow: "auto",
+    height: `calc(100vh - 120px)`,
+  };
 
   return (
     <Stack sx={{ p: 2 }} spacing={1}>
@@ -65,17 +73,49 @@ export default function VirtualMedia() {
           setPage={media.setPage}
         />
       )}
-      <Columns sx={{ alignItems: "start" }} columns="1fr 1fr 1fr 1fr 1fr 1fr">
-        {pages.visible.map((row) => (
-          <MediaCard
-            data={row}
-            key={row.videoURL}
-            getModel={getModel}
-            setParam={media.setParam}
-            stars={stars}
-          />
-        ))}
+
+      <Columns sx={{ alignItems: "start" }} columns="240px 1fr">
+        <Stack
+          sx={{
+            width: "100%",
+            outline: "dotted 1px gray",
+            ...heightProps,
+          }}
+        >
+          {Object.keys(modelData)
+            .sort()
+            .map((key) => (
+              <Flex key={key}>
+                <Nowrap
+                  variant="body2"
+                  bold={param === key}
+                  onClick={() => media.setParam(key)}
+                  hover
+                >
+                  {key}
+                </Nowrap>
+                <Spacer />
+                <Typography variant="body2">{modelData[key].length}</Typography>
+              </Flex>
+            ))}
+        </Stack>
+
+        <Columns
+          sx={{ gridAutoRows: "320px", alignItems: "start", ...heightProps }}
+          columns="1fr 1fr 1fr 1fr 1fr 1fr"
+        >
+          {pages.visible.map((row) => (
+            <MediaCard
+              data={row}
+              key={row.videoURL}
+              getModel={getModel}
+              setParam={media.setParam}
+              stars={stars}
+            />
+          ))}
+        </Columns>
       </Columns>
+
       {pages.pageCount > 1 && (
         <Pages
           count={pages.pageCount}
