@@ -187,7 +187,7 @@ const VideoDrawer = ({
             ></i>
           </Flex>
         </Box>
-        {JSON.stringify(checked)}
+
         <Box sx={{ maxWidth: 400, overflow: "hidden", p: 2 }}>
           <img
             src={video.image}
