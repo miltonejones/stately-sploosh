@@ -126,6 +126,7 @@ const VideoCard = ({
   editClicked,
   domainClicked,
   deleteClicked,
+  deletePage,
   photoClicked,
   bookClicked,
   selected,
@@ -221,6 +222,16 @@ const VideoCard = ({
         >
           <i className="fa-solid fa-trash-can"></i>
         </ConfirmPopover>
+
+        {!!deletePage && (
+          <ConfirmPopover
+            message={`Are you sure you want to remove all videos on this page?`}
+            caption="This action cannot be undone!"
+            onChange={(val) => !!val && deletePage && deletePage()}
+          >
+            <i className="fa-solid fa-dumpster"></i>
+          </ConfirmPopover>
+        )}
 
         <i
           onClick={() => window.open(video.URL)}

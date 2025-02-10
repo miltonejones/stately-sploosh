@@ -219,6 +219,7 @@ const ModelModal = ({
   photoClicked,
   favoriteClicked,
   deleteClicked,
+  deletePage,
   searchClicked,
   bookClicked,
   handleSelect,
@@ -550,6 +551,11 @@ const ModelModal = ({
             {model.videos.records.map((record) => (
               <VideoCard
                 deleteClicked={deleteClicked}
+                deletePage={() => {
+                  const items = model.videos.records.map((e) => e.ID);
+                  // window.alert(JSON.stringify(items));
+                  deletePage(items);
+                }}
                 favoriteClicked={favoriteClicked}
                 selectedID={star.ID}
                 modelClicked={openModel}

@@ -331,6 +331,15 @@ function Application() {
     send({
       type: "DROP",
       ID,
+      doomed: null,
+    });
+  };
+
+  const removePage = (doomed) => {
+    send({
+      type: "DROP",
+      ID: null,
+      doomed,
     });
   };
 
@@ -746,6 +755,7 @@ function Application() {
         photoClicked={photo.openPhoto}
         searchClicked={shop.handleClick}
         deleteClicked={removeVideo}
+        deletePage={removePage}
         favoriteClicked={addFavorite}
         {...modal}
       />
