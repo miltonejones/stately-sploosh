@@ -43,6 +43,10 @@ export const useCartMachine = (onRefresh) => {
         const { track_to_save } = context;
         return await saveVideo(track_to_save);
       },
+      castModel: async (context) => {
+        // alert(context.curateId);
+        return addModelToVideo(context.ID, context.curateId);
+      },
       castModels: async (context) => {
         const { stars_to_add, track_to_save } = context;
         if (stars_to_add?.length) {
@@ -111,11 +115,14 @@ export const useCartMachine = (onRefresh) => {
     },
   });
 
-  const beginImport = (chosen) =>
+  const beginImport = (chosen, curateId) => {
+    const type = state.can("start") ? "start" : "append";
     send({
-      type: state.can("start") ? "start" : "append",
+      type,
       chosen,
+      curateId,
     });
+  };
 
   return {
     state,

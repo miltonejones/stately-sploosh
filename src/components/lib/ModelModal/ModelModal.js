@@ -621,7 +621,7 @@ const ModelModal = ({
           </Flex>
         )}
 
-        <FloatingMenu />
+        <FloatingMenu curateId={star.ID} />
       </Stack>
     </Dialog>
   );

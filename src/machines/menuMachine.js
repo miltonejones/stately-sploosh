@@ -53,6 +53,7 @@ export const menuMachine = createMachine({
           actions: assign({
             anchorEl: null,
             value: (_, event) => event.value,
+            address: "",
           }),
         },
 

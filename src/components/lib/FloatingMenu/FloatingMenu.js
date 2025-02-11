@@ -26,17 +26,17 @@ const Layout = styled(Box)(({ theme, fixed }) => ({
   zIndex: 25000,
 }));
 
-const FloatingMenu = ({ fixed }) => {
+const FloatingMenu = ({ fixed, curateId }) => {
   const { floatingProps: actions, curator } = React.useContext(AppStateContext);
-  const menu = useMenu(
-    (address) => !!address && curator.beginImport([address])
-  );
+  const menu = useMenu((address) => {
+    !!address && curator.beginImport([address], curateId);
+  });
   const initialURL = menu.clipboard?.indexOf("://") > 0;
   return (
     <>
       <Dialog open={menu.state.can("close")} onClose={menu.handleClose()}>
         <Stack spacing={2} sx={{ p: 2 }}>
-          <Typography>Add new video</Typography>
+          <Typography>Add new video [{curateId}]</Typography>
           {initialURL && (
             <>
               <Typography>
@@ -81,7 +81,7 @@ const FloatingMenu = ({ fixed }) => {
                   onClick={menu.handleClose(menu.state.context.address)}
                   variant="contained"
                 >
-                  Save
+                  Save!!
                 </Button>
               </Flex>
             </>

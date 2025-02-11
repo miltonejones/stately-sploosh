@@ -2,7 +2,7 @@ import { createMachine, assign } from "xstate";
 
 export const cartMachine = createMachine(
   {
-    /** @xstate-layout N4IgpgJg5mDOIC5QGMCGAnALgfQLauQAsBLAOzAGJUAHasUiAbQAYBdRUage1mM2K6kOIAB6IAtAEYArAE4ALADoAbAGYAHOoDszdZNnN5k9QBoQATwmrmWxQCZVy+aulatdyXdluAvj7NoWHgEJOSK5CKYFCKwmKiYYIqoAGYJ6AAUkszMAJQUgTj4RGSJEZgs7Egg3Lz8gsJiCOLqzMqK6rIy2aoezNLyphaI+oaKuo7G8kaadlp+ARiFISXhYJHRsfGJKWmZ2XkFwcVhZYySlZw8fAJCVY1SPXaK8rLq8nL63q1mlgjGWkprB5pDY3sppJp5iBDkVQolkFxcLg+BQIIJEmQAG5cADW8MWRzhigRSL4CCxXDQdVIFQqwhq13qd2G+kUcnkdn67hksmk0jsP2Gs1kbIMChevI5kP80IJsJWJORUTRYQpeOJcuWYUVZIpVJutPO9Ku1IaLN0ilUqlk3kkam0IOkgr+QLG9tU+kk8i0ym8UJhWvhiKVFDA6HQXHQimoABt4slI7gNUF5drg7rSNj9YJaWxjbUbmaEI5bDpPLodNYQW9nVp1G1lHZtNZmJItAY1P7Ncd8bFFDGuKgIKj0Yo1fiU4GNX2B0PyZnKfEDWw6VUGabmX9vcxFFknG47Xb287JD12rNZtJJMYWi5lF3Jz3p5h+4Ph2GI1HY-HE8mlk+0BnN95yzJccxXPM1xNQtN2UdsxmmNxt1cPQT1PFROTePlWlkX1nAff8iUAl9qFQABXWBKBiOIEiSVIw0yG1ZAObsiNQPtSIosBV0uAsmVARpjGUHdTybeQ4KmOtZBPbRJEUdsHA8LRrB0dQCMJBV2JfGhY3MEdVQXdUAwArSkloGNzBAxdqVzC5qmg-jRGGZQ3jZfl1BBZhVABLQ22dZxbA8TxnHGVtVHkdTU17bTzL0lUMUMidCM0vsdIsqzsxpFcjSgvjbgE4ZXDkpjmCbAxJghE920BXR9G0WQxLgyKp2IszdNDcNI2jONMATdAk2MtjUtijKwKy1gePsvKiw6dRnjsIxnCtO0eiqto7C84TytUjzmqfD9IwodAwARTEw0m9cYIKpoIWkNkOWkRspmUFzORPD1LQvZTNDbdsGr2okDvQI6Tq4M70DOOzLsc+5T3eUUWgcHpxMkE95B3VxWiWrIbX0AGFTI9Atn0hLsSM1iCaJhJRpsiCoYc-KnIQBbAo8uR+SmCEJOdBQRU8NtwVw5SXmkfHtUJ4mge6n9+r-DTxapsAaeXCbIN4xlGcaFnFF5LRpCtAE4OUNtVH8nQdbtNRcK83ybDFxJZ2HeKx0SuWotfOc9TG2z8w1otxEcVR5PZYS3iCrxnScEU5Hbe1fIlOx7Y999Oq-Hq+oGimwkd5XwNV+nps3a8g90NRPI5PovC0Z0XDu-kvQGHpi7bJPjqHPTNiwC6Gf9zQ2n130+RZgEHBruD7AGVpr1aK03jmGVBpWZIyGIWBCBJl2yaS+XEmX0hV8IXPxu7wvrqkEZdxtPW5A6fkbWdDongWl43nE94bFUJPMVQGNiAgLYAAEmI-5gC4Iob+v9-78FIFADe443ZTggX-QBwCICgPAT-ZB0CoBHx9rlP2m4ehzTDteXy+tvLG3kCefoO5DDWA0F5dGj8v6YKgWAIBICwFIKgWQWBzt4GLzCNwlBnCMGQKXDA3B2UC4EOuk2Hc5U5A2FmF6dQo8hh-GUrYKYaiFoQmyNkROC8s6JGEQkDhaCwFry4AAdwAbgLgaCYywA2DRbY9EMicn2PkExYisHsNQeg6xdiHFONgCfWRTNrxtE8Gow2Nta4Cg0W2a89hSo+nchCF4EVjGPiJAAK1QJiNEATWFbGJIQE6OIAFonwGQCgESNxnzwruZgvNHBTDsI2aSyS2l3TbI3fW7ZXBdKToU4pXBSniNokQKpNTESoHqZDX2TSmbiCcHJTwdhOS+mMAtLykdUmPwGL5HoL0BhjKKSUoBZTaJmICZwuBrtBGJHGdc+5fi2EWNAVI-OKyrprL5DEr0bgvLeRtC5WsLRnieTtJ0bw3o1K5OSmEN5kybnTNMbch5linlbwQU+NFUz-GfJEZY35yz8GrPuOJUsbT0bXg8ibauyT+RtD0E4Rwj9OiSD8DKUgji4DCBef8mGEhTyyCDjfUqVoFrG2dOIXku42XGF5goYWScyiis1kKJQuyOilTeAYGYMkmz2AUuQ8UAIk46kwNqoslt2iyU0FMZw14em-CyHWdoDUjCqRcP8G1Wl7VFzaSKdQVoOTPVVV6BVthwSYTcMJQ8XTeXIp3s+ZOIbrrXm9O0SNz9jYdFjRo+Cc8uUjGNoaoNHFyKUWzVEn0c0PC+gNcbfoAwH6siQq4AYYI7RIoWHklKMVdINsEj6IOklHhTAataFlnqBhjDcDQ8Sajyyi3Te7IG47hgAnkl07Q5z9bOFwtQkUzguSz1KkFG1EsEi7uZlaeSbg6xST0AawYvxjZyVUhyG07l6VJ0do+8Qrg7rcjEhWQwvka4ggPe8K01hJiyFbmAduoHokxPci0V4vIvAesQBoEUCKITth0D6WYOSh0ot3ivNemHORPGEoauCylDBJM9V6lQHINAvTUOFQwLDMXfK4I+jolofSdA5OCPuaMvL2EHnoBQSHZjCf8aJ0l2DH3xxUPWJSrY9Zek44VcSE8XqaERnoO06mvmBKsYQWx9jBXOMfaeWwFDpNdIhPWah3l5JKY8AMBQEJLkTOJWw0DPo5JeHCk268j0OQPz1k6o1hhGXbLC+87FFS5m1MWYzaGOqminPsJK70LkEtOBMwgXCQcNCvzS0hNNNGM1EoxSS+5onQNWzZNsotdomwmxPIe5V7J9M3ymHynwQA */
+    /** @xstate-layout N4IgpgJg5mDOIC5QGMCGAnALgfQLauQAsBLAOzAGJUAHasUiAbQAYBdRUage1mM2K6kOIAB6IAtAEYArAE4ALADoAbAGYAHOoDszdZNnN5k9QBoQATwmrmWxQCZVy+aulatdyXdluAvj7NoWHgEJOSK5CKYFCKwmKiYYIqoAGYJ6AAUkszMAJQUgTj4RGSJEZgs7Egg3Lz8gsJiCOLqdsqK6rIy2aoezNLyphaIDlpKuo7G8kaadlp+ARiFISXhYJHRsfGJKWmZ2XkFwcVhZYySlZw8fAJCVY1Sqp6K8rLq8nL63szKZpYIDlNFNYPNIbG9lHJ5iBDkVQolkFxcLg+BQIIJEmQAG5cADW8MWRzhigRSL4CCxXDQdVIFQqwhq13qd0Qki0qhU0jshlkjlmelmvxZs1soI+Og0qm80ihMOWYRJyKiaLCFLxxIJsJWCrJFKpN1p53pV2pDUQo3sWnUE3UNlaqlU8kFCC66meymUkiMhk0BjsMo1cvhiMVqPRilV+KCmvlwZ1pGxesEtLsF2qxpupoQzCdzH9UcDxNjUTA6HQXHQimoABt4sly7h1fnjkHSZhyfHKfF9Ww6VUGSbmQhHLYdJ5dOK+rpHUMEJa2so7NprMxWQY1Hmls31bFFFWuKgIKGVR21bKt2gd3uD+2E12kz22EbahnB56dIosk43JIPcotLInUkHp2lmWZpEkYwbRcZQN0JLVUEvfdDxLMsK2rWt60bTciQvTBdyQm9O2pWlHz7dMmVARo-1kRRDGMNx5B0Vw9EAoCVDsaQ3mkUFlFkXjnFg6N8R3ahUAAV1gSgYjiBIklSEtMlkJSDgDc8ELw0SJLAXtLmfCjRBZdRlGYD8enBUZGI6QDtEkRR-wcDw2RsXRBILXCkloKtzCPDET0jbD4J3Ghq3MQjExpB9U37F9KJZZQ3kUbjF1BZhVFGLRWSdZxbA8TxnHGFcHVctSgs87zlV87FT1UnD1I8kKwrvCLWDOKLyNuWLnVcWylN9DoVy4wY-lXJRrD0V57PM4ratKkKKBQ8tKxrTA63QBszxmvDgq8xriMip9GQ6gyEA6V15DsIxnHtH8ekArQ2i5RxmAMVldHUaV-GhGqVgW9AKHQMAEUxEsdLTPSjvuTjpES87pAXKZ3RaaRAMeIFQLZTRWX-WQ-U+jaftLct-sBrhgfQVqDoHTqHneRLXmYBwenkD1APkEzXG+K6siU-Rpq1MT0C2Hzwz8rC4PlAWtl27sWtI3TDszC6cveuROSmTi-2nP4FBozxWQhPi2ReD6FibHDJYSebCbQ5bVvW76JcFhJpfvWW2vBxXGMUWRXGke1Rj-D02Sy99OndSVjLSrI5jxh3EivQ8KpFqr-PF+OCN1JqSPdhXB3ERx2S0ORmanXKvCdJwaLkf81Bsl4cb5sIE6t1ClowtaxaE-Dr0zva3cpmLjog9ldDUFLzr6LwtCdFxoc5T0Bh6YfWUbxIAYPbzNiwUHov0+5NDaP3eKSxjRgcGe-3sAZvgg757TeGPTYCsJkjIYhYEIYWI07gtX9Id-CAu2ajvdqmYpD6BMp8IucgOiciUk6Dodgr4vDeMzd4NhVCr0UJiVAVZiAQC2AAAkxPgsAXBsG4PwV2UgUAv6i3xmEHBeCCEJGIaQ8hTCqH8BoUA7OA897DD4t7CCIwnCfE8MjGcq4kF-laM4Ti2RmZYM4SwsAbCIBkIocw6htCk7fwYYkFRRCSEaI4ZQlhZAoC8J7IaMiHtBytBMhdQw9oI4cQ8IBPiZ03BwMXNkLkuMn5py0VwtRJjNEfy4AAd0IbgLgGiqywA2DJbY8kMgcX2PkOOITVHqIiYQaJsT4lgESSA+xnVLSJQXH7NmDNPytCdFyVKFo1CvGZi4FesczYrAAFaoExGiMJ5itjEkIIDHEhC0T4DIBQMpudqb8Q-M9F4jgpitHLlI560NWSLz9v+VwrQsF9IGVwIZ2jZJEHGZMxEqAZkUzsfM464gxEfjsG8uGnQWhs1UBXCC7QcYDAyj0d0Awjn9MGcQ4ZskjGsPCVwOhKcf5bmORCmFhioVhPYdY-uDyqZPO4m0CCp9UppSUvFJ0loTLoJXLxfQ6V1BgpOWc0JOTjHsIRbiVOXcUWnMhec9F-K8lcGxfc+WeL7jMxHMslcxhwJsmnlIzkbQ9BOEcIgzokgsEAEExKYC4IQhCvAoCkCKQkjl1VulhB1Xqg1sAjUmriQkkVcswaPKomlC0Aw-asi8A6H4UjmZzz4mNTwTMMp+E+qQYp8AqgGP4RDCQQEeR0xtIzC6LMZziB9h+JVCgFwQQYo-L6lrShrEwPGzMC8VCfL6i8N6dhGlpVdLMHGftJRTFGFg7U5bcWD0aD+ZVNlNBTGcBBACmzKmIKMDoK04FtBdvUhW18z0aJWgdBdZmxhOhawkLYCErQ1AgkXC4PiC7EIHiXZ1Iltg13nQRluz0FLV2MTVRAj0DMGVdOfsJDS4lJKXqHvdZtP5XhrhkFMIaiBxp2VGK4AY4IfyfqCV3dy20-hir7Sye67IO09A3TjSUCrhoDFoj4tmzMWhjhNsW79ihfoAf7eadw8V7pOBqRHQCchnguBfRoBmuUu0WzAAx4Y9oYNuG0KdLduhfm2RnedJSnIbQKCwQnETTRfZ2Q8IuNm2hDAZRnqCLT7xXEDReFg9eEB0OuvFYmgdObFzKdgV4cdfwNA0W8O8bQXx7qzHkFgv+AD1NSHcSofxRk3DWHOqxGwKhzoaHdGoB0hhlEYqFep1wzwS4OiLugiCkhAIQmhh0AwbMMpFy5DBL9wS0VCtZdwqA6n4pIOgf7HingeR3VeO0XzCgHTaHiv56rXdatwsUJEmJjqSkxowwI50fQsuR0Yv0UE+WusmUlJ8+6OsGZVeQwWHlzLVHBfurZX1jF4oQThtFmc2hiuaBW-+aw-5NXDYO+C3laLRlXKmbco6u8E1NCBfYHkF29AyCcA2mcwagTDoGHWhir39vIo+0dkZo32HBdaYlN5HoVWLlZD8qRrRXQyGLkZDibShvI6JNa-VhriDGtNSUprDp2hOBXC8e6hhGKATkbRYyIx8q7Y+n4IAA */
     id: "cart_machine",
 
     initial: "ready",
@@ -50,12 +50,24 @@ export const cartMachine = createMachine(
 
           onDone: [
             {
+              target: "Auto assign model",
+              cond: "can auto assign",
+              actions: [
+                "incrementSave",
+                assign((context, event) => ({
+                  ID: event.data,
+                  curateId: context.curateId,
+                })),
+              ],
+            },
+            {
               target: "validate video",
               cond: "no model present",
               actions: [
                 "incrementSave",
                 assign((_, event) => ({
                   ID: event.data,
+                  curateId: null,
                 })),
               ],
             },
@@ -65,6 +77,7 @@ export const cartMachine = createMachine(
                 track_to_save: {
                   ...context.track_to_save,
                   ID: event.data,
+                  curateId: null,
                 },
               })),
             },
@@ -302,6 +315,13 @@ export const cartMachine = createMachine(
 
         initial: "check domain",
       },
+
+      "Auto assign model": {
+        invoke: {
+          src: "castModel",
+          onDone: "validate video",
+        },
+      },
     },
 
     on: {
@@ -333,6 +353,7 @@ export const cartMachine = createMachine(
       assignChosen: assign((_, event) => {
         return {
           chosen: event.chosen,
+          curateId: event.curateId,
           save_index: 0,
           skipped: 0,
         };
@@ -348,6 +369,10 @@ export const cartMachine = createMachine(
       }),
     },
     guards: {
+      "can auto assign": (context) => {
+        // alert("can auto assign!!" + context.curateId + "/" + context.ID);
+        return !!context.curateId && !context.track_info?.stars;
+      },
       "javdoe video found": (context, event) => {
         const address = context.chosen[context.save_index];
         const res = event.data;
