@@ -552,8 +552,15 @@ const ModelModal = ({
                 disabled={!dedupe.state.can("DROP")}
               />
             </ConfirmPopover> */}
-
-            <ConfirmPopover
+            <Chip
+              variant={"outlined"}
+              color="primary"
+              label="Drop"
+              size="small"
+              onClick={() => handleDoom()}
+              disabled={!state.can("doom")}
+            />
+            {/* <ConfirmPopover
               message={`Are you sure you want to delete all videos on this  page?`}
               caption="This action cannot be undone!"
               onChange={(val) => !!val && handleDoom && handleDoom()}
@@ -565,7 +572,7 @@ const ModelModal = ({
                 size="small"
                 disabled={!state.can("doom")}
               />
-            </ConfirmPopover>
+            </ConfirmPopover> */}
 
             <Chip
               variant={"outlined"}
