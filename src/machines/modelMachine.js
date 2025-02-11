@@ -74,7 +74,7 @@ export const batchCastMachine = createMachine(
 
 export const modelMachine = createMachine(
   {
-    /** @xstate-layout N4IgpgJg5mDOIC5QFsD2EwBsD6aIENMBiAeQAUBRAOQG0AGAXUVAAdVYBLAFw9QDtmIAB6IAjAGYALADYAdKICc4hZPEB2OgCYArKOlqANCACeiALRrNa2dukK727ZvH7pmgL7ujeLLnSFZVBYwPkgiACUKADFIgGUACXomJBA2Th5+QREETU17WXVJLVyJVTVtI1MECTVJWTdpAA5ijQVdT290XzxCIiiAQQA1EnCASQAVCiTBNO5eARTs0VrGm1zpbUlayxrK811tevFRbToZOlrtBQ6QHxwezFlCDnxYIgh+MFkOPgA3VAA1l87n4CI9nq8ED9-gBjfAZPhJaYpWYIrKIfQKWSaOhnRqNIpSRqWPYIcROeSbNTScTiLQaNTkm4gh6BYKhCBEADCABkSLEpowZuw5plFohJFjRJICeJNG5JFtpNJSXRZM1xI1NKJlto1G1nJtmV17v5HkEQmEBeNkawRWjxTk8qtWgpGnrGko3SqTOYJGqrnRPQpGeVbNpGsaMKawWzLRBZJhUPgID8oO9Pt8-oDgSbQQELRzE8nU3woFDs3CEUihSj7fN0dUXKJ1W46NopNJRATRJpSTrJJp6hd1PZyWoJB4vLc86zC5Biym00QwAAnVeoVeyFiYeEAM03yFkLLNcaLSaXZYrsPh8xryTt6QbjoUyxsSkKij07oUpKUcl0Ox8SuRwZSjbpT3nBMYXYLh8FXN4PlCLN-iBY9Z0g9kFxg2A4IQ69UCrO9GFtVJ6zFUAljscR1V7C5HEUfRRH7XEsUkE5pFxUR2w7VRwJjAssOg2D4LeNcNy3Hd90PdDo3zc0hNkHC8NgAiiP4e9hSfCjhDEOgTgKFwpHOJx9MMX1qjOOo5SseU1H1Okzn4+SzwXZAOFgTgywzZDoRzWSINjKDjw8rzyz89TERI2tH1FBZKLEZUW2VdRNUsPU+wsmk2MlU5Ti1EMp06OS50U9zPOXcTN23XcuAPVcjxPIKytCtM1NvDToofMjtPi3Sm2OWQ6GORUdBpPRxFJRodWxWotBsjZGk1ZzSvjRcME5Mh+gAcUFbrUWfBLqg2LF21UBQgzoJorh9KpuNWHEO31WzlisaQVswtaLw2ogtt2mhRH28i+qWBQwfkbtFR2HFlXMu6g2xdtRxeyxGQ+5qvpLMIACF+nGLlEhinq4sbHRu3kXFTklHEtkcUlB2sZV9Loew8mG65pyawTMZTK0KB5CguRtImDp0pZJWsFR5TaCRZV7UldADTi22JK7Q3R7nzyxzlIjIcJyFI0WQbESU5FfBR5XbfELrdUljhbJbO1UC4waDDWFJ5n7IiofoAFk9q0knHU46wyeJezLmUCoLPYgNX2WfTOJDd3XITKrVwiQWSEGChwkN4HSZkWQJxZqxqU9fR3VJNR3VkFRGiZrVBykUQU9gEIIAAAgAI3hGEAAtO84KA+F6GDkB3MAuDAfPetJ2khyDTQZBr9tGUmizTiHRxjhxV9bBkWxPGnPgungFIucwQOHSOsxbvMabDiu+x7HKTVJUjTmMNjDgIEwMBr6HX6oOauFs64XGGsvOk3ZagpwhOfWKN9+p5BoiGNo5tBx5DphZckUoCSKgbpqZ+2gU5QUAWLRADcsRXFpLUL811fwWRxMXJGq92JgxtqQxS300zkONggFQAElDEh0M0aUtsLI6kUOqN0uVdDKFqEVGcJVPpFmUqJPhjYJB6FkJgq6Lh7I6DlH+V8BQ3SalfMNckLguFrXKmFTRjoE5qg0GUY4rEaQbyqPqOQ+IG65Gmp6V6tita8wgI4o6egroFEUG6akkgnA0kaPTZh91NDEhcM4Ze70v4qIxkWdOET+oqEOAzJoLccTSmrhoeoeo16KFwZINuHce590HsPUeV86xz0dOkxk9Rci6E9AxLQkh6aahsBXYaVwG76WPu4IAA */
+    /** @xstate-layout N4IgpgJg5mDOIC5QFsD2EwBsD6aIENMBiAeQAUBRAOQG0AGAXUVAAdVYBLAFw9QDtmIAB6IAjAGYALADYAdKICc4hZPEB2OgCYArKOlqANCACeiALRrNa2dukK727ZvH7pmgL7ujeLLnSEiADEAQQA1EgAlAEkAFQp6JiQQNk4efkERBFE1R1kADjy1BVtxPNFtcW08o1MECz1ZSU08lzUCulE8js9vdF88QllCDnxYIgh+MFkOPgA3VABrKZ8cAcwhzBHYBBn5gGN8NL4EhMEU7l4BJMzJbUlZBUVdMp01Ju1DE0QpOWltDo+zTo0lUPRAKz8BHWqBYYD4kCIAGEADIkADK8UYZ3YF3S10QkgU8kkeVUmjckkkamk0hqiDo+TopU0omyH2KzjuYIha1kMLhCIxMVOSXORwyiE0mgUeVkGgUMo+eSUMtpXzqEgZ2gUdGVCjU6kcfzy3L6q380Nh8IgRAiFECdrRAAkRawceL8QgpfZZOpJFopRJVDk6Vk-bI3NIulL5bpTRhzVC+VbILJMKh8BAZlBxpNpnNFsszZDBvzrWmM1m+FAdgWDkcTljRe7LhKw9JRPk3HQKjJOpJRJpQ6ymhG6AaitJKmoJB4vODi7yy6n05ns0QwAAnTeoTeyFiYQ4AM13yFkPItyYFEAra+rtf2h0ujcSbtSrc9j2s2vEfsUejybVQyUORdDsAptUcEl436S9lxvPZ2C4fBNzGCZ4XzeYlnPRc4JTBCkJQ7ZdlQetn0YV1khbPFQEyPQlHyQdx0cRR9FEYc6DoIkB1sTjRB7XtxBgxNS3w2RENgZDUI3bdd33Q8uBPTczwvJN4PEwjUIfUin34F9sXfGjhDEAFfRcKQZB7TQOk+Wp+MpX0Y3JNQinETjJGEktLWvc8OFgThq1zDCSOw1TRJ85A-ICmsSLIvSKKbN9cSuWixBpTsaXUUpLEBUMp24wl-n+PJpUsTylzEyL-PXLcdz3A9j1PHCEy8q9yyq6LtLi44EtfKjDJS4yw3ETsmVESkdCnPRxFDMpOysf1nClY1SnKvCfNXDAbTIYIAHFMT6sUP1SrJLCJX9xGlaUnBGllQzMZpfmKVlSX1XQ516FqKo2ysER2-aaFEQ7qMGuj9XuDoCmUNzSppe7HojZ7+zewc1rUsTNoRAAhYIYkRF1Ev65K2x0Tp5E4-5CWsqlHFDJprBpDouLcHVlDR8Ly0xm0MWRChEWFQmjqMujCWsFRyWe0pVEHUNdC1aRgWswpgQndnvM536bTtMgInISihdBsRCTkR4FHJHsCh1GVQxGzsWh+VRxwVXU1baldNdtahggAWQOgzic9bUtU6Loqkqca1VqAciSmmlnseRQ6A8+cwvV93MwRCZUGQfWQbbPQmURs2JDeW4XOHD4I1KVko2KGkBxNFPcPRnzat3T3ERIUIKAiXOBpJmQ5X4s2XNr-RANDNptAeElGZKpopFEV31JgLgAAIs+QSA144CA0LzEKiy+9by1XjfUGz7fd+IutdJ6hg+4Dk6mM0fIyk4pQZ2BWx7v9axspcD2FyLldRCSbsfFu5Y9gAAswB7AWGvBScB16bEkkQR+Hpn4slfvYTo7JbD2AqKGFksgtAciUFxROM5G6fVgpA1MMC4EIKQZJRBfkuDoKBv7TBQ1xoqFIS5GQfxspvGqOqMwGV9RaFKJdakLJZzLzEohPgR4ODKTXgAI0ODAjeWAwBcDAEQPgqAMHHSGtSe4ugNBlEqAONk909DTyTroHUVIDSklRuAuhHMGH8FUeorRXAdEJn0YY4wcBTHC0QIUSxbkqhUhKm8EM4jALyGpAqEkttlRlS8SJNON54QAHc16SUOGANeoggpTEPs1bx+TZBFJKchAxFSup330s2funo8gdl9D0zo1DpQ6m0PDVJv5qYdEUF0QortYBwggJo7R0CSkcCgHwAIiFkAHlCZEw2XpxmkPnuPIBv5ZZaBsBUJijxbAyFsJ4ecxiMDwCSKnbhZjMhmEjuYMoTi7AgnGs0ChChXa70wGAN5USEBNEnmbB444mSaEdgM5OtC8kbC2BCvZ2ROzqGjCoJo11CQ20JGObs5R9A5DUIo68mK2wzlfsoG61l9TpVsuYQk9wCgGgHOBD4M4wGotaupTa2ZaWfkHj+QoOguh8LEXZVkRJlSvRYsoN4H0FwQJ8QRUpqExXPxGnIAlwJWg5UusBR4voZSlEeEySoLhqXtSiqKzpT9eEaAZBoYMI0P5ThmuqScb8elSjKMqbI6rU5uxvFzPVvCFZyBGgqQoIInBTjlQSay5MSqFBcEtGQDrUxt03DGzIKhp70yjIvay41J4aAjB8IBihKgqHzTeM+m8r572LWICor8k6Ul1B2KQLQRniMWg8fQYduVuFWrkoVSjYHwMQWU1hqCuBdqyMtLsdwtA3MukOcRTxGhMhcsqf4-EekCo1XUyNGkVFqOQIsoJyyQkGPXdSBkjKlpcWpB2NlWRZQuWKA3N4g4cmCu+uWRppSWmiHXT0w1ShnAFCnNZLi8NWQz0cCVWwJVm2zt5HMvgCzAk6M4Gswg67mgGgjFKZ4xQ5aIrpqUGwyoFZNp6d0e5QA */
     id: "model_modal",
 
     initial: "idle",
@@ -151,6 +151,7 @@ export const modelMachine = createMachine(
               ],
             },
           },
+
           costars: {
             invoke: {
               src: "loadCostars",
@@ -169,6 +170,7 @@ export const modelMachine = createMachine(
               ],
             },
           },
+
           missing: {
             invoke: {
               src: "loadMissing",
@@ -190,6 +192,7 @@ export const modelMachine = createMachine(
               ],
             },
           },
+
           loaded: {
             on: {
               PAGE: [
@@ -251,10 +254,16 @@ export const modelMachine = createMachine(
                   aliasMode: false,
                 }),
               },
+
+              doom: {
+                target: "get doomed ids",
+                actions: "initDoomedPage",
+              },
             },
 
             description: `Modal is open and ready for interaction.`,
           },
+
           error: {
             on: {
               RECOVER: {
@@ -263,6 +272,46 @@ export const modelMachine = createMachine(
             },
 
             description: `Error occured in some part of the load.`,
+          },
+
+          "get doomed ids": {
+            invoke: {
+              src: "loadDoomedIdList",
+              onDone: {
+                target: "check latest list",
+                actions: "assignDoomedIds",
+              },
+            },
+          },
+
+          "check latest list": {
+            always: [
+              {
+                target: "confirm batch delete",
+                cond: "list is complete",
+              },
+              {
+                target: "get doomed ids",
+                actions: "assignDoomedPage",
+              },
+            ],
+          },
+
+          "confirm batch delete": {
+            on: {
+              no: "#model_modal.opened",
+              yes: {
+                target: "new state 1",
+                actions: "resetPage",
+              },
+            },
+          },
+
+          "new state 1": {
+            invoke: {
+              src: "invokeBatchDelete",
+              onDone: "#model_modal.opened",
+            },
           },
         },
 
@@ -326,10 +375,56 @@ export const modelMachine = createMachine(
     },
   },
   {
+    guards: {
+      "list is complete": (context) => !context.readIDS?.length,
+    },
     actions: {
       setProp: assign((_, event) => ({
         [event.name]: event.value,
       })),
+
+      initDoomedPage: assign((context, event) => {
+        // Extract necessary data from context and event
+        //model.videos.records
+        const { page } = context;
+        return {
+          doomedPage: page,
+          afterPage: page - 1,
+          IDS: [],
+        };
+      }),
+      assignDoomedPage: assign((context, event) => {
+        const { doomedPage } = context;
+        return {
+          doomedPage: doomedPage + 1,
+        };
+      }),
+      resetPage: assign((context, event) => {
+        const { afterPage } = context;
+        return {
+          page: afterPage,
+        };
+      }),
+      assignDoomedIds: assign((context, event) => {
+        // Extract necessary data from context and event
+        const { afterPage, IDS } = context;
+        const model = event.data;
+        const { videos } = model;
+        if (videos && videos.records?.length) {
+          const readIDS = videos.records.map((f) => f.ID);
+          // alert(JSON.stringify(readIDS));
+
+          return {
+            IDS: IDS.concat(readIDS),
+            readIDS,
+          };
+        }
+
+        return {
+          readIDS: [],
+          // page: afterPage,
+        };
+      }),
       assignModels: assign((context, event) => {
         // Extract necessary data from context and event
         const { memory } = context;

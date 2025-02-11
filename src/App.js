@@ -131,7 +131,14 @@ function Application() {
   });
 
   const shop = useShoppingDrawer(curator);
-  const modal = useModelModal();
+
+  const modal = useModelModal((doomed) => {
+    send({
+      type: "DROP",
+      ID: null,
+      doomed,
+    });
+  });
   const finder = useSearchDrawer(
     (val) => !!val && navigate(`/search/1/${val}`)
   );
@@ -320,6 +327,13 @@ function Application() {
     navigate(`/video/1`);
   };
 
+  const removePage = (doomed) => {
+    send({
+      type: "DROP",
+      ID: null,
+      doomed,
+    });
+  };
   const addFavorite = (ID) => {
     send({
       type: "HEART",
@@ -332,14 +346,6 @@ function Application() {
       type: "DROP",
       ID,
       doomed: null,
-    });
-  };
-
-  const removePage = (doomed) => {
-    send({
-      type: "DROP",
-      ID: null,
-      doomed,
     });
   };
 

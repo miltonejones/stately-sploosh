@@ -9,6 +9,7 @@ import {
   Dialog,
   Stack,
   Typography,
+  Button,
 } from "@mui/material";
 import { useMachine } from "@xstate/react";
 import { modelMachine } from "../../../machines";
@@ -71,11 +72,14 @@ const useBatch = (onDone) => {
   };
 };
 
-export const useModelModal = () => {
+export const useModelModal = (batchDrop) => {
   const agent = useCast(() => send("REFRESH"));
   const batch = useBatch(() => send("complete"));
   const [state, send] = useMachine(modelMachine, {
     services: {
+      invokeBatchDelete: async (context) => {
+        batchDrop(context.IDS);
+      },
       sendBatch: async (context) => {
         batch.send({
           type: "cast",
@@ -94,6 +98,17 @@ export const useModelModal = () => {
       },
       loadMissing: async (context) => {
         return await getModelMissingVideos(context.ID);
+      },
+      loadDoomedIdList: async (context) => {
+        const args = {
+          page: context.doomedPage,
+          favorite: context.favorite,
+          param: context.filterText,
+          domain: context.domain,
+        };
+        const models = await getModel(context.ID, args);
+        console.log({ ID: context.ID, args, models });
+        return models;
       },
       loadModel: async (context) => {
         const args = {
@@ -164,6 +179,7 @@ export const useModelModal = () => {
       type: "RENAME",
       alias,
     });
+  const handleDoom = () => send("doom");
   const handleChange = (value) => setState("filterText", value);
   // send({
   //   type: "CHANGE",
@@ -197,8 +213,10 @@ export const useModelModal = () => {
     handleAlias,
     setFavorite,
     setDomain,
+    handleDoom,
     agent,
     batch,
+    answer: (c) => send(c),
     ...state.context,
   };
 };
@@ -206,6 +224,7 @@ export const useModelModal = () => {
 const ModelModal = ({
   open,
   agent,
+  answer,
   state,
   setDomain,
   domain,
@@ -220,6 +239,7 @@ const ModelModal = ({
   favoriteClicked,
   deleteClicked,
   deletePage,
+  handleDoom,
   searchClicked,
   bookClicked,
   handleSelect,
@@ -479,6 +499,26 @@ const ModelModal = ({
           </Flex>
         </Stack>
 
+        {state.can("yes") && (
+          <Stack>
+            <Typography>
+              ready to delete {state.context.IDS.length} items?
+            </Typography>
+
+            <Flex>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => answer("yes")}
+              >
+                Delete
+              </Button>
+
+              <Button onClick={() => answer("no")}>Cancel</Button>
+            </Flex>
+          </Stack>
+        )}
+
         {pageCount > 1 && tab < 2 && (
           <Stack
             sx={{ ml: 1, alignItems: "center" }}
@@ -499,7 +539,7 @@ const ModelModal = ({
               size="small"
               onClick={() => setTab(1)}
             />
-            <ConfirmPopover
+            {/* <ConfirmPopover
               message={`Are you sure you want to drop this model?`}
               caption="This action cannot be undone!"
               onChange={(val) => !!val && handleDrops && handleDrops()}
@@ -511,13 +551,21 @@ const ModelModal = ({
                 size="small"
                 disabled={!dedupe.state.can("DROP")}
               />
+            </ConfirmPopover> */}
+
+            <ConfirmPopover
+              message={`Are you sure you want to delete all videos on this  page?`}
+              caption="This action cannot be undone!"
+              onChange={(val) => !!val && handleDoom && handleDoom()}
+            >
+              <Chip
+                variant={"outlined"}
+                color="primary"
+                label="Drop"
+                size="small"
+                disabled={!state.can("doom")}
+              />
             </ConfirmPopover>
-            {!!progress && (
-              <>
-                [{progress}]
-                <LinearProgress variant="determinate" value={progress} />
-              </>
-            )}
 
             <Chip
               variant={"outlined"}
@@ -550,17 +598,19 @@ const ModelModal = ({
       </pre> */}
           </>
         )}
-
+        {!!progress && (
+          <Stack>
+            <Typography> [{progress}] </Typography>
+            <Box>
+              <LinearProgress variant="determinate" value={progress} />
+            </Box>
+          </Stack>
+        )}
         {tab === 0 && (
           <Grid>
             {model.videos.records.map((record) => (
               <VideoCard
                 deleteClicked={deleteClicked}
-                deletePage={() => {
-                  const items = model.videos.records.map((e) => e.ID);
-                  setPage(page - 1);
-                  deletePage(items);
-                }}
                 favoriteClicked={favoriteClicked}
                 selectedID={star.ID}
                 modelClicked={openModel}
