@@ -439,26 +439,25 @@ export const splooshMachine = createMachine(
         };
       }),
       assignPhotoData: assign((context, event) => {
-        // alert(
-        //   JSON.stringify({
-        //     ID: event.ID,
-        //     doomed: event.doomed,
-        //   })
-        // );
+        const length = event.doomed?.length;
         return {
           ID: event.ID,
           src: event.src,
           doomed: event.doomed,
           doomedComplete: false,
+          doomedLength: length,
         };
       }),
 
       assignDoomed: assign((context) => {
         const items = context.doomed;
         const ID = items.pop();
-        console.log({ ID, items });
+        const progress = 100 * (items.length / context.doomedLength);
+        console.log({ ID, progress, items });
+
         return {
           ID,
+          progress,
           doomed: items,
           doomedComplete: !ID,
         };

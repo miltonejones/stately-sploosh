@@ -499,7 +499,6 @@ const ModelModal = ({
               size="small"
               onClick={() => setTab(1)}
             />
-
             <ConfirmPopover
               message={`Are you sure you want to drop this model?`}
               caption="This action cannot be undone!"
@@ -513,6 +512,12 @@ const ModelModal = ({
                 disabled={!dedupe.state.can("DROP")}
               />
             </ConfirmPopover>
+            {!!progress && (
+              <>
+                [{progress}]
+                <LinearProgress variant="determinate" value={progress} />
+              </>
+            )}
 
             <Chip
               variant={"outlined"}
@@ -553,7 +558,7 @@ const ModelModal = ({
                 deleteClicked={deleteClicked}
                 deletePage={() => {
                   const items = model.videos.records.map((e) => e.ID);
-                  // window.alert(JSON.stringify(items));
+                  setPage(page - 1);
                   deletePage(items);
                 }}
                 favoriteClicked={favoriteClicked}

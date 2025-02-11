@@ -757,6 +757,7 @@ function Application() {
         deleteClicked={removeVideo}
         deletePage={removePage}
         favoriteClicked={addFavorite}
+        progress={state.context.progress}
         {...modal}
       />
       <PhotoModal {...photo} />
