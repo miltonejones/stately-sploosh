@@ -29,10 +29,43 @@ const ModelSelect = (props) => {
   //   }
   //   onValueSelected && onValueSelected(option)
   // }
+  function getFullNames(str) {
+    // Split into words
+    const words = str.trim().split(/\s+/);
+
+    // Array to store full names
+    const fullNames = [];
+
+    // Process pairs of words
+    for (let i = 0; i < words.length; i += 2) {
+      // Check if we have both first and last name
+      if (i + 1 < words.length) {
+        fullNames.push(`${words[i]} ${words[i + 1]}`);
+      }
+    }
+
+    return fullNames;
+  }
 
   const onValueChanged = async ({ value }) => {
     if (!value?.length) return;
     let message = `Create new star named "${value}"`;
+    const names = getFullNames(value);
+
+    if (names.length > 1) {
+      message = `Add "${names.length}" models to the video`;
+      console.log({ message });
+
+      setOptions([
+        {
+          name: message,
+          value,
+          create: 1,
+        },
+      ]);
+      return;
+    }
+
     if (value.indexOf(",") > 0) {
       const stars = value.split(",");
       message = `Add "${stars.length}" models to the video`;
