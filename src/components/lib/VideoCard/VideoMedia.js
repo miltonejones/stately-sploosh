@@ -1,7 +1,10 @@
 import React from "react";
 import { Box, CardMedia, Skeleton, Tooltip } from "@mui/material";
+import { useImage } from "../../../machines/imageMachine";
 
 export default function VideoMedia(props) {
+  // const image = useImage(props.image);
+
   const [loaded, setLoaded] = React.useState(false);
   const [tall, setTall] = React.useState(false);
   React.useEffect(() => {
@@ -16,6 +19,13 @@ export default function VideoMedia(props) {
   if (!loaded) {
     return <Skeleton width={props.size} height={Math.floor(props.size)} />;
   }
+
+  const mediaProps = {
+    ...props,
+    backgroundImage: `url(${props.image})`,
+    src: props.image,
+  };
+
   if (tall) {
     return (
       <Tooltip title={props.alt}>
@@ -36,7 +46,9 @@ export default function VideoMedia(props) {
 
   return (
     <Tooltip title={props.alt}>
-      <CardMedia {...props} />
+      <Box>
+        <CardMedia {...mediaProps} />
+      </Box>
     </Tooltip>
   );
 }

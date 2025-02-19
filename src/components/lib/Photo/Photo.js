@@ -6,7 +6,12 @@ import { imageMachine } from "../../../machines";
 export const usePhoto = (source, backup) => {
   let src = source;
   if (source?.indexOf("img.javdoe.sh") > 0) {
-    src = source.replace("img.javdoe.sh", "javdoe.sh/media/videos");
+    src = source
+      .replace("img.javdoe.sh", "javdoe.sh/media/videos")
+      .replace("/javdoe.sh/media", "/pics.javdoe.sh/media");
+  }
+  if (source?.indexOf("/javdoe.sh/media") > 0) {
+    src = source.replace("/javdoe.sh/media", "/pics.javdoe.sh/media");
   }
 
   const [state, send] = useMachine(imageMachine, {
@@ -18,7 +23,7 @@ export const usePhoto = (source, backup) => {
             resolve(src);
           };
           im.onerror = () => {
-            throw new Error("could not load image");
+            throw new Error("could not load image '" + src + "'");
           };
           if (!src) {
             throw new Error("no source");
