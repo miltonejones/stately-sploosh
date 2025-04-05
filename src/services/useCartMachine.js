@@ -101,7 +101,9 @@ export const useCartMachine = (onRefresh) => {
             ? /\.com\/(.*)/.exec(URL)
             : /([a-z|A-Z]+[-\s]\d+)/.exec(title);
 
-        if (key) {
+        // alert(key[1]);
+
+        if (key && key[1] && key[1].length < 10) {
           const info = await getVideoInfo(key[1]);
           return {
             ...info,
