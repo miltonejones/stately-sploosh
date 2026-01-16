@@ -75,6 +75,7 @@ import Historian from "./components/pages/Janitor/History";
 import videoStore from "./services/HistoryIndex";
 import SettingsPrompt from "./components/lib/SettingsMenu/SettingsPrompt";
 import VirtualMedia from "./components/pages/VirtualMedia/VirtualMedia";
+import VideoFrame from "./components/lib/VideoFrame/VideoFrame.js";
 
 const Btn = styled(Button)(({ theme }) => ({
   textTransform: "capitalize",
@@ -99,6 +100,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Application />} />
         <Route path="/save" element={<VideoForm />} />
+        <Route path="/frame/:id" element={<VideoFrame />} />
         <Route path="/editor" element={<Editor />} />
         <Route path="/janitor" element={<Janitor />} />
         <Route path="/past" element={<Historian />} />

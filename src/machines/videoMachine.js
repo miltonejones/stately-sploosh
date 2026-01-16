@@ -550,8 +550,10 @@ export const videoMachine = createMachine(
         };
 
         function getFullNames(str) {
+          const output = str.replace(/\([^)]*\)\s*/g, "");
+
           // Split into words
-          const words = str.trim().split(/\s+/);
+          const words = output.trim().split(/\s+/);
 
           // Array to store full names
           const fullNames = [];
@@ -563,7 +565,6 @@ export const videoMachine = createMachine(
               fullNames.push(`${words[i]} ${words[i + 1]}`);
             }
           }
-
           return fullNames;
         }
       }),

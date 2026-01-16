@@ -56,7 +56,7 @@ export const imageMachine = createMachine(
   }
 );
 
-export const useImage = (source) => {
+export const usePlayer = (source) => {
   const [state, send] = useMachine(imageMachine, {
     services: {
       loadPhoto: async (context, event) => {
@@ -73,4 +73,10 @@ export const useImage = (source) => {
       },
     },
   });
+
+  return {
+    state,
+    send,
+    ...state.context,
+  };
 };

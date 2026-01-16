@@ -31,7 +31,8 @@ const ModelSelect = (props) => {
   // }
   function getFullNames(str) {
     // Split into words
-    const words = str.trim().split(/\s+/);
+    const output = str.replace(/\([^)]*\)\s*/g, "");
+    const words = output.trim().split(/\s+/);
 
     // Array to store full names
     const fullNames = [];
@@ -44,6 +45,7 @@ const ModelSelect = (props) => {
       }
     }
 
+    // alert(JSON.stringify(fullNames, 0, 2));
     return fullNames;
   }
 
